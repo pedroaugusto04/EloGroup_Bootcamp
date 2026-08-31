@@ -1,0 +1,22 @@
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Caches do Python e testes
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Configurações de IDEs
+.vscode/
+.idea/
+
+# Dados gerados pelo pré-processamento
+data/processed/
+data/*.duckdb
+data/audit_log.json
