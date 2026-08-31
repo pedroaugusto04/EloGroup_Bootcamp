@@ -86,3 +86,35 @@ def test_atendimento_clean(repo):
     """Valida se a linha corrompida com ticket_id 'TKT' foi excluída da base de atendimento."""
     df = repo.execute_sql("SELECT * FROM atendimento WHERE ticket_id = 'TKT';")
     assert len(df) == 0, "O ticket corrompido 'TKT' ainda está presente na view de atendimento."
+
+
+def test_vendas_devolucao_efetividade(repo):
+    """Garante que devoluções zeram a receita efetiva e geram prejuízo de frete na margem efetiva."""
+    df = repo.execute_sql("""
+        SELECT devolvido, receita_liquida, receita_liquida_efetiva, custo_frete, margem_calculada, margem_efetiva 
+        FROM vendas 
+        WHERE status_pagamento = 'Aprovado' 
+        LIMIT 100;
+    """)
+    for _, row in df.iterrows():
+        if row["devolvido"]:
+            assert row["receita_liquida_efetiva"] == 0.0
+            assert abs(row["margem_efetiva"] - (-row["custo_frete"])) < 0.01
+        else:
+            assert abs(row["receita_liquida_efetiva"] - row["receita_liquida"]) < 0.01
+            assert abs(row["margem_efetiva"] - row["margem_calculada"]) < 0.01
+
+
+def test_estoque_descontinuado_capital(repo):
+    """Valida cálculo de capital travado em produtos descontinuados."""
+    df = repo.execute_sql("""
+        SELECT status_disponibilidade, valor_total_estoque, capital_travado_descontinuado 
+        FROM estoque 
+        LIMIT 100;
+    """)
+    for _, row in df.iterrows():
+        if row["status_disponibilidade"] == "Descontinuado":
+            assert abs(row["capital_travado_descontinuado"] - row["valor_total_estoque"]) < 0.01
+        else:
+            assert row["capital_travado_descontinuado"] == 0.0
+

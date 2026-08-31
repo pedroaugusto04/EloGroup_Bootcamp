@@ -45,16 +45,15 @@ class DataPreprocessor:
         raw_path = self._resolve_raw_path("vendas")
         df = pd.read_csv(raw_path)
 
-        # Descarta linhas corrompidas sem order_id
-        df = df.dropna(subset=["order_id"]).copy()
+        # Descarta linhas sem campos transacionais (ex: linha ORD-072219)
+        df = df.dropna(subset=["preco_unitario", "status_pagamento"]).copy()
 
         # Padronização de strings (remoção de espaços nas extremidades)
         df = self._strip_strings(df)
 
         # Padroniza tipos de dados
         df["data_pedido"] = pd.to_datetime(df["data_pedido"], errors="coerce")
-        df["devolvido"] = df["devolvido"].astype(bool)
-        df["motivo_devolucao"] = df["motivo_devolucao"].fillna("Não se aplica")
+        df["devolvido"] = df["devolvido"].astype(str).str.strip().str.upper() == "TRUE"
 
         # Padroniza colunas numéricas
         numeric_cols = [
@@ -65,12 +64,25 @@ class DataPreprocessor:
         for col in numeric_cols:
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
 
-        # Calcula métricas adicionais
+        # Métricas calculadas padrão
         df["margem_calculada"] = df["receita_liquida"] - df["custo_produto"] - df["custo_frete"]
         df["margem_pct"] = np.where(df["receita_liquida"] > 0, (df["margem_calculada"] / df["receita_liquida"]) * 100.0, 0.0)
         df["desconto_pct"] = np.where(df["receita_bruta"] > 0, (df["desconto_reais"] / df["receita_bruta"]) * 100.0, 0.0)
         df["ano_mes"] = df["data_pedido"].dt.strftime("%Y-%m")
         df["ano"] = df["data_pedido"].dt.year
+
+        # Flags e Métricas de Efetividade e Impacto Financeiro de Devoluções/Cancelamentos
+        df["is_aprovado"] = df["status_pagamento"] == "Aprovado"
+        df["is_venda_efetiva"] = (df["status_pagamento"] == "Aprovado") & (~df["devolvido"])
+        df["receita_liquida_efetiva"] = np.where(df["is_venda_efetiva"], df["receita_liquida"], 0.0)
+        # Margem efetiva: se devolvido, a receita é estornada e o frete de envio é prejuízo
+        df["margem_efetiva"] = np.where(
+            df["status_pagamento"] == "Aprovado",
+            np.where(df["devolvido"], -df["custo_frete"], df["margem_calculada"]),
+            0.0
+        )
+        df["receita_devolvida"] = np.where((df["status_pagamento"] == "Aprovado") & (df["devolvido"]), df["receita_liquida"], 0.0)
+        df["custo_frete_perdido"] = np.where((df["status_pagamento"] == "Aprovado") & (df["devolvido"]), df["custo_frete"], 0.0)
 
         parquet_path = self.processed_dir / "vendas.parquet"
         df.to_parquet(parquet_path, index=False)
@@ -97,6 +109,9 @@ class DataPreprocessor:
         df["taxa_conversao_pct"] = np.where(df["cliques"] > 0, (df["conversoes"] / df["cliques"]) * 100.0, 0.0)
         df["cpc_reais"] = np.where(df["cliques"] > 0, df["investimento_reais"] / df["cliques"], 0.0)
         df["lucro_bruto_mkt"] = df["receita_gerada"] - df["investimento_reais"]
+        df["duracao_dias"] = (df["data_fim"] - df["data_inicio"]).dt.days
+        df["cpa_calculado"] = np.where(df["conversoes"] > 0, df["investimento_reais"] / df["conversoes"], 0.0)
+        df["is_ativa"] = df["status"] == "Ativa"
 
         parquet_path = self.processed_dir / "marketing.parquet"
         df.to_parquet(parquet_path, index=False)
@@ -126,6 +141,9 @@ class DataPreprocessor:
         df["margem_unitaria_sugerida"] = df["preco_venda_sugerido"] - df["custo_unitario"]
         df["markup_sugerido_pct"] = np.where(df["custo_unitario"] > 0, (df["margem_unitaria_sugerida"] / df["custo_unitario"]) * 100.0, 0.0)
         df["valor_total_estoque"] = df["estoque_disponivel"] * df["custo_unitario"]
+        df["is_descontinuado"] = df["status_disponibilidade"] == "Descontinuado"
+        df["capital_travado_descontinuado"] = np.where(df["status_disponibilidade"] == "Descontinuado", df["valor_total_estoque"], 0.0)
+        df["capital_em_risco_ruptura"] = np.where(df["em_ruptura"], df["valor_total_estoque"], 0.0)
 
         parquet_path = self.processed_dir / "estoque.parquet"
         df.to_parquet(parquet_path, index=False)
@@ -148,9 +166,11 @@ class DataPreprocessor:
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
 
         # Calcula métricas adicionais
-        ref_year = datetime.now().year
+        ref_year = 2026
         df["idade"] = ref_year - df["data_nascimento"].dt.year
         df["opt_in_newsletter"] = df["opt_in_newsletter"].astype(str).str.upper() == "TRUE"
+        df["ticket_medio_historico"] = np.where(df["total_pedidos_historico"] > 0, df["ltv_acumulado"] / df["total_pedidos_historico"], 0.0)
+        df["dias_desde_cadastro"] = (pd.to_datetime("2026-01-01") - df["data_cadastro"]).dt.days
 
         parquet_path = self.processed_dir / "clientes.parquet"
         df.to_parquet(parquet_path, index=False)
@@ -160,7 +180,7 @@ class DataPreprocessor:
         raw_path = self._resolve_raw_path("atendimento")
         df = pd.read_csv(raw_path)
 
-        # Remove registro com dados faltantes ( linha com id 'TKT' )
+        # Remove registro com dados faltantes (linha com id 'TKT')
         id_linha = "TKT"
         df = df[df["ticket_id"].astype(str).str.strip().str.upper() != id_linha].copy()
 
@@ -180,7 +200,9 @@ class DataPreprocessor:
         df["tempo_resolucao_horas"] = (df["data_fechamento"] - df["data_abertura"]).dt.total_seconds() / 3600.0
         df["tempo_resolucao_horas"] = df["tempo_resolucao_horas"].clip(lower=0.0)
         df["csat_critico"] = df["nota_csat"] <= 2.0
-        df["categoria_problema"] = df["categoria_problema"].fillna("Outros")
+        df["is_automavel"] = df["categoria_problema"].isin(["Onde está meu pedido?", "Dúvida Técnica"])
+        df["custo_evitavel_automacao"] = np.where(df["is_automavel"], df["custo_operacional_ticket"], 0.0)
+        df["sla_resposta_estourado"] = df["tempo_primeira_resposta_minutos"] > 60.0
 
         parquet_path = self.processed_dir / "atendimento.parquet"
         df.to_parquet(parquet_path, index=False)
