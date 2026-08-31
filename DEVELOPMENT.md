@@ -41,3 +41,27 @@
   * **Numéricas**: Coerção de `nota_csat`, `tempo_primeira_resposta_minutos` e `custo_operacional_ticket`.
   * **Métricas**: `tempo_resolucao_horas` (diferença entre abertura e fechamento) e flag `csat_critico` (nota CSAT <= 2.0).
 
+4. Análise inicial
+
+Algumas observações:
+
+Receita/Margem:
+
+* Receita / margem tende a aumentar em mêses específicos (Março, Maio, Novembro, Dezembro) -> Possivelmente datas comemorativas / black friday. 
+
+* Margem costuma ser cerca de aproximadamente metade da receita.
+
+Marketing:
+
+* Investimento em marketing como um todo tende a trazer bons resultados. Investimento de marketing através de **influenciadores** mostra boa eficiência com relação aos demais.
+
+Base de Clientes:
+
+* Clientes 'Campeões' são relativamente poucos mas impactam grande parte da receita da empresa
+* Muitos clientes 'Promissores' e 'Em Risco'.
+
+Atendimento e Suporte:
+
+* WhatsApp como maior canal de entrada (fatia considerável para email/ChatBot também).
+* Maioria dos chamados são relacionados a clientes querendo saber onde está o pedido.
+* Indice de satisfação do cliente (CSAT) mediano (nota 3 mais frequente numa escala de 1 a 5).

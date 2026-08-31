@@ -6,6 +6,7 @@ Domain entities and dataclasses for Project Vértice.
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Any
 from datetime import datetime
+from enum import StrEnum
 
 
 @dataclass(frozen=True)
@@ -74,28 +75,80 @@ class InventoryAlert:
     selling_price: float
 
 
+class Sentiment(StrEnum):
+    POSITIVE = "Positive"
+    NEUTRAL = "Neutral"
+    NEGATIVE = "Negative"
+
+
+class Urgency(StrEnum):
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
+    CRITICAL = "Critical"
+
+
+class IssueCategory(StrEnum):
+    LOGISTICS = "Logistics & Delivery Delay"
+    SIZE_FIT = "Size / Fit Exchange"
+    DEFECT = "Product Quality / Defect"
+    FINANCIAL = "Financial & Refund"
+    GENERAL = "General Questions & Navigation"
+
+
+class ChurnRisk(StrEnum):
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
+
+
+class RoadmapHorizon(StrEnum):
+    DAYS_30 = "30 Days"
+    DAYS_60 = "60 Days"
+    DAYS_90 = "90 Days"
+
+
+class Pillar(StrEnum):
+    COMMERCIAL = "Commercial & Margin"
+    MARKETING = "Marketing & CAC"
+    OPERATIONS = "Operations & Inventory"
+    CUSTOMER_SERVICE = "Customer Service & AI"
+
+
+class Effort(StrEnum):
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
+
+
+class Speed(StrEnum):
+    IMMEDIATE = "Immediate (Quick-Win)"
+    MEDIUM = "Medium"
+    STRUCTURAL = "Structural"
+
+
 @dataclass(frozen=True)
 class TicketClassification:
     ticket_id: str
     customer_id: str
     customer_text: str
-    sentiment: str          # 'Positive', 'Neutral', 'Negative'
-    urgency: str            # 'Low', 'Medium', 'High', 'Critical'
-    issue_category: str     # 'Logistics & Delivery Delay', 'Size / Fit Exchange', 'Product Quality / Defect', 'Financial & Refund', 'General Questions & Navigation'
+    sentiment: Sentiment
+    urgency: Urgency
+    issue_category: IssueCategory
     recommended_action: str
     automatable: bool
-    churn_risk: str         # 'Low', 'Medium', 'High'
+    churn_risk: ChurnRisk
 
 
 @dataclass(frozen=True)
 class RoadmapInitiative:
-    horizon: str           # '30 Days', '60 Days', '90 Days'
-    pillar: str            # 'Commercial & Margin', 'Marketing & CAC', 'Operations & Inventory', 'Customer Service & AI'
+    horizon: RoadmapHorizon
+    pillar: Pillar
     title: str
     description: str
     estimated_monthly_financial_impact: float
-    effort: str            # 'Low', 'Medium', 'High'
-    speed: str             # 'Immediate (Quick-Win)', 'Medium', 'Structural'
+    effort: Effort
+    speed: Speed
 
 
 @dataclass
