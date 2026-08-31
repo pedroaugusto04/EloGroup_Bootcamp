@@ -21,8 +21,10 @@ from app.views.v_01_visao_geral import show_visao_geral
 from app.views.v_02_vendas_margem import show_vendas_margem
 from app.views.v_03_marketing import show_marketing
 from app.views.v_04_estoque import show_estoque
-from app.views.v_05_clientes import show_clientes
-from app.views.v_06_atendimento import show_atendimento
+from app.views.v_05_hipotese_clientes import show_hipotese_clientes
+from app.views.v_06_hipotese_atendimento import show_hipotese_atendimento
+from app.views.v_07_hipotese_decisao_gestao import show_hipotese_decisao_gestao
+from app.views.v_08_plano_estrategico import show_plano_estrategico
 
 
 st.set_page_config(
@@ -48,9 +50,9 @@ def get_repository() -> DuckDBRepository:
 def main():
     repo = get_repository()
 
-    # Sidebar Simples e Direta
-    st.sidebar.markdown("### Análise de Dados")
-    st.sidebar.markdown("<p style='font-size: 12px; color: #9CA3AF; margin-top: -10px;'>Painel de Exploração & Gráficos</p>", unsafe_allow_html=True)
+    # Sidebar Estruturada e Executiva
+    st.sidebar.markdown("### Vértice Analytics")
+    st.sidebar.markdown("<p style='font-size: 12px; color: #9CA3AF; margin-top: -10px;'>Diagnóstico Estratégico & Decisão</p>", unsafe_allow_html=True)
     st.sidebar.markdown("---")
 
     paginas = {
@@ -58,11 +60,13 @@ def main():
         "2. Vendas & Margem": show_vendas_margem,
         "3. Marketing & Mídia": show_marketing,
         "4. Estoque & Operações": show_estoque,
-        "5. Base de Clientes (RFM)": show_clientes,
-        "6. Atendimento & Suporte": show_atendimento,
+        "5. Hipótese 4: Atendimento & Sintomas": show_hipotese_atendimento,
+        "6. Hipótese 5: Segmentação de Clientes": show_hipotese_clientes,
+        "7. Hipótese 6: Decisão Baseada em Dados": show_hipotese_decisao_gestao,
+        "8. Matriz Priorização & Roadmap 30-60-90": show_plano_estrategico,
     }
 
-    escolha = st.sidebar.radio("Selecione o Tema:", list(paginas.keys()), index=0)
+    escolha = st.sidebar.radio("Navegue pelos Módulos:", list(paginas.keys()), index=0)
 
     st.sidebar.markdown("---")
     st.sidebar.markdown(

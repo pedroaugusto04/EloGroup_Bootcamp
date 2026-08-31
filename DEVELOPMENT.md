@@ -46,7 +46,7 @@
 * **Atendimento**:
   * **Tipagem**: Conversão de `data_abertura` e `data_fechamento` para datetime.
   * **Numéricas**: Coerção de `nota_csat`, `tempo_primeira_resposta_minutos` e `custo_operacional_ticket`.
-  * **Métricas**: `tempo_resolucao_horas` (diferença entre abertura e fechamento), flag `csat_critico` (nota CSAT <= 2.0), flag `is_automavel` (chamados de status e dúvidas), `custo_evitavel_automacao` e `sla_resposta_estourado`.
+  * **Métricas**: `tempo_resolucao_horas` (diferença entre abertura e fechamento), flag `csat_critico` (nota CSAT <= 2.0), flag `is_automatizavel` (chamados de status e dúvidas), `custo_evitavel_automacao` e `sla_resposta_estourado`.
 
 4. Análise inicial
 
@@ -77,3 +77,41 @@ Atendimento e Suporte:
 * WhatsApp como maior canal de entrada (fatia considerável para email/ChatBot também).
 * Maioria dos chamados são relacionados a clientes querendo saber onde está o pedido (30% do volume), gerando mais de R$ 150 mil em custos operacionais evitáveis com triagem via IA.
 * Índice de satisfação do cliente (CSAT) mediano (nota 3 mais frequente numa escala de 1 a 5).
+
+5. Análise das Hipóteses descritas no case
+
+* **Hipótese 1: O crescimento pode estar vindo com pior qualidade de margem**
+  - PREENCHER
+
+* **Hipótese 2: Nem todo crescimento de aquisição gera clientes igualmente valiosos**
+  - PREENCHER
+
+* **Hipótese 3: Falhas operacionais podem estar destruindo valor depois da venda**
+  - PREENCHER
+
+* **Hipótese 4: O atendimento pode estar concentrando sintomas de problemas recorrentes**
+  - Principal pontos identificado:
+    * Dúvidas de 'Onde está meu pedido' correspondem ao tipo de dúvida mais frequente com maior custo evitável (R$ 159,660.00)
+      * Resolvido de forma relativamente simples com envios de emails / mensagens via wpp em atualizações de status do pedido. ( uma única mensagem wpp após a compra com link de rastreamento pode ser uma boa ideia )
+    * Dúvidas técnicas correspondem ao segundo tipo de dúvida mais frequente com segundo maior custo evitável (R$ 78,888.00)
+      * Pode ser resolvido com melhores explicações nas páginas dos produtos / FAQ detalhado.
+      Caso continue com alto volume mesmo com explicações / FAQ, atendimento automatizado com IA via wpp podem reduzir custos comparado ao atendimento humano.
+    Conclusão: Bom ponto a ser explorado. Possível quick win em envio de notificações acerca do status do pedido. 
+
+* **Hipótese 5: O crescimento pode esconder diferenças importantes entre segmentos de clientes**
+  - Principais pontos identificados:
+    * Clientes 'Campeões' e 'Fiéis' são poucos mas representam grande parte do faturamento (a diferença não está no valor de cada compra, mas no volume de compras).
+    * 46,7% dos clientes estão nas faixas 'Em Risco', 'Hibernando' ou 'Churn'.
+      * Talvez seria interessante algum mecanismo pra incentivar segunda,terceira compra e fidelidade
+    * Preferir investimentos em influenciadores: maior receita gerada e os clientes tendem a comprar mais ( menos risco de churn )
+    Conclusão: Bom ponto, mas é mais médio/longo prazo quando comparado com a hipótese 4, por exemplo. Talvez da pra tomar alguma ação rápida pros clientes em risco (emails com cupoms,etc)
+
+
+* **Hipótese 6: Parte da ineficiência pode estar na forma como a informação vira decisão**:
+  - Principais pontos identificados:
+    * Mais de R$ 14,7 milhões parados em 207 SKUs fora de linha sem uma ação rápida de liquidação.
+      * Talvez seja interessante liquidação para queima de estoque
+    * 701 SKUs operam abaixo do ponto de pedido (mais de R$ 7,2 milhões em risco de falta de estoque).
+      * Produtos descontinuados em excesso, produtos muito vendidos em falta (?). Ajustar o mecanismo de compra/liberação de estoque
+    * Parece que falta entendimento da situação do estoque. Talvez relatórios gerados com IA / dashboards dinâmicos para a gestão podem auxiliar nessas decisões. 
+    Conclusão: Possível quick in na liquidação (verificar melhor depois). Verificar o problema do estoque e se realmente trazer mais informações acerca disso ajudaria na tomada de decisão ou se é algum outro tipo de limitação.

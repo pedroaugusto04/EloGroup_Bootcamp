@@ -200,8 +200,8 @@ class DataPreprocessor:
         df["tempo_resolucao_horas"] = (df["data_fechamento"] - df["data_abertura"]).dt.total_seconds() / 3600.0
         df["tempo_resolucao_horas"] = df["tempo_resolucao_horas"].clip(lower=0.0)
         df["csat_critico"] = df["nota_csat"] <= 2.0
-        df["is_automavel"] = df["categoria_problema"].isin(["Onde está meu pedido?", "Dúvida Técnica"])
-        df["custo_evitavel_automacao"] = np.where(df["is_automavel"], df["custo_operacional_ticket"], 0.0)
+        df["is_automatizavel"] = df["categoria_problema"].isin(["Onde está meu pedido?", "Dúvida Técnica"])
+        df["custo_evitavel_automacao"] = np.where(df["is_automatizavel"], df["custo_operacional_ticket"], 0.0)
         df["sla_resposta_estourado"] = df["tempo_primeira_resposta_minutos"] > 60.0
 
         parquet_path = self.processed_dir / "atendimento.parquet"
