@@ -20,3 +20,6 @@ htmlcov/
 data/processed/
 data/*.duckdb
 data/audit_log.json
+
+# Outros Arquivos
+AGENTS.md

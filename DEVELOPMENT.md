@@ -60,12 +60,13 @@ Receita/Margem:
 
 Marketing:
 
-* Investimento em marketing como um todo tende a trazer bons resultados. Investimento de marketing através de **influenciadores** mostra boa eficiência com relação aos demais.
+* Nos relatórios das plataformas de mídia (`marketing`), o investimento, de modo geral, traz bom retorno aparente, com destaque para **Influenciadores** apresentando o maior ROAS declarado (7,75x) e menor CAC.
+* No ERP (`vendas`), o canal de Influenciadores representa menor volume absoluto de pedidos (R$ 1,81M líquido, 5º colocado), mas entrega o maior ticket médio da base (R$ 901,91) e margem saudável (52,3%), apesar do maior desconto médio em cupons (R$ 83,36).
 
 Estoque:
 
-* Mais de R$ 17,7 milhões de capital de giro imobilizados em SKUs com status 'Descontinuado'.
-Muitos SKUs de alta demanda operam em risco de ruptura.
+* Mais de R$ 14,7 milhões em estoque disponível (R$ 17,7M em estoque físico) imobilizados em 207 SKUs com status 'Descontinuado'.
+* 99 SKUs com estoque zero e 701 SKUs operando em nível crítico abaixo do ponto de pedido, muitos deles de alta demanda.
 
 Base de Clientes:
 
@@ -83,16 +84,16 @@ Atendimento e Suporte:
 * **Hipótese 1: O crescimento pode estar vindo com pior qualidade de margem**
   - PREENCHER
 
-* **Hipótese 2: Nem todo crescimento de aquisição gera clientes igualmente valiosos**
+* **Hipótese 2:
   - PREENCHER
 
 * **Hipótese 3: Falhas operacionais podem estar destruindo valor depois da venda**
   - PREENCHER
 
 * **Hipótese 4: O atendimento pode estar concentrando sintomas de problemas recorrentes**
-  - Principal pontos identificado:
+  - Principais pontos identificados:
     * Dúvidas de 'Onde está meu pedido' correspondem ao tipo de dúvida mais frequente com maior custo evitável (R$ 159,660.00)
-      * Resolvido de forma relativamente simples com envios de emails / mensagens via wpp em atualizações de status do pedido. ( uma única mensagem wpp após a compra com link de rastreamento pode ser uma boa ideia )
+      * Resolvido de forma relativamente simples com envios de emails / mensagens via wpp em atualizações de status do pedido (o prazo de entrega é normal, cerca de 8,3 dias, logo o problema é falta de visibilidade do rastreio e ansiedade do cliente — mensagens automáticas com link de rastreamento podem ser uma boa ideia).
     * Dúvidas técnicas correspondem ao segundo tipo de dúvida mais frequente com segundo maior custo evitável (R$ 78,888.00)
       * Pode ser resolvido com melhores explicações nas páginas dos produtos / FAQ detalhado.
       Caso continue com alto volume mesmo com explicações / FAQ, atendimento automatizado com IA via wpp podem reduzir custos comparado ao atendimento humano.
@@ -102,16 +103,14 @@ Atendimento e Suporte:
   - Principais pontos identificados:
     * Clientes 'Campeões' e 'Fiéis' são poucos mas representam grande parte do faturamento (a diferença não está no valor de cada compra, mas no volume de compras).
     * 46,7% dos clientes estão nas faixas 'Em Risco', 'Hibernando' ou 'Churn'.
-      * Talvez seria interessante algum mecanismo pra incentivar segunda,terceira compra e fidelidade
-    * Preferir investimentos em influenciadores: maior receita gerada e os clientes tendem a comprar mais ( menos risco de churn )
-    Conclusão: Bom ponto, mas é mais médio/longo prazo quando comparado com a hipótese 4, por exemplo. Talvez da pra tomar alguma ação rápida pros clientes em risco (emails com cupoms,etc)
+      * Talvez seria interessante algum mecanismo pra incentivar segunda, terceira compra e fidelidade.
+    Conclusão: Bom ponto, mas é mais médio/longo prazo quando comparado com a hipótese 4, por exemplo. Focar em retenção ativa para clientes em risco.
 
 
 * **Hipótese 6: Parte da ineficiência pode estar na forma como a informação vira decisão**:
   - Principais pontos identificados:
-    * Mais de R$ 14,7 milhões parados em 207 SKUs fora de linha sem uma ação rápida de liquidação.
+    * Mais de R$ 14,7 milhões em estoque disponível (R$ 17,7M físico) parados em 207 SKUs fora de linha sem uma ação rápida de liquidação.
       * Talvez seja interessante liquidação para queima de estoque
-    * 701 SKUs operam abaixo do ponto de pedido (mais de R$ 7,2 milhões em risco de falta de estoque).
       * Produtos descontinuados em excesso, produtos muito vendidos em falta (?). Ajustar o mecanismo de compra/liberação de estoque
     * Parece que falta entendimento da situação do estoque. Talvez relatórios gerados com IA / dashboards dinâmicos para a gestão podem auxiliar nessas decisões. 
-    Conclusão: Possível quick in na liquidação (verificar melhor depois). Verificar o problema do estoque e se realmente trazer mais informações acerca disso ajudaria na tomada de decisão ou se é algum outro tipo de limitação.
+    Conclusão: Possível quick win na liquidação (verificar melhor depois). Verificar o problema do estoque e se realmente trazer mais informações acerca disso ajudaria na tomada de decisão ou se é algum outro tipo de limitação.
