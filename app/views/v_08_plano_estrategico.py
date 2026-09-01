@@ -8,15 +8,16 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 from src.infrastructure.database import DuckDBRepository
+from app.components.cards import render_action_card
 
 
 def show_plano_estrategico(repo: DuckDBRepository):
-    st.markdown('<div class="page-title">🎯 Matriz de Priorização & Roadmap</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-title">Matriz de Priorização & Roadmap</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle">Priorização das ações identificadas nas Hipóteses 4, 5 e 6 descritas no DEVELOPMENT.md.</div>', unsafe_allow_html=True)
 
     tab1, tab2 = st.tabs([
-        "⚖️ 1. Matriz de Priorização (Impacto x Prazo)",
-        "🗓️ 2. Roadmap Executivo (Curto vs Médio/Longo Prazo)"
+        "Matriz de Priorização (Impacto x Prazo)",
+        "Curto vs Médio/Longo Prazo"
     ])
 
     # ==========================================
@@ -129,38 +130,45 @@ def show_plano_estrategico(repo: DuckDBRepository):
         c1, c2, c3 = st.columns(3)
 
         with c1:
-            st.success("### 🟢 Curto Prazo (Quick Wins)")
-            st.markdown("""
-            **Foco:** Ações rápidas de alto retorno imediato.
-            
-            1. **Notificações de Rastreio (Hipótese 4):**
-               - Envio de mensagem no WhatsApp após a compra com link de rastreamento (ataca o gargalo de R$ 159,6k).
-            2. **Queima de Estoque Parado (Hipótese 6):**
-               - Liquidação dos 207 SKUs descontinuados para liberar até R$ 14,7M em caixa.
-            3. **Cupons para Clientes em Risco (Hipótese 5):**
-               - Disparo de e-mails promocionais para incentivar recompras em clientes da faixa 'Em Risco'.
-            """)
+            render_action_card(
+                horizon="Curto Prazo (Quick Wins)",
+                title="Ações Rápidas & Caixa Imediato",
+                content_html="""
+                <b>1. Notificações de Rastreio (Hipótese 4):</b><br>
+                Envio de mensagem no WhatsApp após a compra com link de rastreamento direto (ataca o gargalo de R$ 159,6k).<br><br>
+                <b>2. Queima de Estoque Parado (Hipótese 6):</b><br>
+                Liquidação dos 207 SKUs descontinuados para liberar até R$ 14,7M em caixa.<br><br>
+                <b>3. Cupons para Clientes em Risco (Hipótese 5):</b><br>
+                Disparo de e-mails promocionais para incentivar recompras em clientes da faixa 'Em Risco'.
+                """,
+                dot_color="#10B981"
+            )
 
         with c2:
-            st.info("### 🔵 Médio Prazo (Processos & Mídia)")
-            st.markdown("""
-            **Foco:** Eficiência operacional e melhor alocação de verba.
-            
-            1. **FAQ & Atendimento com IA (Hipótese 4):**
-               - Melhores explicações nas páginas dos produtos e automação com IA via WhatsApp para dúvidas técnicas (R$ 78,8k).
-            2. **Foco em Influenciadores (Hipótese 5):**
-               - Priorizar investimentos de marketing em influenciadores (maior receita gerada e menor risco de churn).
-            3. **Relatórios com IA para a Gestão (Hipótese 6):**
-               - Relatórios automatizados e dashboards dinâmicos para apoiar a tomada de decisão da gestão.
-            """)
+            render_action_card(
+                horizon="Médio Prazo (Processos & Mídia)",
+                title="Eficiência Operacional & Alocação",
+                content_html="""
+                <b>1. FAQ & Atendimento com IA (Hipótese 4):</b><br>
+                Melhores explicações nas páginas dos produtos e triagem via WhatsApp para dúvidas técnicas (R$ 78,8k).<br><br>
+                <b>2. Foco em Influenciadores (Hipótese 5):</b><br>
+                Priorizar investimentos de mídia em influenciadores (maior receita gerada e menor taxa de churn).<br><br>
+                <b>3. Gestão Orientada a Dados (Hipótese 6):</b><br>
+                Dashboards dinâmicos para apoiar a tomada de decisão da gestão.
+                """,
+                dot_color="#38BDF8"
+            )
 
         with c3:
-            st.warning("### 🟣 Médio / Longo Prazo (Estrutural)")
-            st.markdown("""
-            **Foco:** Planejamento sustentável de estoque e fidelização.
-            
-            1. **Ajuste no Mecanismo de Compras (Hipótese 6):**
-               - Ajustar mecanismo de compra e liberação de estoque para evitar falta nos 701 SKUs com estoque abaixo do ponto de pedido (R$ 7,2M em risco).
-            2. **Mecanismos Contínuos de Fidelidade (Hipótese 5):**
-               - Estruturar programas de fidelidade para incentivar segunda e terceira compras recorrentes.
-            """)
+            render_action_card(
+                horizon="Médio / Longo Prazo (Estrutural)",
+                title="Planejamento & Fidelidade",
+                content_html="""
+                <b>1. Ajuste no Mecanismo de Compras (Hipótese 6):</b><br>
+                Ajustar mecanismo de reposição para evitar falta nos 701 SKUs com estoque abaixo do ponto de pedido (R$ 7,2M em risco).<br><br>
+                <b>2. Mecanismos Contínuos de Fidelidade (Hipótese 5):</b><br>
+                Estruturar programas de fidelidade para incentivar compras recorrentes na base.
+                """,
+                dot_color="#A78BFA"
+            )
+

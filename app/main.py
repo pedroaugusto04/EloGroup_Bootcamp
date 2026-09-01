@@ -25,6 +25,8 @@ from app.views.v_05_hipotese_clientes import show_hipotese_clientes
 from app.views.v_06_hipotese_atendimento import show_hipotese_atendimento
 from app.views.v_07_hipotese_decisao_gestao import show_hipotese_decisao_gestao
 from app.views.v_08_plano_estrategico import show_plano_estrategico
+from app.views.v_09_dispersao_outliers import show_dispersao_outliers
+from app.views.v_10_analise_relacional import show_analise_relacional
 
 
 st.set_page_config(
@@ -64,6 +66,8 @@ def main():
         "6. Hipótese 5: Segmentação de Clientes": show_hipotese_clientes,
         "7. Hipótese 6: Decisão Baseada em Dados": show_hipotese_decisao_gestao,
         "8. Matriz Priorização & Roadmap 30-60-90": show_plano_estrategico,
+        "9. Dispersão & Outliers (Boxplots)": show_dispersao_outliers,
+        "10. Análise Relacional Integrada (Visão 360°)": show_analise_relacional,
     }
 
     escolha = st.sidebar.radio("Navegue pelos Módulos:", list(paginas.keys()), index=0)

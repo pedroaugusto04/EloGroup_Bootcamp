@@ -12,24 +12,10 @@ from src.infrastructure.query_loader import load_query
 
 
 def show_hipotese_clientes(repo: DuckDBRepository):
-    st.markdown('<div class="page-title">📌 Hipótese 5: Segmentação & Concentração de Clientes</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-title">Hipótese 5: Segmentação & Concentração de Clientes</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle"><i>"O crescimento pode esconder diferenças importantes entre segmentos de clientes."</i></div>', unsafe_allow_html=True)
 
-    # 1. Resumo conforme DEVELOPMENT.md
-    st.markdown(
-        """
-        <div style="background-color: #1E293B; padding: 16px; border-radius: 8px; border-left: 4px solid #10B981; margin-bottom: 20px;">
-            <b>Principais pontos identificados (DEVELOPMENT.md):</b><br>
-            • Clientes <b>'Campeões' e 'Fiéis'</b> são poucos mas representam grande parte do faturamento (a diferença não está no valor de cada compra, mas no volume de compras).<br>
-            • <b>46,7% dos clientes</b> estão nas faixas <b>'Em Risco', 'Hibernando' ou 'Churn'</b>.<br>
-            • <b>Preferir investimentos em influenciadores:</b> maior receita gerada e os clientes tendem a comprar mais (menos risco de churn).<br>
-            • <b>Conclusão:</b> Bom ponto, mas é mais médio/longo prazo quando comparado com a hipótese 4. Talvez dê para tomar alguma ação rápida para clientes em risco (e-mails com cupons, etc).
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # 2. Métricas Chave
+    # 1. Métricas Chave
     q_rfm = load_query("hipotese_5_clientes/distribuicao_rfm_pareto.sql", where_sql="")
     df_rfm = repo.execute_sql(q_rfm)
 
@@ -76,67 +62,104 @@ def show_hipotese_clientes(repo: DuckDBRepository):
         fig_ped.update_layout(height=340)
         st.plotly_chart(fig_ped, use_container_width=True)
 
-    # 4. Análise de Canais (Foco em Influenciadores)
-    st.subheader("Aquisição por Canal: Eficiência de Influenciadores")
+    # 4. Análise de Canais: Mídia Declarada (Marketing) vs. Vendas Reais (ERP)
+    st.subheader("Comparativo de Canais: Mídia Declarada vs. Vendas Reais no ERP")
     
-    q_mkt_canal = """
+    q_cross = """
+        WITH mkt AS (
+            SELECT 
+                canal,
+                SUM(investimento_reais) AS investimento_mkt,
+                SUM(receita_gerada) AS receita_mkt,
+                ROUND(SUM(receita_gerada) / NULLIF(SUM(investimento_reais), 0), 2) AS roas_mkt
+            FROM marketing
+            GROUP BY canal
+        ),
+        vendas_real AS (
+            SELECT 
+                canal,
+                COUNT(order_id) AS total_pedidos,
+                SUM(receita_liquida) AS receita_real,
+                SUM(margem_calculada) AS margem_real,
+                ROUND(AVG(receita_liquida), 2) AS ticket_medio_real,
+                ROUND(AVG(desconto_reais), 2) AS desconto_medio_reais,
+                ROUND(SUM(margem_calculada) / NULLIF(SUM(receita_liquida), 0) * 100.0, 1) AS margem_pct_real
+            FROM vendas
+            WHERE status_pagamento = 'Aprovado'
+            GROUP BY canal
+        ),
+        first_order AS (
+            SELECT 
+                customer_id, 
+                canal AS canal_aquisicao, 
+                MIN(data_pedido) AS data_primeira_compra
+            FROM vendas
+            WHERE status_pagamento = 'Aprovado'
+            GROUP BY customer_id, canal
+            QUALIFY ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY data_primeira_compra ASC) = 1
+        ),
+        churn_qualidade AS (
+            SELECT 
+                f.canal_aquisicao AS canal,
+                ROUND(SUM(CASE WHEN c.segmento_rfm IN ('Em Risco', 'Hibernando', 'Churn') THEN 1 ELSE 0 END) * 100.0 / COUNT(c.customer_id), 1) AS pct_risco_churn
+            FROM clientes c
+            JOIN first_order f ON c.customer_id = f.customer_id
+            GROUP BY f.canal_aquisicao
+        )
         SELECT 
-            canal, 
-            ROUND(SUM(receita_gerada) / 1e6, 2) AS receita_gerada_milhoes,
-            ROUND(SUM(investimento_reais) / 1e6, 2) AS investimento_milhoes,
-            ROUND(SUM(receita_gerada) / NULLIF(SUM(investimento_reais), 0), 2) AS roas
-        FROM marketing
-        GROUP BY canal
-        ORDER BY receita_gerada_milhoes DESC;
+            v.canal,
+            m.investimento_mkt,
+            m.receita_mkt,
+            m.roas_mkt,
+            v.receita_real,
+            v.ticket_medio_real,
+            v.margem_pct_real,
+            v.desconto_medio_reais,
+            COALESCE(q.pct_risco_churn, 0.0) AS pct_risco_churn
+        FROM vendas_real v
+        LEFT JOIN mkt m ON v.canal = m.canal
+        LEFT JOIN churn_qualidade q ON v.canal = q.canal
+        ORDER BY v.ticket_medio_real DESC;
     """
-    df_mkt_c = repo.execute_sql(q_mkt_canal)
-
-    q_canal = load_query("hipotese_5_clientes/qualidade_canal_aquisicao.sql")
-    df_canal = repo.execute_sql(q_canal)
+    df_cross = repo.execute_sql(q_cross)
 
     col_c1, col_c2 = st.columns(2)
     with col_c1:
-        fig_inf_rec = px.bar(
-            df_mkt_c,
+        fig_ticket = px.bar(
+            df_cross,
             x="canal",
-            y="receita_gerada_milhoes",
+            y="ticket_medio_real",
             color="canal",
-            labels={"receita_gerada_milhoes": "Receita Gerada (R$ Milhões)", "canal": "Canal"},
-            title="Receita Gerada por Canal de Mídia (R$ Milhões)"
+            labels={"ticket_medio_real": "Ticket Médio Real (R$)", "canal": "Canal"},
+            title="Ticket Médio Real por Canal (ERP Vendas)",
+            color_discrete_map={"Influenciador": "#10B981"}
         )
-        fig_inf_rec.update_layout(height=320)
-        st.plotly_chart(fig_inf_rec, use_container_width=True)
+        fig_ticket.update_layout(height=320, showlegend=False)
+        st.plotly_chart(fig_ticket, use_container_width=True)
 
     with col_c2:
-        fig_inf_churn = px.bar(
-            df_canal,
-            x="canal_aquisicao",
+        fig_churn = px.bar(
+            df_cross,
+            x="canal",
             y="pct_risco_churn",
-            labels={"pct_risco_churn": "% Em Risco / Churn", "canal_aquisicao": "Canal"},
-            title="% de Clientes em Risco de Churn por Canal",
+            labels={"pct_risco_churn": "% Em Risco / Churn", "canal": "Canal de Entrada"},
+            title="% de Clientes em Risco de Churn por Canal de Aquisição",
             color="pct_risco_churn",
             color_continuous_scale="Reds"
         )
-        fig_inf_churn.update_layout(height=320)
-        st.plotly_chart(fig_inf_churn, use_container_width=True)
+        fig_churn.update_layout(height=320)
+        st.plotly_chart(fig_churn, use_container_width=True)
 
-    st.markdown("---")
+    st.markdown("##### 📊 Tabela Comparativa Cruzada (Mídia vs. ERP Vendas):")
+    st.dataframe(df_cross.style.format({
+        "investimento_mkt": "R$ {:,.2f}",
+        "receita_mkt": "R$ {:,.2f}",
+        "roas_mkt": "{:.2f}x",
+        "receita_real": "R$ {:,.2f}",
+        "ticket_medio_real": "R$ {:,.2f}",
+        "margem_pct_real": "{:.1f}%",
+        "desconto_medio_reais": "R$ {:,.2f}",
+        "pct_risco_churn": "{:.1f}%"
+    }), use_container_width=True)
 
-    # 5. Ações Propostas no DEVELOPMENT.md (Padronizadas)
-    st.subheader("Ações Identificadas para a Hipótese 5")
 
-    col_a1, col_a2 = st.columns(2)
-    with col_a1:
-        st.success("### 🟢 Quick Win: Reativação de Clientes em Risco")
-        st.markdown("""
-        - **Problema:** 46,7% dos clientes estão em risco, hibernando ou churn.
-        - **Ação:** Disparo rápido de e-mails com cupons de desconto para incentivar segunda e terceira compras.
-        """)
-
-    with col_a2:
-        st.info("### 🔵 Médio / Longo Prazo: Foco em Influenciadores & Fidelidade")
-        st.markdown("""
-        - **Problema:** Aquisição em canais genéricos traz clientes com maior taxa de abandono.
-        - **Ação:** Priorizar investimentos em marketing com influenciadores (maior receita gerada e clientes tendem a comprar mais vezes).
-        - **Fidelização:** Mecanismos contínuos de incentivo à fidelidade pós-primeira compra.
-        """)
