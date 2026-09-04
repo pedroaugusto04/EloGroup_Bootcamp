@@ -61,15 +61,21 @@ def test_vendas_math_integrity(repo):
 
 
 def test_estoque_rupture_flag(repo):
-    """Valida se a regra lógica de ruptura de estoque foi aplicada corretamente."""
+    """Valida se a segregação de ruptura real (saldo zero) e estoque crítico foi aplicada corretamente."""
     df = repo.execute_sql("""
-        SELECT estoque_disponivel, ponto_pedido, em_ruptura 
+        SELECT estoque_disponivel, ponto_pedido, em_ruptura, is_ruptura_real, is_estoque_critico, precisa_reposicao 
         FROM estoque 
         LIMIT 100;
     """)
     for _, row in df.iterrows():
-        expected_rupture = (row["estoque_disponivel"] <= row["ponto_pedido"]) or (row["estoque_disponivel"] == 0)
-        assert row["em_ruptura"] == expected_rupture
+        expected_real = (row["estoque_disponivel"] == 0)
+        expected_critical = (row["estoque_disponivel"] > 0) and (row["estoque_disponivel"] <= row["ponto_pedido"])
+        expected_reorder = expected_real or expected_critical
+
+        assert row["is_ruptura_real"] == expected_real
+        assert row["em_ruptura"] == expected_real
+        assert row["is_estoque_critico"] == expected_critical
+        assert row["precisa_reposicao"] == expected_reorder
 
 
 def test_clientes_age_calculation(repo):

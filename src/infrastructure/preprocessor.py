@@ -137,13 +137,16 @@ class DataPreprocessor:
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
 
         # Calcula métricas adicionais
-        df["em_ruptura"] = (df["estoque_disponivel"] <= df["ponto_pedido"]) | (df["estoque_disponivel"] == 0)
+        df["is_ruptura_real"] = df["estoque_disponivel"] == 0
+        df["is_estoque_critico"] = (df["estoque_disponivel"] > 0) & (df["estoque_disponivel"] <= df["ponto_pedido"])
+        df["precisa_reposicao"] = df["is_ruptura_real"] | df["is_estoque_critico"]
+        df["em_ruptura"] = df["is_ruptura_real"]
         df["margem_unitaria_sugerida"] = df["preco_venda_sugerido"] - df["custo_unitario"]
         df["markup_sugerido_pct"] = np.where(df["custo_unitario"] > 0, (df["margem_unitaria_sugerida"] / df["custo_unitario"]) * 100.0, 0.0)
         df["valor_total_estoque"] = df["estoque_disponivel"] * df["custo_unitario"]
         df["is_descontinuado"] = df["status_disponibilidade"] == "Descontinuado"
         df["capital_travado_descontinuado"] = np.where(df["status_disponibilidade"] == "Descontinuado", df["valor_total_estoque"], 0.0)
-        df["capital_em_risco_ruptura"] = np.where(df["em_ruptura"], df["valor_total_estoque"], 0.0)
+        df["capital_em_risco_ruptura"] = np.where(df["is_estoque_critico"], df["valor_total_estoque"], 0.0)
 
         parquet_path = self.processed_dir / "estoque.parquet"
         df.to_parquet(parquet_path, index=False)
