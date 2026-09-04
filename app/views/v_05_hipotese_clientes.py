@@ -68,6 +68,3 @@ def show_hipotese_clientes(repo: DuckDBRepository):
         )
         fig_ped.update_layout(height=340)
         st.plotly_chart(fig_ped, use_container_width=True)
-
-    st.info("ℹ️ **Nota de Integridade Relacional:** O cruzamento direto de canal de aquisição com LTV e churn individual entre CRM e Vendas foi descontinuado nesta aba porque apenas 346 dos 15.000 clientes cadastrados constam no extrato do ERP. Para ver a auditoria completa de consistência, consulte a aba **4. Integridade entre Bases (Auditoria)**.")
-

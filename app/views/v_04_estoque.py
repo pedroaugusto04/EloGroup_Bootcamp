@@ -84,7 +84,6 @@ def show_estoque(repo: DuckDBRepository):
         )
         fig_cat.update_layout(height=340, legend=dict(orientation="h", y=1.05))
         st.plotly_chart(fig_cat, use_container_width=True)
-        st.caption("🔴 *Nota de Auditoria:* 96 dos 99 SKUs zerados estão em **Beleza**, enquanto os 701 SKUs críticos afetam todas as categorias (~10% a 20% de cada catálogo).")
 
     with col_g2:
         st.subheader("Lead Time Médio por Categoria (Dias)")

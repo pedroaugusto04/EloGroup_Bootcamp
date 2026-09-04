@@ -49,7 +49,7 @@ def show_hipotese_atendimento(repo: DuckDBRepository):
             x="categoria_problema",
             y="custo_operacional_total",
             color="is_automatizavel",
-            labels={"custo_operacional_total": "Custo Total (R$)", "categoria_problema": "Motivo", "is_automatizavel": "Destaque no .md?"},
+            labels={"custo_operacional_total": "Custo Total (R$)", "categoria_problema": "Motivo", "is_automatizavel": "Destaque"},
             color_discrete_map={True: "#3B82F6", False: "#64748B"}
         )
         fig_custo.update_layout(height=340)
