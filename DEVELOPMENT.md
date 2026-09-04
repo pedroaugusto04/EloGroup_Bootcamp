@@ -225,3 +225,19 @@ Obs: MUITOS problemas entre as bases. Talvez alguma atitude pra integrar os dado
       * Produtos descontinuados em excesso, produtos muito vendidos em falta (?). Ajustar o mecanismo de compra/liberação de estoque
     * Parece que falta entendimento da situação do estoque. Talvez relatórios gerados com IA / dashboards dinâmicos para a gestão podem auxiliar nessas decisões. 
     Conclusão: Possível quick win na liquidação (verificar melhor depois). Verificar o problema do estoque e se realmente trazer mais informações acerca disso ajudaria na tomada de decisão ou se é algum outro tipo de limitação.
+
+  Análise dos módulos recomendados:
+
+  Módulo A: (Possivelmente descartar -> base de marketing e vendas muito incoerentes, difícil tirar conclusões boas. Analisar cada uma separadamente traz resultados diferentes.
+
+  Módulo B: Acho boa ideia pra quick win -> a ideia de enviar link de rastreio e/ou atendimento automatizado simples pode ajudar de forma rápida.
+
+  Módulo C: Parece válido. Dá pra pegar as informações confiáveis das bases e dar boas sugestões, mas parece muito genérico...
+
+  Módulo D: Parece com o C, mas atua mais como um resumo, enquanto o C auxilia na tomada de decisões com antecedência. Talvez o C entregue mais valor
+
+  Ideia: (Semelhante ao Módulo C) -> Oferecer sugestões com base na análise rotineira da situação de estoque da empresa. O estoque parece ter grande influência 
+
+  * Não da pra ter uma ideia mt boa de valores pois estoque e vendas mostra preços diferentes para os mesmos produtos, o que é inconsistente. Talvez é possível verificar se o produto é muito/pouco comprado e relacionar com o estoque.
+
+  * Talvez vale a pena a solução ser isso + as quick wins encontradas na análise das hipóteses ( verificar se faz sentido essa solução como longo prazo / quick wins como curto prazo, mesmo que não tenham relação direta )
