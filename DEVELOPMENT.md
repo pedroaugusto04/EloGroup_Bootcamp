@@ -159,7 +159,9 @@ Analisando as bases, percebemos que, embora cada tabela esteja relativamente coe
 Enquanto Atendimento, Marketing e Estoque cobrem o período de **2023 a 2025**, a base de Vendas possui dados utilizáveis apenas para o ano fechado de **2023** e 26 dias de 2024.
 **Fonte:** primeiro bloco de [integridade_bases.sql](src/queries/auditoria/integridade_bases.sql).
 
-Apenas **346 dos 15.000 clientes cadastrados (2,3%)** aparecem na tabela `vendas`. Um único cliente concentra **11.282 compras na tabela `vendas` (40,6% de todos os pedidos)**, enquanto o seu cadastro no CRM informa apenas poucos pedidos.
+Apenas **346 dos 15.000 clientes cadastrados (2,3%)** aparecem na tabela `vendas`.
+Um único cliente concentra **11.282 compras na tabela `vendas` (40,6% de todos os pedidos / 9.955 aprovados)** e **14.355 chamados no `atendimento` (40,0% do suporte)**, apesar de ter apenas 15 compras registradas no CRM. 
+* Obs: Desconsiderar esse cliente não alterou de forma relevante a distribuição dos dados.
 **Fonte:** blocos de vínculo e concentração de [integridade_bases.sql](src/queries/auditoria/integridade_bases.sql).
 
 As colunas de `ltv_acumulado` e `total_pedidos_historico` da tabela de `clientes` não batem com o dinheiro e os pedidos reais da tabela de `vendas`.
