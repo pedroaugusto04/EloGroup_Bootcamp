@@ -8,11 +8,18 @@ import plotly.express as px
 import plotly.graph_objects as go
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.query_loader import load_query
+from app.components.cards import render_data_source_badge
 
 
 def show_visao_geral(repo: DuckDBRepository):
     st.markdown('<div class="page-title">Visão Geral & Métricas Consolidadas</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle">Panorama agregado de vendas, margem, canais e categorias para análise exploratória.</div>', unsafe_allow_html=True)
+
+    render_data_source_badge(
+        tables=["vendas"],
+        scope="27.753 transações (ERP) | Jan/2023 a 26/Jan/2024",
+        dev_section="Seção 3: Observações por Tabela (Receita/Margem)"
+    )
 
     # 1. Filtros Rápidos com Session Keys Estáveis
     col_f1, col_f2, col_f3 = st.columns([2, 3, 2])

@@ -12,13 +12,20 @@ import pandas as pd
 
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.query_loader import load_query
+from app.components.cards import render_data_source_badge
 
 
 def show_analise_relacional(repo: DuckDBRepository):
-    st.markdown('<div class="page-title">🔗 Análise Relacional Integrada (Visão 360°)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-title">Integridade entre Bases & Análise Relacional</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="page-subtitle">Diagnóstico cruzado entre Vendas, Marketing, Estoque, Clientes e Atendimento para identificar impactos sistêmicos na rentabilidade.</div>',
+        '<div class="page-subtitle">Diagnóstico cruzado entre Vendas, Marketing, Estoque, Clientes e Atendimento para auditoria de integridade e impactos sistêmicos.</div>',
         unsafe_allow_html=True
+    )
+
+    render_data_source_badge(
+        tables=["vendas", "marketing", "estoque", "clientes", "atendimento"],
+        scope="Cruzamento Relacional Global (5 Bases)",
+        dev_section="Seção 4: Observações Gerais (Incoerências & Integridade das Bases)"
     )
 
     tab1, tab2, tab3, tab4 = st.tabs([

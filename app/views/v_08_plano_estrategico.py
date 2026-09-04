@@ -8,12 +8,18 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 from src.infrastructure.database import DuckDBRepository
-from app.components.cards import render_action_card
+from app.components.cards import render_action_card, render_data_source_badge
 
 
 def show_plano_estrategico(repo: DuckDBRepository):
-    st.markdown('<div class="page-title">Matriz de Priorização & Roadmap</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Priorização das ações identificadas nas Hipóteses 4, 5 e 6 descritas no DEVELOPMENT.md.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-title">Plano de Ação Estratégico & Roadmap</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Priorização das iniciativas de negócio (30/60/90 dias) derivadas das conclusões do DEVELOPMENT.md.</div>', unsafe_allow_html=True)
+
+    render_data_source_badge(
+        tables=["vendas", "atendimento", "estoque", "clientes", "marketing"],
+        scope="Síntese Executiva Transversal (30 / 60 / 90 Dias)",
+        dev_section="Conclusões & Quick Wins (Hipóteses 4, 5 e 6)"
+    )
 
     tab1, tab2 = st.tabs([
         "Matriz de Priorização (Impacto x Prazo)",

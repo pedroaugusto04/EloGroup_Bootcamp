@@ -7,11 +7,18 @@ import streamlit as st
 import plotly.express as px
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.query_loader import load_query
+from app.components.cards import render_data_source_badge
 
 
 def show_estoque(repo: DuckDBRepository):
     st.markdown('<div class="page-title">Gestão de Estoque & Operações</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle">Acompanhamento de rupturas, pontos de pedido, lead times de fornecedores e estoque imobilizado.</div>', unsafe_allow_html=True)
+
+    render_data_source_badge(
+        tables=["estoque"],
+        scope="5.000 SKUs cadastrados (WMS) | Snapshot Jan/2026",
+        dev_section="Seção 3: Observações por Tabela (Estoque & Rupturas)"
+    )
 
     # 1. Filtro
     categorias = repo.execute_sql("SELECT DISTINCT categoria FROM estoque WHERE categoria IS NOT NULL ORDER BY categoria;").iloc[:, 0].tolist()
@@ -48,20 +55,36 @@ def show_estoque(repo: DuckDBRepository):
     col_g1, col_g2 = st.columns(2)
 
     with col_g1:
-        st.subheader("Taxa de Ruptura por Categoria (%)")
+        st.subheader("SKUs com Necessidade de Reposição por Categoria")
         q_cat = load_query("estoque/ruptura_por_categoria.sql", where_sql=where_sql)
         df_cat_est = repo.execute_sql(q_cat)
         
-        fig_cat = px.bar(
-            df_cat_est,
-            x="categoria",
-            y="taxa_ruptura_pct",
-            labels={"taxa_ruptura_pct": "Ruptura (%)", "categoria": "Categoria"},
-            color="taxa_ruptura_pct",
-            color_continuous_scale="Reds"
+        df_plot_rep = df_cat_est.melt(
+            id_vars=["categoria"],
+            value_vars=["skus_ruptura", "skus_estoque_critico"],
+            var_name="Tipo_Risco",
+            value_name="Qtd_SKUs"
         )
-        fig_cat.update_layout(height=340)
+        df_plot_rep["Tipo_Risco"] = df_plot_rep["Tipo_Risco"].map({
+            "skus_ruptura": "Ruptura Real (Estoque = 0)",
+            "skus_estoque_critico": "Estoque Crítico (<= Ponto de Pedido)"
+        })
+        
+        fig_cat = px.bar(
+            df_plot_rep,
+            x="categoria",
+            y="Qtd_SKUs",
+            color="Tipo_Risco",
+            barmode="stack",
+            labels={"Qtd_SKUs": "Total de SKUs", "categoria": "Categoria", "Tipo_Risco": "Severidade"},
+            color_discrete_map={
+                "Ruptura Real (Estoque = 0)": "#EF4444",
+                "Estoque Crítico (<= Ponto de Pedido)": "#F59E0B"
+            }
+        )
+        fig_cat.update_layout(height=340, legend=dict(orientation="h", y=1.05))
         st.plotly_chart(fig_cat, use_container_width=True)
+        st.caption("🔴 *Nota de Auditoria:* 96 dos 99 SKUs zerados estão em **Beleza**, enquanto os 701 SKUs críticos afetam todas as categorias (~10% a 20% de cada catálogo).")
 
     with col_g2:
         st.subheader("Lead Time Médio por Categoria (Dias)")

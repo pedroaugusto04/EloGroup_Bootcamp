@@ -89,3 +89,24 @@ def render_summary_banner(title: str, content_html: str, dot_color: str = "#94A3
     st.markdown(html, unsafe_allow_html=True)
 
 
+def render_data_source_badge(tables: list[str], scope: str, dev_section: str):
+    """Renderiza badge visual de auditoria indicando a base de dados, escopo e referência no DEVELOPMENT.md."""
+    tables_code = " ".join([f'<code style="background: rgba(56, 189, 248, 0.12); color: #38BDF8; padding: 2px 8px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(56, 189, 248, 0.25);">{t}</code>' for t in tables])
+    html = textwrap.dedent(f"""
+    <div style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid #38BDF8; border-radius: 6px; padding: 10px 16px; margin: 12px 0 20px 0; font-size: 13px; color: #E2E8F0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-weight: 600; color: #94A3B8;">📁 Tabela(s) Utilizada(s):</span>
+            {tables_code}
+        </div>
+        <div>
+            <span style="font-weight: 600; color: #94A3B8;">⏱️ Escopo / Amostra:</span> <span style="color: #F1F5F9;">{scope}</span>
+        </div>
+        <div>
+            <span style="font-weight: 600; color: #94A3B8;">📖 Ref. DEVELOPMENT.md:</span> <span style="color: #34D399; font-weight: 600;">{dev_section}</span>
+        </div>
+    </div>
+    """).strip()
+    st.markdown(html, unsafe_allow_html=True)
+
+
+

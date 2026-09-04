@@ -126,8 +126,10 @@ Estoque:
 
 * Mais de R$ 14,7 milhões em estoque disponível (R$ 17,7M em estoque físico) imobilizados em 207 SKUs com status 'Descontinuado'.
   **Fonte:** [descompasso_estoque_ruptura.sql](src/queries/hipotese_6_decisao_gestao/descompasso_estoque_ruptura.sql).
-* 99 SKUs com estoque zero e 701 SKUs operando em nível crítico abaixo do ponto de pedido.
-  **Fonte:** [kpis_estoque.sql](src/queries/estoque/kpis_estoque.sql) e [skus_criticos.sql](src/queries/estoque/skus_criticos.sql).
+  * 99 SKUs com estoque zero e 701 SKUs operando em nível crítico abaixo do ponto de pedido (totalizando 800 SKUs com necessidade de reposição).
+  * 96 dos 99 SKUs zerados (97%) estão concentrados exclusivamente na categoria **Beleza** (taxa de 6,35% do catálogo de Beleza). Acessórios, Lifestyle e Moda possuem apenas 1 SKU zerado cada.
+  * Os 701 SKUs críticos afetam todas as categorias de forma distribuída (232 em Beleza, 184 em Lifestyle, 160 em Moda e 125 em Acessórios).
+  **Fonte:** [kpis_estoque.sql](src/queries/estoque/kpis_estoque.sql), [skus_criticos.sql](src/queries/estoque/skus_criticos.sql) e [ruptura_por_categoria.sql](src/queries/estoque/ruptura_por_categoria.sql).
 
 Base de Clientes:
 

@@ -9,11 +9,18 @@ import plotly.express as px
 import pandas as pd
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.query_loader import load_query
+from app.components.cards import render_data_source_badge
 
 
 def show_hipotese_atendimento(repo: DuckDBRepository):
     st.markdown('<div class="page-title">Hipótese 4: Atendimento & Sintomas Recorrentes</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle"><i>"O atendimento pode estar concentrando sintomas de problemas recorrentes."</i></div>', unsafe_allow_html=True)
+
+    render_data_source_badge(
+        tables=["atendimento"],
+        scope="35.840 tickets de suporte (10.749 sobre rastreio) | Jan/2023 a Dez/2025",
+        dev_section="Seção 5: Hipótese 4 (Atendimento, Rastreamento & Automação via IA)"
+    )
 
     # 1. Métricas Chave
     q_diag = load_query("hipotese_4_atendimento/causas_raiz_e_automacao.sql", where_sql="")

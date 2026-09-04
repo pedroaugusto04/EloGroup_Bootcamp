@@ -9,11 +9,18 @@ import plotly.express as px
 import pandas as pd
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.query_loader import load_query
+from app.components.cards import render_data_source_badge
 
 
 def show_hipotese_decisao_gestao(repo: DuckDBRepository):
     st.markdown('<div class="page-title">Hipótese 6: Informação para Decisão & Estoque</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle"><i>"Parte da ineficiência pode estar na forma como a informação vira decisão."</i></div>', unsafe_allow_html=True)
+
+    render_data_source_badge(
+        tables=["estoque"],
+        scope="5.000 SKUs (207 descontinuados e 701 em nível crítico) | Snapshot Jan/2026",
+        dev_section="Seção 5: Hipótese 6 (Capital Imobilizado vs Ruptura)"
+    )
 
     # 1. Métricas Chave do Estoque
     q_est = load_query("hipotese_6_decisao_gestao/descompasso_estoque_ruptura.sql")

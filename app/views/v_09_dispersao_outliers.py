@@ -11,6 +11,7 @@ import numpy as np
 import plotly.express as px
 
 from src.infrastructure.database import DuckDBRepository
+from app.components.cards import render_data_source_badge
 
 
 TABLE_CONFIGS: Dict[str, Dict[str, Any]] = {
@@ -159,8 +160,14 @@ def calculate_iqr_stats(series: pd.Series, k: float = 1.5) -> Dict[str, Any]:
 
 def show_dispersao_outliers(repo: DuckDBRepository):
     """Página simplificada e direta de Boxplots & Análise de Outliers."""
-    st.markdown('<div class="page-title">Dispersão & Outliers</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-title">Dispersão & Outliers (Tukey 1.5x IQR)</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle">Análise estatística de dispersão e identificação de anomalias por base de dados.</div>', unsafe_allow_html=True)
+
+    render_data_source_badge(
+        tables=["vendas", "atendimento", "estoque", "clientes", "marketing"],
+        scope="5 Bases Sanitizadas (27.7k vendas, 35.8k tickets, 5k SKUs, 15k clientes, 3.5k campanhas)",
+        dev_section="Seção 2: Outliers e Anomalias (Critério de Tukey)"
+    )
 
     # 1. Controles Principais (Seleção Direta)
     c1, c2, c3, c4 = st.columns(4)
