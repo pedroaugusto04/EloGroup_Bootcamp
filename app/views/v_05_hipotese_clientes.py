@@ -62,6 +62,9 @@ def show_hipotese_clientes(repo: DuckDBRepository):
         fig_ped.update_layout(height=340)
         st.plotly_chart(fig_ped, use_container_width=True)
 
+    st.warning("O cruzamento de canal, LTV e churn foi removido: o CRM contém 15.000 clientes, mas apenas 346 têm vínculo com vendas, e o Marketing cobre um período maior que o ERP.")
+    return
+
     # 4. Análise de Canais: Mídia Declarada (Marketing) vs. Vendas Reais (ERP)
     st.subheader("Comparativo de Canais: Mídia Declarada vs. Vendas Reais no ERP")
     
@@ -161,5 +164,4 @@ def show_hipotese_clientes(repo: DuckDBRepository):
         "desconto_medio_reais": "R$ {:,.2f}",
         "pct_risco_churn": "{:.1f}%"
     }), use_container_width=True)
-
 

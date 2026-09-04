@@ -30,8 +30,8 @@ def show_hipotese_decisao_gestao(repo: DuckDBRepository):
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Capital Parado em Descontinuados", f"R$ {cap_travado/1e6:.1f}M", help="Mais de R$ 14,7M imobilizados")
     c2.metric("SKUs Fora de Linha", f"{int(skus_desc)} SKUs", help="Produtos sem ação rápida de liquidação")
-    c3.metric("Capital em Risco de Ruptura", f"R$ {cap_risco/1e6:.1f}M", help="Mais de R$ 7,2M em risco de falta")
-    c4.metric("SKUs Abaixo do Ponto de Pedido", f"{int(skus_crit)} SKUs", help="Produtos muito vendidos que podem faltar")
+    c3.metric("Capital em Estoque Crítico", f"R$ {cap_risco/1e6:.1f}M", help="Valor atualmente imobilizado nos 701 SKUs abaixo do ponto de pedido; não representa perda de receita")
+    c4.metric("SKUs Abaixo do Ponto de Pedido", f"{int(skus_crit)} SKUs", help="Produtos abaixo do ponto de pedido; demanda e receita perdida não foram estimadas")
 
     st.markdown("---")
 
@@ -55,4 +55,3 @@ def show_hipotese_decisao_gestao(repo: DuckDBRepository):
         fig_skus = px.pie(df_est, names="status_disponibilidade", values="total_skus", hole=0.4)
         fig_skus.update_layout(height=340)
         st.plotly_chart(fig_skus, use_container_width=True)
-

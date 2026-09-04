@@ -122,6 +122,9 @@ def show_clientes(repo: DuckDBRepository):
         }), use_container_width=True)
 
     with tab2:
+        st.warning("A qualidade de aquisição não é exibida: somente 346 de 15.000 clientes possuem vínculo confiável com vendas, e os períodos de Marketing e ERP não coincidem.")
+        return
+
         st.subheader("Qualidade e Retenção do Cliente por Canal de Aquisição")
         st.markdown(
             "Cruzamento entre o **canal da primeira compra** e o valor gerado ao longo da vida do cliente (LTV, CAC e taxa de clientes de alto valor vs risco de churn)."

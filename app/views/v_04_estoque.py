@@ -26,10 +26,10 @@ def show_estoque(repo: DuckDBRepository):
     if cat_sel:
         cat_str = "', '".join(cat_sel)
         where_sql = f"WHERE categoria IN ('{cat_str}')"
-        crit_where = f"WHERE em_ruptura = true AND categoria IN ('{cat_str}')"
+        crit_where = f"WHERE (em_ruptura = true OR is_estoque_critico = true) AND categoria IN ('{cat_str}')"
     else:
         where_sql = ""
-        crit_where = "WHERE em_ruptura = true"
+        crit_where = "WHERE em_ruptura = true OR is_estoque_critico = true"
 
     # 2. Métricas Globais de Estoque
     q_kpi = load_query("estoque/kpis_estoque.sql", where_sql=where_sql)

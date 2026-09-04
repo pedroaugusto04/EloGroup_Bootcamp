@@ -48,12 +48,12 @@ def show_atendimento(repo: DuckDBRepository):
     q_kpi = load_query("atendimento/kpis_atendimento.sql", where_sql=where_sql)
     df_at_kpi = repo.execute_sql(q_kpi).iloc[0]
 
-    c1, c2, c3, c4, c5 = st.columns(5)
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric("Total de Chamados", f"{int(df_at_kpi['total_tickets']):,}")
     c2.metric("CSAT Médio", f"{df_at_kpi['csat_medio']:.2f} / 5.0")
     c3.metric("Tempo Médio 1ª Resposta", f"{df_at_kpi['tempo_resposta_min']:.1f} min")
-    c4.metric("Tempo Médio Resolução", f"{df_at_kpi['tempo_resolucao_h']:.1f} horas")
-    c5.metric("Custo Total Suporte", f"R$ {df_at_kpi['custo_total']/1e3:,.1f}k")
+    c4.metric("Custo Total Suporte", f"R$ {df_at_kpi['custo_total']/1e3:,.1f}k")
+    st.info("Tempo médio de resolução não é exibido: a base contém 8.798 registros com datas de fechamento anômalas (31/12/2025), que distorcem o indicador. É necessária uma decisão metodológica antes de corrigir esse KPI.")
 
     st.markdown("---")
 
