@@ -205,7 +205,7 @@ def main():
 
     if st.sidebar.button("Executar Auditoria & Enviar E-mail", type="primary", width="stretch", help="Executa a auditoria de estoque imediatamente e dispara o e-mail executivo via Resend."):
         with st.sidebar.status(f"Auditando estoque ({audit_period_label})...", expanded=True) as status_box:
-            status_box.write("Processando cruzamento no DuckDB...")
+            status_box.write("Processando...")
             res = run_autonomous_inventory_audit(
                 send_email=True,
                 date_filter=audit_date_filter,
