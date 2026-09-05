@@ -1,29 +1,41 @@
 """
 app/views/v_11_agente_consultor.py
 Interface de Chat Dedicada & Minimalista para o Copiloto de Estoque (Vértice Retail).
-Foco em conversação analítica, consultas determinísticas no DuckDB e memória contínua.
+Foco em conversação analítica, consultas determinísticas no DuckDB e memória contínua persistente.
 """
 
 import uuid
 import streamlit as st
 from src.infrastructure.database import DuckDBRepository
+from src.infrastructure.chat_store import CopilotChatStore
 from src.agent.service import InventoryAgentService
 from src.utils.formatters import sanitize_markdown_for_streamlit
 
 
 def show_agente_consultor(repo: DuckDBRepository):
-    """Renderiza a interface de chat minimalista para o Copiloto de Estoque."""
+    """Renderiza a interface de chat minimalista para o Copiloto de Estoque com persistência."""
     service = InventoryAgentService()
+    chat_store = CopilotChatStore()
 
-    # Inicialização de estado da sessão de chat
+    # Inicialização do ID da thread ativa
     if "copilot_thread_id" not in st.session_state:
-        st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+        threads = chat_store.list_threads()
+        if threads:
+            st.session_state["copilot_thread_id"] = threads[0]["id"]
+            thread_data = chat_store.get_thread(threads[0]["id"])
+            st.session_state["copilot_messages"] = thread_data.get("messages", []) if thread_data else []
+        else:
+            st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+            st.session_state["copilot_messages"] = []
 
+    active_thread_id = st.session_state["copilot_thread_id"]
+
+    # Sincroniza mensagens do estado com o armazenamento persistente caso necessário
     if "copilot_messages" not in st.session_state:
-        st.session_state["copilot_messages"] = []
+        thread_data = chat_store.get_thread(active_thread_id)
+        st.session_state["copilot_messages"] = thread_data.get("messages", []) if thread_data else []
 
-    # Verificação de origem: Se o usuário veio por deep link de e-mail e o chat está no início,
-    # pré-carrega o conteúdo da auditoria executiva como contexto inicial da conversa.
+    # Verificação de origem por e-mail
     source_param = str(st.query_params.get("source", "")).lower()
     from_param = str(st.query_params.get("from", "")).lower()
     is_from_email = (source_param == "email" or from_param == "email")
@@ -59,33 +71,36 @@ def show_agente_consultor(repo: DuckDBRepository):
             )
             
         st.session_state["copilot_messages"] = [{"role": "assistant", "content": init_context}]
+        chat_store.save_thread(active_thread_id, st.session_state["copilot_messages"], title="Auditoria de Estoque")
         service.seed_copilot(
-            thread_id=st.session_state["copilot_thread_id"],
+            thread_id=active_thread_id,
             initial_message=init_context
         )
 
-
-
     # =========================================================================
-    # CABEÇALHO MINIMALISTA DO CHAT
+    # CABEÇALHO DO CHAT
     # =========================================================================
-    col_header, col_actions = st.columns([4, 1])
+    thread_info = chat_store.get_thread(active_thread_id)
+    chat_title = thread_info.get("title", "Nova Conversa") if thread_info else "Nova Conversa"
+
+    col_header, col_actions = st.columns([4, 1.2])
     with col_header:
         st.markdown(
-            """
+            f"""
             <div style="margin-bottom: 8px;">
-                <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: #F3F4F6;">Copiloto de Estoque</h2>
+                <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: #F3F4F6;">{chat_title}</h2>
                 <p style="margin: 2px 0 0 0; font-size: 12px; color: #9CA3AF;">
-                    Consultoria Analítica de Estoque & Rentabilidade &bull; <span style="color: #10B981; font-weight: 600;">Conectado</span>
+                    Consultoria Analítica &bull; <span style="color: #10B981; font-weight: 600;">Conectado ao DuckDB</span>
                 </p>
             </div>
             """,
             unsafe_allow_html=True,
         )
     with col_actions:
-        st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
-        if st.button("Nova Conversa", width="stretch", help="Reinicia a conversa e limpa o contexto da sessão."):
-            st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+        st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
+        if st.button("Nova Conversa", key="btn_new_chat_header", width="stretch", help="Inicia uma nova conversa e limpa o contexto da sessão."):
+            new_id = str(uuid.uuid4())
+            st.session_state["copilot_thread_id"] = new_id
             st.session_state["copilot_messages"] = []
             st.rerun()
 
@@ -103,9 +118,6 @@ def show_agente_consultor(repo: DuckDBRepository):
                 <h3 style="font-size: 20px; font-weight: 600; color: #F9FAFB; margin-bottom: 6px;">
                     Como posso apoiar a estratégia de estoque hoje?
                 </h3>
-                <p style="font-size: 13px; color: #9CA3AF; max-width: 620px; margin: 0 auto;">
-                    Acesso direto ao banco analítico DuckDB (Ano Base 2026). Simulações financeiras de liquidação, mapeamento de rupturas, auditoria de marketing e detalhamento de SKUs.
-                </p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -118,6 +130,7 @@ def show_agente_consultor(repo: DuckDBRepository):
             if st.button(
                 "**Simular Liquidação de Moda (-30%)**\n\n"
                 "Simula a queima da categoria com desconto e calcula o caixa liberado.",
+                key="btn_sug_1",
                 width="stretch",
             ):
                 prompt_to_send = "Simule liquidar a categoria Moda com 30% de desconto e mostre o potencial de liberação de caixa e impacto financeiro."
@@ -125,6 +138,7 @@ def show_agente_consultor(repo: DuckDBRepository):
             if st.button(
                 "**Diagnóstico 360° do SKU-00185**\n\n"
                 "Investigação detalhada de vendas, margem, estoque e devoluções.",
+                key="btn_sug_2",
                 width="stretch",
             ):
                 prompt_to_send = "Faça uma investigação detalhada 360° do produto SKU-00185."
@@ -133,6 +147,7 @@ def show_agente_consultor(repo: DuckDBRepository):
             if st.button(
                 "**Descompasso entre Marketing e Ruptura**\n\n"
                 "Identifica categorias com verba de mídia ativa e estoque em ruptura.",
+                key="btn_sug_3",
                 width="stretch",
             ):
                 prompt_to_send = "Quais categorias apresentam descompasso crítico entre verba de marketing e ruptura de estoque?"
@@ -140,6 +155,7 @@ def show_agente_consultor(repo: DuckDBRepository):
             if st.button(
                 "**Atrito Operacional e Devoluções**\n\n"
                 "Lista produtos com alto índice de devolução e frete desperdiçado.",
+                key="btn_sug_4",
                 width="stretch",
             ):
                 prompt_to_send = "Quais produtos têm a maior taxa de devolução e custo de frete desperdiçado?"
@@ -158,21 +174,21 @@ def show_agente_consultor(repo: DuckDBRepository):
     user_query = chat_input or prompt_to_send
 
     if user_query:
-        # Registra e exibe mensagem do usuário
         st.session_state["copilot_messages"].append({"role": "user", "content": user_query})
+        chat_store.save_thread(active_thread_id, st.session_state["copilot_messages"])
         with st.chat_message("user"):
             st.markdown(user_query)
 
         # Executa ciclo ReAct com memória de thread
         with st.chat_message("assistant"):
-            with st.spinner("Consultando dados no DuckDB..."):
+            with st.spinner("Consultando dados..."):
                 response_text = service.ask_copilot(
                     query=user_query,
-                    thread_id=st.session_state["copilot_thread_id"],
+                    thread_id=active_thread_id,
                 )
                 safe_response = sanitize_markdown_for_streamlit(response_text)
                 st.markdown(safe_response)
 
         st.session_state["copilot_messages"].append({"role": "assistant", "content": safe_response})
+        chat_store.save_thread(active_thread_id, st.session_state["copilot_messages"])
         st.rerun()
-

@@ -5,6 +5,7 @@ Painel focado exclusivamente em visualização, métricas agregadas e gráficos 
 """
 
 import sys
+import uuid
 import logging
 from pathlib import Path
 
@@ -23,6 +24,7 @@ import streamlit as st
 from app.styles.elo_theme import inject_elotarget_css, configure_plotly_theme
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.preprocessor import DataPreprocessor
+from src.infrastructure.chat_store import CopilotChatStore
 
 # Import das visualizações analíticas alinhadas ao DEVELOPMENT.md
 from app.views.v_09_dispersao_outliers import show_dispersao_outliers
@@ -87,17 +89,58 @@ def main():
 
     # Se estiver em modo Copiloto (Deep Link do E-mail ou Botão)
     if query_view in ["agente_consultor", "agent", "copiloto", "estoque", "7"]:
+        chat_store = CopilotChatStore()
+
         st.sidebar.markdown("### Copiloto de Estoque")
-        st.sidebar.markdown("<p style='font-size: 12px; color: #38BDF8;'>Consultoria & Diagnóstico</p>", unsafe_allow_html=True)
-        st.sidebar.markdown("---")
+        st.sidebar.markdown("<p style='font-size: 12px; color: #38BDF8; margin-top: -10px;'>Consultoria & Diagnóstico</p>", unsafe_allow_html=True)
         
-        import uuid
-        if st.sidebar.button("Nova Conversa", width="stretch", help="Reinicia a sessão e limpa o contexto da conversa."):
-            st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+        # Botão Nova Conversa
+        if st.sidebar.button("+ Nova Conversa", key="sidebar_new_chat_btn", type="primary", width="stretch", help="Inicia uma nova conversa do zero."):
+            new_thread_id = str(uuid.uuid4())
+            st.session_state["copilot_thread_id"] = new_thread_id
             st.session_state["copilot_messages"] = []
             st.rerun()
 
-        if st.sidebar.button("Voltar ao Workbench", width="stretch", help="Retorna ao painel completo de gráficos e auditoria analítica."):
+        st.sidebar.markdown("---")
+        st.sidebar.markdown("<p style='font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px;'>Histórico de Conversas</p>", unsafe_allow_html=True)
+
+        threads = chat_store.list_threads()
+        active_id = st.session_state.get("copilot_thread_id")
+
+        if threads:
+            for thread in threads:
+                t_id = thread["id"]
+                t_title = thread["title"]
+                t_count = thread["message_count"]
+                is_active = (t_id == active_id)
+
+                prefix = "• " if not is_active else "► "
+                btn_label = f"{prefix}{t_title}"
+                
+                col_thread, col_del = st.sidebar.columns([4, 1])
+                with col_thread:
+                    if st.button(
+                        btn_label,
+                        key=f"thread_btn_{t_id}",
+                        width="stretch",
+                        help=f"Abrir conversa ({t_count} mensagens)"
+                    ):
+                        st.session_state["copilot_thread_id"] = t_id
+                        thread_data = chat_store.get_thread(t_id)
+                        st.session_state["copilot_messages"] = thread_data.get("messages", []) if thread_data else []
+                        st.rerun()
+                with col_del:
+                    if st.button("✕", key=f"del_thread_{t_id}", help="Excluir esta conversa"):
+                        chat_store.delete_thread(t_id)
+                        if t_id == active_id:
+                            st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+                            st.session_state["copilot_messages"] = []
+                        st.rerun()
+        else:
+            st.sidebar.caption("Nenhuma conversa salva ainda.")
+
+        st.sidebar.markdown("---")
+        if st.sidebar.button("Voltar ao Workbench", key="sidebar_back_workbench_btn", width="stretch", help="Retorna ao painel completo de gráficos e auditoria analítica."):
             st.query_params.clear()
             st.rerun()
 
@@ -106,6 +149,7 @@ def main():
             """
             <div style="font-size: 11px; color: #71717A; line-height: 1.6;">
                 <b>Arquitetura:</b> ReAct com Memória<br>
+                <b>Persistência:</b> Histórico Local (JSON)<br>
                 <b>Base de Dados:</b> DuckDB OLAP (2026)<br>
                 <b>Status:</b> <span style="color: #10B981;">Conectado</span>
             </div>
@@ -160,7 +204,5 @@ def main():
     view_fn(repo)
 
 
-
 if __name__ == "__main__":
     main()
-
