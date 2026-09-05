@@ -16,9 +16,10 @@ from src.agent.tools import (
     tool_simulate_inventory_liquidation,
 )
 from src.agent.graph import (
+    _extract_json,
+    _validate_critic_payload,
     build_inventory_agent_graph,
     critic_node,
-    refiner_node,
     InventoryAgentState,
 )
 from src.agent.service import InventoryAgentService
@@ -99,6 +100,7 @@ def test_inventory_agent_graph_execution():
         "draft_report": None,
         "critic_feedback": None,
         "critic_approved": False,
+        "critic_reviewed": False,
         "revision_count": 0,
         "final_report": None,
         "structured_data": None,
@@ -111,7 +113,53 @@ def test_inventory_agent_graph_execution():
 
 
 
-def test_critic_guardrail_rejection_and_refinement():
+def test_critic_payload_requires_complete_schema():
+    valid = {
+        "approved": True,
+        "score": 9,
+        "feedback": "Relatório consistente.",
+        "corrections_needed": [],
+    }
+    assert _validate_critic_payload(valid) == valid
+    assert _validate_critic_payload({"approved": True, "score": 9}) is None
+    assert _validate_critic_payload({**valid, "approved": "true"}) is None
+    assert _extract_json("Resposta: {\"approved\": true}") == {"approved": True}
+
+
+def test_critic_repairs_invalid_json_once(monkeypatch):
+    class FakeResponse:
+        def __init__(self, content):
+            self.content = content
+
+    class FakeLLM:
+        def __init__(self):
+            self.responses = [
+                FakeResponse("Aprovo a minuta."),
+                FakeResponse("{\"approved\": true, \"score\": 9, \"feedback\": \"Guardrails atendidos.\", \"corrections_needed\": []}"),
+            ]
+            self.calls = 0
+
+        def invoke(self, _messages):
+            self.calls += 1
+            return self.responses.pop(0)
+
+    llm = FakeLLM()
+    monkeypatch.setattr("src.agent.graph.get_llm", lambda: llm)
+    state = {
+        "draft_report": "## Quick Wins\nAção em 30 dias.",
+        "structured_data": {"ruptura_count": 1},
+        "revision_count": 0,
+    }
+
+    result = critic_node(state)
+
+    assert llm.calls == 2
+    assert result["critic_reviewed"] is True
+    assert result["critic_approved"] is True
+    assert result["final_report"] == state["draft_report"]
+
+
+def test_critic_guardrail_rejection():
     # Minuta simulada com violação de guardrail (sugerindo compra de descontinuado)
     state: InventoryAgentState = {
         "mission": "Teste de Guardrails",
@@ -121,6 +169,7 @@ def test_critic_guardrail_rejection_and_refinement():
         "draft_report": "Recomendamos comprar descontinuado SKU-00185 imediatamente.",
         "critic_feedback": None,
         "critic_approved": False,
+        "critic_reviewed": False,
         "revision_count": 0,
         "final_report": None,
         "structured_data": {},
@@ -129,11 +178,6 @@ def test_critic_guardrail_rejection_and_refinement():
     assert critic_res["critic_approved"] is False
     assert "Violação Guardrail 1" in critic_res["critic_feedback"]
 
-    # Nó refinador deve aplicar ajuste
-    state.update(critic_res)
-    refiner_res = refiner_node(state)
-    assert refiner_res["critic_approved"] is True
-    assert "Nota de Revisão" in refiner_res["final_report"]
 
 
 def test_inventory_agent_service():
@@ -195,7 +239,6 @@ def test_copilot_seed_conversation_memory():
     # Pergunta de follow-up que depende diretamente do e-mail inicial semeado
     followup_resp = service.ask_copilot("Qual foi o capital travado citado no relatório?", thread_id=thread_id)
     assert len(followup_resp) > 10
-
 
 
 

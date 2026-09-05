@@ -29,8 +29,12 @@ def show_hipotese_atendimento(repo: DuckDBRepository):
     df_rastreio = df_diag[df_diag["categoria_problema"] == "Onde está meu pedido?"]
     df_duvida = df_diag[df_diag["categoria_problema"] == "Dúvida Técnica"]
 
-    custo_rastreio = df_rastreio["custo_evitavel_automacao"].sum() if not df_rastreio.empty else 159660.0
-    custo_duvida = df_duvida["custo_evitavel_automacao"].sum() if not df_duvida.empty else 78888.0
+    if df_diag.empty:
+        st.info("Não há dados de atendimento disponíveis para esta análise.")
+        return
+
+    custo_rastreio = df_rastreio["custo_evitavel_automacao"].sum()
+    custo_duvida = df_duvida["custo_evitavel_automacao"].sum()
     total_custo_evitavel = df_diag["custo_evitavel_automacao"].sum()
 
     c1, c2, c3 = st.columns(3)
@@ -62,4 +66,3 @@ def show_hipotese_atendimento(repo: DuckDBRepository):
         fig_can = px.pie(df_canais, names="canal_entrada", values="total_tickets", hole=0.4)
         fig_can.update_layout(height=340)
         st.plotly_chart(fig_can, use_container_width=True)
-

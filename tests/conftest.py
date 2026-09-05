@@ -13,7 +13,6 @@ class FakeConsultingLLM(FakeListChatModel):
     
     def __init__(self):
         default_responses = [
-            '{"plan": [{"step_id": 1, "name": "Scan de Ruptura", "description": "Diagnóstico"}, {"step_id": 2, "name": "Cruzamento Comercial", "description": "Demanda"}, {"step_id": 3, "name": "Auditoria de Devoluções", "description": "Qualidade"}, {"step_id": 4, "name": "Recomendações", "description": "Síntese"}]}',
             '# Relatório Executivo: Diagnóstico de Estoque\n\n## 1. Sumário Executivo\nTaxa de ruptura sob controle.\n\n## 2. Matriz de Ações por Horizonte Temporal\n### Quick Wins (30 dias)\n- Saldão controlado de descontinuados.\n- Reposição de SKUs Curva A.\n\n### Médio Prazo (60 dias)\n- Ajuste de lead times.\n\n### Longo Prazo (90 dias)\n- S&OP integrado.\n\n## 3. Top SKUs Críticos\nSKU-00185 em acompanhamento.',
             '{"approved": true, "score": 10, "feedback": "Total conformidade com os guardrails de negócio.", "corrections_needed": []}',
             'O capital total travado em descontinuados é de R$ 38.640,00, com potencial de liberação de caixa de R$ 52.450,00 com 30% de desconto.',
@@ -38,4 +37,3 @@ def mock_llm_for_tests(monkeypatch):
     monkeypatch.setattr("src.agent.graph.get_llm", lambda: fake_model)
     monkeypatch.setattr("src.agent.copilot.get_llm", lambda: fake_model)
     monkeypatch.setattr("src.agent.service.get_llm", lambda: fake_model, raising=False)
-

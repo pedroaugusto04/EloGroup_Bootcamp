@@ -60,9 +60,6 @@ CRITIC_APPROVAL_SUCCESS_FEEDBACK = (
     "Relatório aprovado integralmente nos 4 guardrails operacionais e financeiros."
 )
 
-REVISION_NOTE_PREFIX = "\n\n> **Nota de Revisão:** Ajustes de conformidade aplicados com base no feedback: "
-
-
 # ============================================================================
 # MENSAGENS DE VIOLAÇÃO DE GUARDRAILS
 # ============================================================================

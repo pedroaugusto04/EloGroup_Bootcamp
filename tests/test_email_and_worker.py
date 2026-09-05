@@ -106,3 +106,20 @@ def test_run_autonomous_inventory_audit_worker(mock_send):
     assert "structured_data" in snapshot
     assert "final_report" in snapshot
 
+
+@patch("src.agent.worker.InventoryAgentService")
+@patch.object(ResendEmailService, "send_email")
+def test_worker_does_not_send_unvalidated_report(mock_send, mock_service):
+    mock_service.return_value.run_diagnostic.return_value = {
+        "critic_approved": False,
+        "critic_reviewed": False,
+        "final_report": None,
+        "structured_data": {"ruptura_count": 2, "criticos_count": 1},
+        "critic_feedback": "Revisão indisponível.",
+    }
+
+    result = run_autonomous_inventory_audit(send_email=True)
+
+    assert result["success"] is False
+    assert result["email_result"] is None
+    mock_send.assert_not_called()

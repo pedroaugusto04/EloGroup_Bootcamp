@@ -24,6 +24,7 @@ class InventoryAgentState(TypedDict):
     draft_report: Optional[str]
     critic_feedback: Optional[str]
     critic_approved: bool
+    critic_reviewed: bool
     revision_count: int
     final_report: Optional[str]
     structured_data: Optional[Dict[str, Any]]

@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 from src.agent.service import InventoryAgentService
+from src.agent.constants import LLM_UNAVAILABLE_MESSAGE
 from src.infrastructure.email_service import ResendEmailService, render_executive_email_template
 
 logger = logging.getLogger("vertice.inventory_worker")
@@ -50,6 +51,12 @@ def run_autonomous_inventory_audit(
     # 1. Executa auditoria no LangGraph
     service = InventoryAgentService()
     diagnostic_result = service.run_diagnostic()
+    report = diagnostic_result.get("final_report") or ""
+    report_is_valid = (
+        diagnostic_result.get("critic_approved") is True
+        and diagnostic_result.get("critic_reviewed") is True
+        and LLM_UNAVAILABLE_MESSAGE not in report
+    )
     
     deep_link = get_deep_link_url()
     
@@ -65,7 +72,7 @@ def run_autonomous_inventory_audit(
         "critic_approved": diagnostic_result.get("critic_approved", False),
         "critic_feedback": diagnostic_result.get("critic_feedback", ""),
         "structured_data": diagnostic_result.get("structured_data", {}),
-        "final_report": diagnostic_result.get("final_report", ""),
+        "final_report": report if report_is_valid else "",
         "deep_link_url": deep_link,
     }
     
@@ -79,7 +86,7 @@ def run_autonomous_inventory_audit(
 
     # 4. Disparo de E-mail via Resend
     email_result = None
-    if send_email:
+    if send_email and report_is_valid:
         recipient = to_email or os.environ.get("RESEND_TO_EMAIL", "diretoria@verticeretail.com.br")
         subject = "[Vértice Analytics] Parecer Executivo de Auditoria de Estoque & Rentabilidade"
         
@@ -90,9 +97,11 @@ def run_autonomous_inventory_audit(
             html_content=email_html
         )
         logger.info("Resultado do envio de e-mail via Resend: %s", email_result.get("status"))
+    elif send_email:
+        logger.warning("E-mail executivo não enviado: parecer não foi validado.")
 
     return {
-        "success": True,
+        "success": report_is_valid,
         "timestamp": snapshot_data["timestamp"],
         "diagnostic": diagnostic_result,
         "deep_link_url": deep_link,

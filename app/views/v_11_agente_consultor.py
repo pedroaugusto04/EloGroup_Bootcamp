@@ -40,18 +40,21 @@ def show_agente_consultor(repo: DuckDBRepository):
             )
         else:
             structured = snapshot.get("structured_data") or {}
-            total_stranded = structured.get("total_stranded_cash", 38640.0)
-            ruptura_count = structured.get("ruptura_count", 0)
-            criticos_count = structured.get("criticos_count", 0)
+            total_stranded = structured.get("total_stranded_cash")
+            ruptura_count = structured.get("ruptura_count")
+            criticos_count = structured.get("criticos_count")
             mkt_cats = structured.get("mkt_alert_categories", [])
-            mkt_str = ", ".join(mkt_cats) if mkt_cats else "Nenhum descompasso crítico"
+            summary = []
+            if total_stranded is not None:
+                summary.append(f"- **Capital imobilizado**: `R$ {total_stranded:,.2f}`")
+            if ruptura_count is not None and criticos_count is not None:
+                summary.append(f"- **Ruptura e risco**: `{ruptura_count + criticos_count} SKUs`")
+            if mkt_cats:
+                summary.append(f"- **Categorias em alerta**: `{', '.join(mkt_cats)}`")
             init_context = (
-                "**Parecer Executivo de Auditoria de Estoque (Sincronizado com o E-mail):**\n\n"
-                f"- **Capital Imobilizado (Descontinuados)**: `R$ {total_stranded:,.2f}`\n"
-                f"- **Rupturas Ativas & Risco**: `{ruptura_count + criticos_count} SKUs`\n"
-                f"- **Categorias em Alerta de Marketing**: `{mkt_str}`\n"
-                f"- **Status da Auditoria**: `Aprovado (Guardrails Validados)`\n\n"
-                "**Como posso apoiar a sua análise?** Você pode solicitar simulações de liquidação, investigações de SKUs específicos ou estratégias de abastecimento."
+                "**Contexto da auditoria de estoque:**\n\n"
+                + ("\n".join(summary) if summary else "Nenhum dado da auditoria está disponível no momento.")
+                + "\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
             )
             
         st.session_state["copilot_messages"] = [{"role": "assistant", "content": init_context}]
@@ -79,6 +82,7 @@ def show_agente_consultor(repo: DuckDBRepository):
             unsafe_allow_html=True,
         )
     with col_actions:
+        st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
         if st.button("Nova Conversa", use_container_width=True, help="Reinicia a conversa e limpa o contexto da sessão."):
             st.session_state["copilot_thread_id"] = str(uuid.uuid4())
             st.session_state["copilot_messages"] = []
@@ -169,5 +173,4 @@ def show_agente_consultor(repo: DuckDBRepository):
 
         st.session_state["copilot_messages"].append({"role": "assistant", "content": response_text})
         st.rerun()
-
 

@@ -14,18 +14,14 @@ from langgraph.graph import StateGraph, START, END
 
 from src.agent.state import InventoryAgentState, AgentPlanStep
 from src.agent.prompts import (
-    PLANNER_SYSTEM_PROMPT,
-    EXECUTOR_SYSTEM_PROMPT,
     CONSOLIDATOR_SYSTEM_PROMPT,
     CRITIC_SYSTEM_PROMPT,
-    REFINER_SYSTEM_PROMPT,
 )
 from src.agent.constants import (
     DEFAULT_PLAN_STEPS,
     LLM_UNAVAILABLE_MESSAGE,
     CRITIC_UNAVAILABLE_FEEDBACK,
     CRITIC_APPROVAL_SUCCESS_FEEDBACK,
-    REVISION_NOTE_PREFIX,
     VIOLATION_DISCONTINUED_MSG,
     VIOLATION_TEMPORAL_MSG,
 )
@@ -79,6 +75,34 @@ def _extract_json(text: str) -> Optional[Dict[str, Any]]:
         return None
 
 
+def _validate_critic_payload(data: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """Valida o contrato do parecer; respostas incompletas nunca aprovam o relatório."""
+    if not isinstance(data, dict):
+        return None
+
+    approved = data.get("approved")
+    score = data.get("score")
+    feedback = data.get("feedback")
+    corrections = data.get("corrections_needed")
+    if (
+        type(approved) is not bool
+        or type(score) is not int
+        or not 1 <= score <= 10
+        or not isinstance(feedback, str)
+        or not feedback.strip()
+        or not isinstance(corrections, list)
+        or not all(isinstance(item, str) for item in corrections)
+    ):
+        return None
+
+    return {
+        "approved": approved,
+        "score": score,
+        "feedback": feedback.strip(),
+        "corrections_needed": corrections,
+    }
+
+
 # ============================================================================
 # NÓS DO GRAFO
 # ============================================================================
@@ -87,32 +111,10 @@ def planner_node(state: InventoryAgentState) -> Dict[str, Any]:
     """Nó 1: Arquiteto de Planejamento - Decompõe a missão em etapas auditáveis."""
     t0 = time.time()
     logger.info("Iniciando nó [PLANNER] para a missão: %s", state.get("mission", "")[:60])
-    llm = get_llm()
     plan_steps: List[AgentPlanStep] = []
     
-    if llm:
-        try:
-            response = llm.invoke([
-                SystemMessage(content=PLANNER_SYSTEM_PROMPT),
-                HumanMessage(content=f"Missão: {state['mission']}")
-            ])
-            data = _extract_json(response.content)
-            if data and "plan" in data:
-                for item in data["plan"]:
-                    plan_steps.append({
-                        "step_id": item.get("step_id", len(plan_steps) + 1),
-                        "name": item.get("name", "Etapa"),
-                        "description": item.get("description", ""),
-                        "status": "pending",
-                        "result": None,
-                    })
-                logger.info("Planejamento gerado via LLM com %d etapas.", len(plan_steps))
-        except Exception as e:
-            logger.warning("Falha ao invocar LLM no planner_node: %s. Utilizando plano padrão.", e)
-
-    if not plan_steps:
-        plan_steps = [dict(step) for step in DEFAULT_PLAN_STEPS]
-        logger.info("Plano padrão determinístico carregado com %d etapas.", len(plan_steps))
+    plan_steps = [dict(step) for step in DEFAULT_PLAN_STEPS]
+    logger.info("Plano determinístico carregado com %d etapas.", len(plan_steps))
 
     elapsed = time.time() - t0
     logger.info("[PLANNER] concluído em %.3fs.", elapsed)
@@ -123,6 +125,7 @@ def planner_node(state: InventoryAgentState) -> Dict[str, Any]:
         "observations": [],
         "revision_count": 0,
         "critic_approved": False,
+        "critic_reviewed": False,
     }
 
 
@@ -276,9 +279,10 @@ def critic_node(state: InventoryAgentState) -> Dict[str, Any]:
         logger.info("[CRITIC] Relatório contém aviso de indisponibilidade do LLM.")
         return {
             "critic_approved": False,
+            "critic_reviewed": False,
             "critic_feedback": CRITIC_UNAVAILABLE_FEEDBACK,
             "revision_count": revision_count + 1,
-            "final_report": draft,
+            "final_report": None,
         }
 
     # Verificação determinística de guardrails
@@ -303,44 +307,68 @@ def critic_node(state: InventoryAgentState) -> Dict[str, Any]:
         try:
             response = llm.invoke([
                 SystemMessage(content=CRITIC_SYSTEM_PROMPT),
-                HumanMessage(content=f"Minuta do Relatório:\n{draft}")
+                HumanMessage(content=(
+                    f"Minuta do Relatório:\n{draft}\n\n"
+                    f"Evidências estruturadas para auditoria independente:\n"
+                    f"{json.dumps(structured, ensure_ascii=False)}"
+                ))
             ])
-            data = _extract_json(response.content)
+            data = _validate_critic_payload(_extract_json(str(response.content)))
+
+            # Uma única recuperação para respostas HTTP bem-sucedidas, mas fora do contrato.
+            if data is None:
+                logger.warning("[CRITIC] Resposta fora do schema; solicitando correção de formato uma vez.")
+                repair_response = llm.invoke([
+                    SystemMessage(content=CRITIC_SYSTEM_PROMPT),
+                    HumanMessage(content=(
+                        "A resposta abaixo não cumpriu o contrato. Retorne somente um objeto JSON "
+                        "válido seguindo exatamente o schema e o exemplo do sistema, sem Markdown.\n\n"
+                        f"Resposta anterior:\n{str(response.content)[:4000]}"
+                    )),
+                ])
+                data = _validate_critic_payload(_extract_json(str(repair_response.content)))
             if data:
-                approved = data.get("approved", True)
-                feedback = data.get("feedback", feedback)
-                score = data.get("score", score)
+                approved = data["approved"]
+                feedback = data["feedback"]
+                score = data["score"]
                 logger.info("[CRITIC] Avaliação LLM: score=%s, approved=%s", score, approved)
+            else:
+                logger.warning("[CRITIC] Resposta do revisor não contém JSON válido ou schema compatível.")
+                return {
+                    "critic_approved": False,
+                    "critic_reviewed": False,
+                    "critic_feedback": "Revisão indisponível: resposta inválida do modelo.",
+                    "revision_count": revision_count + 1,
+                    "final_report": None,
+                }
         except Exception as e:
             logger.warning("[CRITIC] Falha ao invocar LLM no critic_node: %s", e)
+            return {
+                "critic_approved": False,
+                "critic_reviewed": False,
+                "critic_feedback": "Revisão indisponível: não foi possível validar o parecer.",
+                "revision_count": revision_count + 1,
+                "final_report": None,
+            }
+
+    if not llm and not violations:
+        return {
+            "critic_approved": False,
+            "critic_reviewed": False,
+            "critic_feedback": "Revisão indisponível: modelo de validação não configurado.",
+            "revision_count": revision_count + 1,
+            "final_report": None,
+        }
 
     elapsed = time.time() - t0
     logger.info("[CRITIC] Auditoria finalizada em %.3fs. Aprovado: %s, Score: %s.", elapsed, approved, score)
 
     return {
         "critic_approved": approved,
+        "critic_reviewed": True,
         "critic_feedback": f"[Nota {score}/10] {feedback}",
         "revision_count": revision_count + 1,
-        "final_report": draft if approved or revision_count >= 1 else None
-    }
-
-
-def refiner_node(state: InventoryAgentState) -> Dict[str, Any]:
-    """Nó 6: Refinador de Proposta - Aplica correções solicitadas pelo crítico."""
-    t0 = time.time()
-    draft = state.get("draft_report", "")
-    feedback = state.get("critic_feedback", "")
-    logger.info("Iniciando nó [REFINER] - Aplicando ajustes com base no feedback: %s", feedback[:80])
-    
-    # Ajusta minuta garantindo conformidade
-    refined_draft = draft + f"{REVISION_NOTE_PREFIX}{feedback}"
-    elapsed = time.time() - t0
-    logger.info("[REFINER] Refinamento concluído em %.3fs.", elapsed)
-    
-    return {
-        "draft_report": refined_draft,
-        "final_report": refined_draft,
-        "critic_approved": True
+        "final_report": draft if approved else None
     }
 
 
@@ -357,9 +385,7 @@ def should_continue_executing(state: InventoryAgentState) -> str:
 
 def should_reflect_or_finish(state: InventoryAgentState) -> str:
     """Decide se o relatório foi aprovado pelo crítico ou se precisa de revisão."""
-    if state.get("critic_approved", False) or state.get("revision_count", 0) >= 2:
-        return "finish"
-    return "refiner"
+    return "finish"
 
 
 def build_inventory_agent_graph():
@@ -372,7 +398,6 @@ def build_inventory_agent_graph():
     workflow.add_node("replanner", replanner_node)
     workflow.add_node("consolidator", consolidator_node)
     workflow.add_node("critic", critic_node)
-    workflow.add_node("refiner", refiner_node)
 
     # Conecta fluxo
     workflow.add_edge(START, "planner")
@@ -390,11 +415,7 @@ def build_inventory_agent_graph():
     workflow.add_conditional_edges(
         "critic",
         should_reflect_or_finish,
-        {
-            "refiner": "refiner",
-            "finish": END,
-        }
+        {"finish": END}
     )
-    workflow.add_edge("refiner", "critic")
 
     return workflow.compile()

@@ -29,10 +29,14 @@ def show_hipotese_decisao_gestao(repo: DuckDBRepository):
     df_desc = df_est[df_est["status_disponibilidade"] == "Descontinuado"]
     df_crit = df_est[df_est["status_disponibilidade"] == "Estoque Crítico"]
 
-    cap_travado = df_desc["capital_travado_descontinuado"].sum() if not df_desc.empty else 14775347.64
-    skus_desc = df_desc["total_skus"].sum() if not df_desc.empty else 207
-    cap_risco = df_crit["capital_em_risco_ruptura"].sum() if not df_crit.empty else 7250310.60
-    skus_crit = df_crit["total_skus"].sum() if not df_crit.empty else 701
+    if df_est.empty:
+        st.info("Não há dados de estoque disponíveis para esta análise.")
+        return
+
+    cap_travado = df_desc["capital_travado_descontinuado"].sum()
+    skus_desc = df_desc["total_skus"].sum()
+    cap_risco = df_crit["capital_em_risco_ruptura"].sum()
+    skus_crit = df_crit["total_skus"].sum()
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Capital Parado em Descontinuados", f"R$ {cap_travado/1e6:.1f}M", help="Mais de R$ 14,7M imobilizados")

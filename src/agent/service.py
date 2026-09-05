@@ -33,6 +33,7 @@ class InventoryAgentService(IInventoryAgentService):
             "draft_report": None,
             "critic_feedback": None,
             "critic_approved": False,
+            "critic_reviewed": False,
             "revision_count": 0,
             "final_report": None,
             "structured_data": None,
@@ -72,6 +73,5 @@ class InventoryAgentService(IInventoryAgentService):
     def seed_copilot(self, thread_id: str, initial_message: str) -> None:
         """Inicializa a memória do Copiloto ReAct com uma mensagem prévia (ex: e-mail de auditoria)."""
         self.copilot.seed_conversation(thread_id, initial_message)
-
 
 
