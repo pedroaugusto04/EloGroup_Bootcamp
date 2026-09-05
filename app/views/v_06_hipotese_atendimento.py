@@ -57,7 +57,7 @@ def show_hipotese_atendimento(repo: DuckDBRepository):
             color_discrete_map={True: "#3B82F6", False: "#64748B"}
         )
         fig_custo.update_layout(height=340)
-        st.plotly_chart(fig_custo, use_container_width=True)
+        st.plotly_chart(fig_custo, width="stretch")
 
     with col_g2:
         st.subheader("Canais de Entrada (WhatsApp como Maior Canal)")
@@ -65,4 +65,4 @@ def show_hipotese_atendimento(repo: DuckDBRepository):
         df_canais = repo.execute_sql(q_canais)
         fig_can = px.pie(df_canais, names="canal_entrada", values="total_tickets", hole=0.4)
         fig_can.update_layout(height=340)
-        st.plotly_chart(fig_can, use_container_width=True)
+        st.plotly_chart(fig_can, width="stretch")

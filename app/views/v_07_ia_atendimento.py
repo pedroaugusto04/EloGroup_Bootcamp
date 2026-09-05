@@ -140,7 +140,7 @@ def show_ia_atendimento(repo: DuckDBRepository):
                 title="Custo Operacional por Categoria de Chamado (R$)"
             )
             fig_custo.update_layout(height=340)
-            st.plotly_chart(fig_custo, use_container_width=True)
+            st.plotly_chart(fig_custo, width="stretch")
 
         with col_g2:
             fig_csat = px.scatter(
@@ -153,7 +153,7 @@ def show_ia_atendimento(repo: DuckDBRepository):
                 title="CSAT vs Tempo de Resposta por Motivo"
             )
             fig_csat.update_layout(height=340)
-            st.plotly_chart(fig_csat, use_container_width=True)
+            st.plotly_chart(fig_csat, width="stretch")
 
         st.subheader("Detalhamento Analítico de Causas-Raiz")
         st.dataframe(
@@ -167,7 +167,7 @@ def show_ia_atendimento(repo: DuckDBRepository):
                 "custo_operacional_total": "R$ {:,.2f}",
                 "custo_evitavel_automacao": "R$ {:,.2f}"
             }),
-            use_container_width=True
+            width="stretch"
         )
 
     # ==========================================

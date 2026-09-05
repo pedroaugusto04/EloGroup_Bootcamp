@@ -64,7 +64,7 @@ def show_marketing(repo: DuckDBRepository):
             labels={"value": "Valor (R$)", "canal": "Canal", "variable": "Métrica"}
         )
         fig_bar.update_layout(height=340, legend=dict(orientation="h", y=1.05))
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar, width="stretch")
 
     with col_g2:
         st.subheader("Dispersão: CAC vs. ROAS por Canal")
@@ -79,7 +79,7 @@ def show_marketing(repo: DuckDBRepository):
         )
         fig_scatter.update_traces(textposition="top center")
         fig_scatter.update_layout(height=340)
-        st.plotly_chart(fig_scatter, use_container_width=True)
+        st.plotly_chart(fig_scatter, width="stretch")
 
     # 4. Tabela Completa de Eficiência por Canal
     st.subheader("Matriz de Eficiência por Canal")
@@ -93,4 +93,4 @@ def show_marketing(repo: DuckDBRepository):
         "cac": "R$ {:,.2f}",
         "ctr_pct": "{:.2f}%",
         "taxa_conversao_pct": "{:.2f}%"
-    }), use_container_width=True)
+    }), width="stretch")

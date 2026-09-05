@@ -69,7 +69,7 @@ def show_clientes(repo: DuckDBRepository):
             color_continuous_scale="Blues"
         )
         fig_rfm.update_layout(height=340)
-        st.plotly_chart(fig_rfm, use_container_width=True)
+        st.plotly_chart(fig_rfm, width="stretch")
 
     with col_g2:
         st.subheader("LTV Médio por Segmento (R$)")
@@ -82,7 +82,7 @@ def show_clientes(repo: DuckDBRepository):
             color_continuous_scale="Greens"
         )
         fig_ltv.update_layout(height=340)
-        st.plotly_chart(fig_ltv, use_container_width=True)
+        st.plotly_chart(fig_ltv, width="stretch")
 
     # 4. Demografia e Dispositivos
     col_g3, col_g4 = st.columns(2)
@@ -93,7 +93,7 @@ def show_clientes(repo: DuckDBRepository):
         
         fig_uf = px.bar(df_uf, x="estado", y="total_clientes", labels={"total_clientes": "Clientes", "estado": "UF"})
         fig_uf.update_layout(height=320)
-        st.plotly_chart(fig_uf, use_container_width=True)
+        st.plotly_chart(fig_uf, width="stretch")
 
     with col_g4:
         st.subheader("Clientes por Nível de Fidelidade")
@@ -102,7 +102,7 @@ def show_clientes(repo: DuckDBRepository):
         
         fig_fid = px.pie(df_fid, names="nivel_fidelidade", values="total_clientes", hole=0.4)
         fig_fid.update_layout(height=320)
-        st.plotly_chart(fig_fid, use_container_width=True)
+        st.plotly_chart(fig_fid, width="stretch")
 
     # 5. Tabela Resumo dos Segmentos RFM
     st.subheader("Tabela Consolidada de Segmentos RFM")
@@ -113,4 +113,4 @@ def show_clientes(repo: DuckDBRepository):
         "ltv_medio": "R$ {:,.2f}",
         "media_pedidos": "{:.1f}",
         "renda_media": "R$ {:,.2f}"
-    }), use_container_width=True)
+    }), width="stretch")

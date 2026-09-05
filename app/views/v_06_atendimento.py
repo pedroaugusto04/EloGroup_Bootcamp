@@ -81,7 +81,7 @@ def show_atendimento(repo: DuckDBRepository):
             color_continuous_scale="Blues"
         )
         fig_mot.update_layout(height=340)
-        st.plotly_chart(fig_mot, use_container_width=True)
+        st.plotly_chart(fig_mot, width="stretch")
 
     with col_g2:
         st.subheader("Distribuição de Notas CSAT (1 a 5)")
@@ -97,7 +97,7 @@ def show_atendimento(repo: DuckDBRepository):
             color_continuous_scale=["#EF4444", "#F59E0B", "#10B981"]
         )
         fig_csat.update_layout(height=340)
-        st.plotly_chart(fig_csat, use_container_width=True)
+        st.plotly_chart(fig_csat, width="stretch")
 
     # 4. Canais de Entrada e Status
     col_g3, col_g4 = st.columns(2)
@@ -108,7 +108,7 @@ def show_atendimento(repo: DuckDBRepository):
         
         fig_canais_at = px.pie(df_canais_at, names="canal_entrada", values="total_tickets", hole=0.4)
         fig_canais_at.update_layout(height=320)
-        st.plotly_chart(fig_canais_at, use_container_width=True)
+        st.plotly_chart(fig_canais_at, width="stretch")
 
     with col_g4:
         st.subheader("Status dos Atendimentos")
@@ -117,10 +117,10 @@ def show_atendimento(repo: DuckDBRepository):
         
         fig_status_at = px.bar(df_status_at, x="status_atendimento", y="total_tickets", labels={"total_tickets": "Chamados", "status_atendimento": "Status"})
         fig_status_at.update_layout(height=320)
-        st.plotly_chart(fig_status_at, use_container_width=True)
+        st.plotly_chart(fig_status_at, width="stretch")
 
     # 5. Amostra de Mensagens Recentes de Clientes
     st.subheader("Amostra Recente de Chamados de Clientes")
     q_sample = load_query("atendimento/amostra_recentes.sql", where_sql=where_sql, limit=50)
     df_amostra = repo.execute_sql(q_sample)
-    st.dataframe(df_amostra, use_container_width=True)
+    st.dataframe(df_amostra, width="stretch")

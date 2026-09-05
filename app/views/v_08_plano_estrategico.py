@@ -119,12 +119,12 @@ def show_plano_estrategico(repo: DuckDBRepository):
         )
         fig_matriz.update_traces(textposition='top center')
         fig_matriz.update_layout(height=460)
-        st.plotly_chart(fig_matriz, use_container_width=True)
+        st.plotly_chart(fig_matriz, width="stretch")
 
         st.markdown("#### Tabela Detalhada das Iniciativas do `DEVELOPMENT.md`:")
         st.dataframe(
             df_iniciativas[["Iniciativa", "Hipótese", "Tipo", "Impacto_Financeiro", "Descrição"]],
-            use_container_width=True
+            width="stretch"
         )
 
     # ==========================================

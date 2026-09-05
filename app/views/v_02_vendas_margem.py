@@ -80,7 +80,7 @@ def show_vendas_margem(repo: DuckDBRepository):
             labels={"value": "Valor (R$)", "categoria": "Categoria", "variable": "Indicador"}
         )
         fig_cat.update_layout(height=340, legend=dict(orientation="h", y=1.05))
-        st.plotly_chart(fig_cat, use_container_width=True)
+        st.plotly_chart(fig_cat, width="stretch")
 
     with col_g2:
         st.subheader("Motivos de Devolução (Impacto Financeiro)")
@@ -89,7 +89,7 @@ def show_vendas_margem(repo: DuckDBRepository):
         
         fig_dev = px.pie(df_dev, names="motivo_devolucao", values="valor_devolvido", hole=0.4)
         fig_dev.update_layout(height=340)
-        st.plotly_chart(fig_dev, use_container_width=True)
+        st.plotly_chart(fig_dev, width="stretch")
 
     # 4. Análise Granular por SKU
     st.subheader("Tabela de Produtos (SKU): Top Faturamento e Margem")
@@ -102,4 +102,4 @@ def show_vendas_margem(repo: DuckDBRepository):
         "margem_total": "R$ {:,.2f}",
         "margem_pct": "{:.1f}%",
         "desconto_medio_pct": "{:.1f}%"
-    }), use_container_width=True)
+    }), width="stretch")

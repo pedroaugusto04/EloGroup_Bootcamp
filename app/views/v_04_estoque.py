@@ -83,7 +83,7 @@ def show_estoque(repo: DuckDBRepository):
             }
         )
         fig_cat.update_layout(height=340, legend=dict(orientation="h", y=1.05))
-        st.plotly_chart(fig_cat, use_container_width=True)
+        st.plotly_chart(fig_cat, width="stretch")
 
     with col_g2:
         st.subheader("Lead Time Médio por Categoria (Dias)")
@@ -94,7 +94,7 @@ def show_estoque(repo: DuckDBRepository):
             labels={"lead_time_medio": "Lead Time Médio (Dias)", "categoria": "Categoria"}
         )
         fig_lt.update_layout(height=340)
-        st.plotly_chart(fig_lt, use_container_width=True)
+        st.plotly_chart(fig_lt, width="stretch")
 
     # 4. Tabela de SKUs Críticos (Abaixo do Ponto de Pedido)
     st.subheader("SKUs em Ruptura ou Estoque Crítico")
@@ -108,4 +108,4 @@ def show_estoque(repo: DuckDBRepository):
         "lead_time_dias": "{:.0f}",
         "custo_unitario": "R$ {:,.2f}",
         "preco_venda_sugerido": "R$ {:,.2f}"
-    }), use_container_width=True)
+    }), width="stretch")

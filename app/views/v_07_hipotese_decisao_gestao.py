@@ -59,10 +59,10 @@ def show_hipotese_decisao_gestao(repo: DuckDBRepository):
             title="Capital Travado vs Em Estoque (R$)"
         )
         fig_cap.update_layout(height=340)
-        st.plotly_chart(fig_cap, use_container_width=True)
+        st.plotly_chart(fig_cap, width="stretch")
 
     with col_g2:
         st.subheader("Participação de SKUs por Status")
         fig_skus = px.pie(df_est, names="status_disponibilidade", values="total_skus", hole=0.4)
         fig_skus.update_layout(height=340)
-        st.plotly_chart(fig_skus, use_container_width=True)
+        st.plotly_chart(fig_skus, width="stretch")

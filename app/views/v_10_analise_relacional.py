@@ -85,7 +85,7 @@ def show_analise_relacional(repo: DuckDBRepository):
                 }
             )
             fig_rec_comp.update_layout(height=340, legend=dict(orientation="h", y=1.05))
-            st.plotly_chart(fig_rec_comp, use_container_width=True)
+            st.plotly_chart(fig_rec_comp, width="stretch")
 
         with col_g2:
             st.subheader("Ticket Médio Real por Canal (ERP Vendas)")
@@ -105,7 +105,7 @@ def show_analise_relacional(repo: DuckDBRepository):
                 annotation_position="top left"
             )
             fig_tkt.update_layout(height=340, showlegend=False)
-            st.plotly_chart(fig_tkt, use_container_width=True)
+            st.plotly_chart(fig_tkt, width="stretch")
 
         st.subheader("Tabela Cruzada: Mídia Declarada vs. Realidade Financeira do ERP")
         st.dataframe(df_mkt_ven.style.format({
@@ -122,7 +122,7 @@ def show_analise_relacional(repo: DuckDBRepository):
             "margem_pct_real": "{:.1f}%",
             "taxa_devolucao_pct": "{:.1f}%",
             "roas_real_erp": "{:.2f}x"
-        }), use_container_width=True)
+        }), width="stretch")
 
     # =========================================================================
     # TAB 2: ESTOQUE X VENDAS (GIRO & RUPTURA)
@@ -162,7 +162,7 @@ def show_analise_relacional(repo: DuckDBRepository):
                 }
             )
             fig_est_bar.update_layout(height=340, legend=dict(orientation="h", y=1.05))
-            st.plotly_chart(fig_est_bar, use_container_width=True)
+            st.plotly_chart(fig_est_bar, width="stretch")
 
         with col_e2:
             st.subheader("Taxa de Ruptura de Estoque (%) por Categoria")
@@ -175,7 +175,7 @@ def show_analise_relacional(repo: DuckDBRepository):
                 color_continuous_scale="Reds"
             )
             fig_rup.update_layout(height=340)
-            st.plotly_chart(fig_rup, use_container_width=True)
+            st.plotly_chart(fig_rup, width="stretch")
 
         st.subheader("Tabela Cruzada: Desempenho de Giro e Ruptura por Categoria")
         st.dataframe(df_est_ven.style.format({
@@ -190,7 +190,7 @@ def show_analise_relacional(repo: DuckDBRepository):
             "receita_real": "R$ {:,.2f}",
             "margem_real": "R$ {:,.2f}",
             "giro_estoque_ratio": "{:.2f}x"
-        }), use_container_width=True)
+        }), width="stretch")
 
     # =========================================================================
     # TAB 3: VENDAS X ATENDIMENTO (LOGÍSTICA & CSAT)
@@ -238,7 +238,7 @@ def show_analise_relacional(repo: DuckDBRepository):
                 yaxis2=dict(title="% CSAT Crítico", overlaying="y", side="right"),
                 legend=dict(orientation="h", y=1.1)
             )
-            st.plotly_chart(fig_sla, use_container_width=True)
+            st.plotly_chart(fig_sla, width="stretch")
 
         with col_l2:
             st.subheader("Custos de Suporte (Total vs. Evitável) por Faixa de Entrega")
@@ -254,7 +254,7 @@ def show_analise_relacional(repo: DuckDBRepository):
                 }
             )
             fig_c_log.update_layout(height=340, legend=dict(orientation="h", y=1.05))
-            st.plotly_chart(fig_c_log, use_container_width=True)
+            st.plotly_chart(fig_c_log, width="stretch")
 
         st.subheader("Tabela Cruzada: Desempenho Logístico x Atrito no Atendimento")
         st.dataframe(df_log_atd.style.format({
@@ -266,7 +266,7 @@ def show_analise_relacional(repo: DuckDBRepository):
             "taxa_devolucao_pct": "{:.1f}%",
             "custo_suporte_total": "R$ {:,.2f}",
             "custo_evitavel_automacao": "R$ {:,.2f}"
-        }), use_container_width=True)
+        }), width="stretch")
 
     # =========================================================================
     # TAB 4: CLIENTES X VENDAS X SUPORTE (CICLO DE VIDA & ATRITO VIP)
@@ -302,7 +302,7 @@ def show_analise_relacional(repo: DuckDBRepository):
                 color_continuous_scale="Blues"
             )
             fig_ltv.update_layout(height=340)
-            st.plotly_chart(fig_ltv, use_container_width=True)
+            st.plotly_chart(fig_ltv, width="stretch")
 
         with col_c2:
             st.subheader("Clientes com Experiência Negativa (CSAT Crítico) por Segmento")
@@ -315,7 +315,7 @@ def show_analise_relacional(repo: DuckDBRepository):
                 color_continuous_scale="Reds"
             )
             fig_crit.update_layout(height=340)
-            st.plotly_chart(fig_crit, use_container_width=True)
+            st.plotly_chart(fig_crit, width="stretch")
 
         st.subheader("Tabela Cruzada: Ciclo de Vida do Cliente, Devoluções e Atrito no Suporte")
         st.dataframe(df_cli_atd.style.format({
@@ -329,4 +329,4 @@ def show_analise_relacional(repo: DuckDBRepository):
             "pct_clientes_com_csat_critico": "{:.1f}%",
             "taxa_devolucao_pedidos_pct": "{:.1f}%",
             "custo_suporte_segmento": "R$ {:,.2f}"
-        }), use_container_width=True)
+        }), width="stretch")

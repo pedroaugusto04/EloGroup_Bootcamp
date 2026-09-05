@@ -6,13 +6,14 @@ Permite aos tomadores de decisão (C-Level e Gerentes de Categoria) realizar
 perguntas ad-hoc, investigações de SKU e simulações financeiras em tempo real com raciocínio multi-hop.
 """
 
+import os
 import logging
 from typing import Optional, Dict, Any
 from langchain_core.messages import HumanMessage
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 
-from src.agent.graph import get_llm
+from src.infrastructure.llm import get_llm
 from src.agent.tools import (
     tool_inventory_health_scan,
     tool_sales_demand_matrix,
@@ -36,6 +37,7 @@ Diretrizes de Raciocínio (ReAct):
 3. **Guardrail de Descontinuados**: NUNCA sugira comprar ou repor itens marcados como 'descontinuados'. Para estes itens, recomende queima controlada/liquidação ou renegociação.
 4. **Memória de Contexto**: Mantenha a continuidade da conversa. Se o usuário fizer uma pergunta de follow-up (ex: 'E qual o lead time do primeiro produto citado?'), utilize o contexto das mensagens e ferramentas anteriores para responder com precisão.
 5. **Formatação Limpa**: Estruture suas respostas em Markdown profissional, com bullet points, tabelas comparativas e destaques em negrito.
+6. **Sem Diagramas Mermaid**: NUNCA utilize blocos de código mermaid (```mermaid). Use exclusivamente tabelas Markdown estruturadas e listas analíticas para sintetizar fluxos e etapas.
 """
 
 OFFLINE_FALLBACK_NOTICE = (

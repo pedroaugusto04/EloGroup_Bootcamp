@@ -81,7 +81,7 @@ def show_visao_geral(repo: DuckDBRepository):
             name="Margem Contribuição", marker_color="#94A3B8", opacity=0.7
         ))
         fig_trend.update_layout(height=340, hovermode="x unified", legend=dict(orientation="h", y=1.05))
-        st.plotly_chart(fig_trend, use_container_width=True)
+        st.plotly_chart(fig_trend, width="stretch")
 
     with col_g2:
         st.subheader("Receita Líquida por Canal de Venda")
@@ -97,7 +97,7 @@ def show_visao_geral(repo: DuckDBRepository):
             color_discrete_map={"receita_liquida": "#38BDF8", "margem_contribuicao": "#94A3B8"}
         )
         fig_canal.update_layout(height=340, legend=dict(orientation="h", y=1.05))
-        st.plotly_chart(fig_canal, use_container_width=True)
+        st.plotly_chart(fig_canal, width="stretch")
 
     # 4. Distribuição por Categoria e Métodos de Pagamento
     col_g3, col_g4 = st.columns(2)
@@ -108,7 +108,7 @@ def show_visao_geral(repo: DuckDBRepository):
         
         fig_cat = px.pie(df_cat, names="categoria", values="receita_liquida", hole=0.4)
         fig_cat.update_layout(height=320)
-        st.plotly_chart(fig_cat, use_container_width=True)
+        st.plotly_chart(fig_cat, width="stretch")
 
     with col_g4:
         st.subheader("Volume por Método de Pagamento")
@@ -124,7 +124,7 @@ def show_visao_geral(repo: DuckDBRepository):
             color_continuous_scale="Blues"
         )
         fig_pag.update_layout(height=320)
-        st.plotly_chart(fig_pag, use_container_width=True)
+        st.plotly_chart(fig_pag, width="stretch")
 
     # 5. Tabela Resumo Agregada
     st.subheader("Tabela Resumo: Desempenho Mensal Consolidado")
@@ -132,4 +132,4 @@ def show_visao_geral(repo: DuckDBRepository):
         "receita_liquida": "R$ {:,.2f}",
         "margem_contribuicao": "R$ {:,.2f}",
         "pedidos": "{:,.0f}"
-    }), use_container_width=True)
+    }), width="stretch")

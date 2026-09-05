@@ -145,6 +145,8 @@ def test_critic_repairs_invalid_json_once(monkeypatch):
 
     llm = FakeLLM()
     monkeypatch.setattr("src.agent.graph.get_llm", lambda: llm)
+    monkeypatch.setattr("src.agent.nodes.get_llm", lambda: llm)
+    monkeypatch.setattr("src.infrastructure.llm.get_llm", lambda: llm)
     state = {
         "draft_report": "## Quick Wins\nAção em 30 dias.",
         "structured_data": {"ruptura_count": 1},

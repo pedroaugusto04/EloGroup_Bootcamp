@@ -54,7 +54,7 @@ def show_hipotese_clientes(repo: DuckDBRepository):
             color_discrete_map={"Campeão": "#10B981", "Fiel": "#3B82F6", "Promissor": "#6366F1", "Em Risco": "#F59E0B", "Hibernando": "#EF4444", "Churn": "#78716C"}
         )
         fig_rfm.update_layout(height=340)
-        st.plotly_chart(fig_rfm, use_container_width=True)
+        st.plotly_chart(fig_rfm, width="stretch")
 
     with col_g2:
         st.subheader("Média de Pedidos por Segmento (Volume de Compras)")
@@ -67,4 +67,4 @@ def show_hipotese_clientes(repo: DuckDBRepository):
             color_continuous_scale="Blues"
         )
         fig_ped.update_layout(height=340)
-        st.plotly_chart(fig_ped, use_container_width=True)
+        st.plotly_chart(fig_ped, width="stretch")

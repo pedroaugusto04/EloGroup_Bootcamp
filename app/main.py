@@ -92,12 +92,12 @@ def main():
         st.sidebar.markdown("---")
         
         import uuid
-        if st.sidebar.button("Nova Conversa", use_container_width=True, help="Reinicia a sessão e limpa o contexto da conversa."):
+        if st.sidebar.button("Nova Conversa", width="stretch", help="Reinicia a sessão e limpa o contexto da conversa."):
             st.session_state["copilot_thread_id"] = str(uuid.uuid4())
             st.session_state["copilot_messages"] = []
             st.rerun()
 
-        if st.sidebar.button("Voltar ao Workbench", use_container_width=True, help="Retorna ao painel completo de gráficos e auditoria analítica."):
+        if st.sidebar.button("Voltar ao Workbench", width="stretch", help="Retorna ao painel completo de gráficos e auditoria analítica."):
             st.query_params.clear()
             st.rerun()
 
@@ -125,7 +125,7 @@ def main():
 
     from src.agent.worker import run_autonomous_inventory_audit
 
-    if st.sidebar.button("Executar Auditoria & Enviar E-mail", type="primary", use_container_width=True, help="Executa a auditoria de estoque imediatamente e dispara o e-mail executivo via Resend."):
+    if st.sidebar.button("Executar Auditoria & Enviar E-mail", type="primary", width="stretch", help="Executa a auditoria de estoque imediatamente e dispara o e-mail executivo via Resend."):
         with st.sidebar.status("Executando auditoria & enviando e-mail...", expanded=True) as status_box:
             status_box.write("Auditando estoque no DuckDB...")
             res = run_autonomous_inventory_audit(send_email=True)
@@ -140,7 +140,7 @@ def main():
                 status_box.update(label="Auditoria finalizada com aviso.", state="error", expanded=False)
                 st.sidebar.warning(f"{email_res.get('error', 'Status indefinido')}")
 
-    if st.sidebar.button("Abrir Copiloto de Estoque", use_container_width=True, help="Abre a interface conversacional do Copiloto de Estoque com memória."):
+    if st.sidebar.button("Abrir Copiloto de Estoque", width="stretch", help="Abre a interface conversacional do Copiloto de Estoque com memória."):
         st.query_params["view"] = "agent"
         st.rerun()
 

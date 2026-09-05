@@ -8,6 +8,7 @@ import uuid
 import streamlit as st
 from src.infrastructure.database import DuckDBRepository
 from src.agent.service import InventoryAgentService
+from src.utils.formatters import sanitize_markdown_for_streamlit
 
 
 def show_agente_consultor(repo: DuckDBRepository):
@@ -83,7 +84,7 @@ def show_agente_consultor(repo: DuckDBRepository):
         )
     with col_actions:
         st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
-        if st.button("Nova Conversa", use_container_width=True, help="Reinicia a conversa e limpa o contexto da sessão."):
+        if st.button("Nova Conversa", width="stretch", help="Reinicia a conversa e limpa o contexto da sessão."):
             st.session_state["copilot_thread_id"] = str(uuid.uuid4())
             st.session_state["copilot_messages"] = []
             st.rerun()
@@ -117,14 +118,14 @@ def show_agente_consultor(repo: DuckDBRepository):
             if st.button(
                 "**Simular Liquidação de Moda (-30%)**\n\n"
                 "Simula a queima da categoria com desconto e calcula o caixa liberado.",
-                use_container_width=True,
+                width="stretch",
             ):
                 prompt_to_send = "Simule liquidar a categoria Moda com 30% de desconto e mostre o potencial de liberação de caixa e impacto financeiro."
 
             if st.button(
                 "**Diagnóstico 360° do SKU-00185**\n\n"
                 "Investigação detalhada de vendas, margem, estoque e devoluções.",
-                use_container_width=True,
+                width="stretch",
             ):
                 prompt_to_send = "Faça uma investigação detalhada 360° do produto SKU-00185."
 
@@ -132,14 +133,14 @@ def show_agente_consultor(repo: DuckDBRepository):
             if st.button(
                 "**Descompasso entre Marketing e Ruptura**\n\n"
                 "Identifica categorias com verba de mídia ativa e estoque em ruptura.",
-                use_container_width=True,
+                width="stretch",
             ):
                 prompt_to_send = "Quais categorias apresentam descompasso crítico entre verba de marketing e ruptura de estoque?"
 
             if st.button(
                 "**Atrito Operacional e Devoluções**\n\n"
                 "Lista produtos com alto índice de devolução e frete desperdiçado.",
-                use_container_width=True,
+                width="stretch",
             ):
                 prompt_to_send = "Quais produtos têm a maior taxa de devolução e custo de frete desperdiçado?"
 
@@ -148,7 +149,7 @@ def show_agente_consultor(repo: DuckDBRepository):
     # =========================================================================
     for msg in st.session_state["copilot_messages"]:
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            st.markdown(sanitize_markdown_for_streamlit(msg["content"]))
 
     # =========================================================================
     # BARRA DE ENTRADA DO CHAT (CHAT INPUT OU SUGESTÃO CLICADA)
@@ -169,8 +170,9 @@ def show_agente_consultor(repo: DuckDBRepository):
                     query=user_query,
                     thread_id=st.session_state["copilot_thread_id"],
                 )
-                st.markdown(response_text)
+                safe_response = sanitize_markdown_for_streamlit(response_text)
+                st.markdown(safe_response)
 
-        st.session_state["copilot_messages"].append({"role": "assistant", "content": response_text})
+        st.session_state["copilot_messages"].append({"role": "assistant", "content": safe_response})
         st.rerun()
 

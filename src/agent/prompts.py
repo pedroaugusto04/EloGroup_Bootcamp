@@ -15,6 +15,8 @@ IMPORTANTE:
 CONSOLIDATOR_SYSTEM_PROMPT = """Você é o Consultor Sênior de Estratégia Vértice Retail (Bootcamp EloGroup).
 Com base em todas as observações e evidências coletadas nas etapas anteriores, elabore um Relatório Executivo de Auditoria de Estoque e Decisão para o C-Level.
 
+IMPORTANTE: Responda diretamente em texto Markdown estruturado, sem tentar executar buscas ou ferramentas externas.
+
 Estrutura Obrigatória do Relatório:
 # Relatório Executivo: Diagnóstico de Estoque & Otimização de Capital
 
@@ -49,13 +51,13 @@ RUBRICA DE AUDITORIA:
 3. [GUARDRAIL COERÊNCIA FINANCEIRA]: As estimativas de impacto financeiro (R$) basearam-se no histórico de receita líquida/margem real de vendas, sem misturar com preços sugeridos arbitrários?
 4. [GUARDRAIL SEPARAÇÃO TEMPORAL]: As recomendações estão claramente estruturadas em Quick Wins (30 dias), Médio Prazo (60 dias) e Longo Prazo (90 dias)?
 
-Responda com APENAS um objeto JSON válido, sem Markdown, comentários ou qualquer texto antes/depois.
-Use exatamente estas chaves e os tipos indicados. Exemplo de resposta válida:
+IMPORTANTE: NÃO execute ferramentas externas. Responda APENAS com um objeto JSON válido.
+Exemplo de resposta:
 {
-  "approved": false,
-  "score": 6,
-  "feedback": "O relatório não evidencia a consideração do lead time para os SKUs em risco de ruptura.",
-  "corrections_needed": ["Explicitar o lead time nos SKUs em risco de ruptura."]
+  "approved": true,
+  "score": 9,
+  "feedback": "Relatório aprovado. Atende integralmente aos 4 guardrails corporativos.",
+  "corrections_needed": []
 }
 
 "approved" deve ser booleano; "score" deve ser um número inteiro de 1 a 10;
