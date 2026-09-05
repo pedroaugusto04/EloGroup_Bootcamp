@@ -243,4 +243,44 @@ def test_copilot_seed_conversation_memory():
     assert len(followup_resp) > 10
 
 
+def test_copilot_with_explicit_history_window():
+    from src.agent.copilot import InventoryCopilot
+    copilot = InventoryCopilot()
+    thread_id = "test_explicit_history_session"
+
+    history = [
+        {"role": "user", "content": "Quais são os produtos mais críticos em ruptura na categoria Eletrônicos?"},
+        {"role": "assistant", "content": "Na categoria Eletrônicos, o produto SKU-00185 é o mais crítico com 0 unidades em estoque."},
+        {"role": "user", "content": "Qual a margem dele?"},
+        {"role": "assistant", "content": "A margem unitária do SKU-00185 é de R$ 45,20 com 120 pedidos no histórico."},
+    ]
+
+    # Nova pergunta no mesmo chat referenciando o produto mencionado no histórico
+    resp = copilot.ask(
+        query="E quantas unidades foram vendidas desse mesmo produto no total?",
+        thread_id=thread_id,
+        history=history,
+    )
+    assert len(resp) > 10
+    assert "erro" not in resp.lower() or "não" in resp.lower()
+
+
+def test_service_ask_copilot_with_history_propagation():
+    service = InventoryAgentService()
+    thread_id = "test_service_history_propagation"
+
+    history = [
+        {"role": "user", "content": "Qual o SKU de maior capital travado em descontinuados?"},
+        {"role": "assistant", "content": "O produto com maior capital travado é o SKU-00185 com R$ 12.500 imobilizados."},
+    ]
+
+    resp = service.ask_copilot(
+        query="Qual o status desse produto?",
+        thread_id=thread_id,
+        history=history,
+    )
+    assert len(resp) > 10
+
+
+
 

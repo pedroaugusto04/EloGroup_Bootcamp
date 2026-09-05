@@ -8,8 +8,8 @@ perguntas ad-hoc, investigações de SKU e simulações financeiras em tempo rea
 
 import os
 import logging
-from typing import Optional, Dict, Any
-from langchain_core.messages import HumanMessage
+from typing import Optional, Dict, Any, List
+from langchain_core.messages import HumanMessage, AIMessage
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 
@@ -80,10 +80,15 @@ class InventoryCopilot:
         else:
             self.agent = None
 
-    def ask(self, query: str, thread_id: str = "vertice_default_session") -> str:
+    def ask(
+        self,
+        query: str,
+        thread_id: str = "vertice_default_session",
+        history: Optional[List[Dict[str, str]]] = None,
+    ) -> str:
         """
         Executa o ciclo ReAct (Thought -> Action -> Observation -> Final Answer)
-        mantendo a esteira de memória associada ao thread_id.
+        mantendo a esteira de memória associada ao thread_id e janela deslizante de histórico recente.
         """
         logger.info("Copilot ReAct recebeu query para thread '%s': %s", thread_id, query[:80])
 
@@ -95,15 +100,30 @@ class InventoryCopilot:
 
         try:
             recursion_limit = int(os.environ.get("COPILOT_RECURSION_LIMIT", "15"))
+            history_window = int(os.environ.get("COPILOT_HISTORY_WINDOW", "6"))
             config = {
                 "configurable": {"thread_id": thread_id},
                 "recursion_limit": recursion_limit,
             }
+
+            input_messages = []
+            if history:
+                # Recorta as últimas N mensagens
+                recent_history = history[-history_window:]
+                for msg in recent_history:
+                    role = msg.get("role")
+                    content = msg.get("content", "")
+                    if role == "user" and content:
+                        input_messages.append(HumanMessage(content=content))
+                    elif role == "assistant" and content:
+                        input_messages.append(AIMessage(content=content))
+
+            input_messages.append(HumanMessage(content=query))
+
             result = self.agent.invoke(
-                {"messages": [HumanMessage(content=query)]},
+                {"messages": input_messages},
                 config=config,
             )
-
 
             messages = result.get("messages", [])
             if messages:
@@ -121,7 +141,6 @@ class InventoryCopilot:
             self._build_agent()
         if self.agent:
             try:
-                from langchain_core.messages import AIMessage
                 config = {"configurable": {"thread_id": thread_id}}
                 self.agent.update_state(config, {"messages": [AIMessage(content=initial_assistant_message)]})
                 logger.info("Memória ReAct da thread '%s' inicializada com contexto de e-mail/auditoria.", thread_id)

@@ -174,17 +174,19 @@ def show_agente_consultor(repo: DuckDBRepository):
     user_query = chat_input or prompt_to_send
 
     if user_query:
+        past_history = list(st.session_state.get("copilot_messages", []))
         st.session_state["copilot_messages"].append({"role": "user", "content": user_query})
         chat_store.save_thread(active_thread_id, st.session_state["copilot_messages"])
         with st.chat_message("user"):
             st.markdown(user_query)
 
-        # Executa ciclo ReAct com memória de thread
+        # Executa ciclo ReAct com memória de thread e histórico contextual recente
         with st.chat_message("assistant"):
             with st.spinner("Consultando dados..."):
                 response_text = service.ask_copilot(
                     query=user_query,
                     thread_id=active_thread_id,
+                    history=past_history,
                 )
                 safe_response = sanitize_markdown_for_streamlit(response_text)
                 st.markdown(safe_response)

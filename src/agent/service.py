@@ -65,10 +65,11 @@ class InventoryAgentService(IInventoryAgentService):
     def ask_copilot(
         self,
         query: str,
-        thread_id: str = "vertice_default_session"
+        thread_id: str = "vertice_default_session",
+        history: Optional[List[Dict[str, str]]] = None,
     ) -> str:
         """Processa perguntas ad-hoc e simulações com o Copiloto Interativo ReAct mantendo memória de sessão."""
-        return self.copilot.ask(query, thread_id=thread_id)
+        return self.copilot.ask(query, thread_id=thread_id, history=history)
 
     def seed_copilot(self, thread_id: str, initial_message: str) -> None:
         """Inicializa a memória do Copiloto ReAct com uma mensagem prévia (ex: e-mail de auditoria)."""

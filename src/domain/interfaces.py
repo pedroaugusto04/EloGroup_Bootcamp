@@ -3,7 +3,7 @@ src/domain/interfaces.py
 Abstract contracts and Protocols for Clean Architecture.
 """
 
-from typing import Protocol, Optional, Any, Dict
+from typing import Protocol, Optional, Any, Dict, List
 
 class IInventoryAgentService(Protocol):
     """Contract for the Inventory & Executive Strategy AI Agent."""
@@ -18,7 +18,8 @@ class IInventoryAgentService(Protocol):
     def ask_copilot(
         self,
         query: str,
-        thread_id: str = "vertice_default_session"
+        thread_id: str = "vertice_default_session",
+        history: Optional[List[Dict[str, str]]] = None
     ) -> str:
         ...
 
