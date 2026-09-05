@@ -123,41 +123,88 @@ def show_agente_consultor(repo: DuckDBRepository):
             unsafe_allow_html=True,
         )
 
-        st.markdown("<p style='font-size: 11px; font-weight: 600; color: #9CA3AF; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;'>Sugestões de Análise:</p>", unsafe_allow_html=True)
+        st.markdown(
+            """
+            <style>
+            .sug-card-container div[data-testid="stButton"] > button {
+                text-align: left !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                justify-content: center !important;
+                padding: 12px 16px !important;
+                background-color: rgba(255, 255, 255, 0.02) !important;
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                border-radius: 8px !important;
+                min-height: 74px !important;
+                width: 100% !important;
+                transition: all 0.2s ease-in-out !important;
+            }
+            .sug-card-container div[data-testid="stButton"] > button:hover {
+                background-color: rgba(56, 189, 248, 0.05) !important;
+                border-color: rgba(56, 189, 248, 0.35) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+            .sug-card-container div[data-testid="stButton"] > button p {
+                font-size: 13px !important;
+                line-height: 1.4 !important;
+                margin: 0 !important;
+                color: #E2E8F0 !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
 
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button(
-                "**Simular Liquidação de Moda (-30%)**\n\n"
-                "Simula a queima da categoria com desconto e calcula o caixa liberado.",
-                key="btn_sug_1",
-                width="stretch",
-            ):
-                prompt_to_send = "Simule liquidar a categoria Moda com 30% de desconto e mostre o potencial de liberação de caixa e impacto financeiro."
+        st.markdown("<p style='font-size: 11px; font-weight: 600; color: #9CA3AF; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;'>Sugestões de Análise:</p>", unsafe_allow_html=True)
 
-            if st.button(
-                "**Diagnóstico 360° do SKU-00185**\n\n"
-                "Investigação detalhada de vendas, margem, estoque e devoluções.",
-                key="btn_sug_2",
-                width="stretch",
-            ):
-                prompt_to_send = "Faça uma investigação detalhada 360° do produto SKU-00185."
+        suggestions = [
+            (
+                "⚡ **Simular Liquidação de Moda (-30%)**\n\nCalcula liberação de caixa e margem de contribuição.",
+                "Simule liquidar a categoria Moda com 30% de desconto e mostre o potencial de liberação de caixa e impacto financeiro.",
+                "btn_sug_liquidation",
+            ),
+            (
+                "📦 **Auditoria de Rupturas & Risco**\n\nIdentifica SKUs em falta e dias de cobertura crítica.",
+                "Faça uma varredura na saúde do estoque identificando quais SKUs estão em ruptura ou em risco crítico de falta nos próximos dias.",
+                "btn_sug_rupturas",
+            ),
+            (
+                "🔍 **Diagnóstico 360° (SKU-00185)**\n\nInvestigação de estoque, vendas, margem e devoluções.",
+                "Faça uma investigação detalhada 360° do produto SKU-00185 (Camisa Social Clássico Nude).",
+                "btn_sug_sku_dive",
+            ),
+            (
+                "⚠️ **Capital em Descontinuados**\n\nRanking de itens fora de linha com capital imobilizado.",
+                "Quais são os principais SKUs descontinuados com maior capital de giro travado no estoque?",
+                "btn_sug_stranded",
+            ),
+            (
+                "📊 **Matriz Volume vs Receita Real**\n\nCurva de faturamento e produtos com maior margem.",
+                "Gere a matriz de demanda e faturamento de vendas identificando os produtos com maior volume e margem de contribuição.",
+                "btn_sug_demand_matrix",
+            ),
+            (
+                "🔄 **Atrito & Devoluções Críticas**\n\nProdutos com alta devolução e frete desperdiçado.",
+                "Quais produtos têm a maior taxa de devolução, principais motivos de atrito e custo de frete desperdiçado?",
+                "btn_sug_returns_risk",
+            ),
+        ]
 
-            if st.button(
-                "**Capital Travado em Descontinuados**\n\n"
-                "Identifica os itens fora de linha com maior valor de estoque parado.",
-                key="btn_sug_3",
-                width="stretch",
-            ):
-                prompt_to_send = "Quais são os principais SKUs descontinuados com maior capital de giro travado no estoque?"
-
-            if st.button(
-                "**Atrito Operacional e Devoluções**\n\n"
-                "Lista produtos com alto índice de devolução e frete desperdiçado.",
-                key="btn_sug_4",
-                width="stretch",
-            ):
-                prompt_to_send = "Quais produtos têm a maior taxa de devolução e custo de frete desperdiçado?"
+        st.markdown('<div class="sug-card-container">', unsafe_allow_html=True)
+        for i in range(0, len(suggestions), 2):
+            c1, c2 = st.columns(2)
+            with c1:
+                label_1, prompt_1, key_1 = suggestions[i]
+                if st.button(label_1, key=key_1, use_container_width=True):
+                    prompt_to_send = prompt_1
+            with c2:
+                if i + 1 < len(suggestions):
+                    label_2, prompt_2, key_2 = suggestions[i + 1]
+                    if st.button(label_2, key=key_2, use_container_width=True):
+                        prompt_to_send = prompt_2
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # =========================================================================
     # HISTÓRICO DE CONVERSAÇÃO (MENSAGENS)

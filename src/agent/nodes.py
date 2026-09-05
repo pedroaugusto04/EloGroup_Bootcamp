@@ -272,8 +272,12 @@ def critic_node(state: InventoryAgentState) -> Dict[str, Any]:
         violations.append(VIOLATION_DISCONTINUED_MSG)
         logger.warning("[CRITIC] Violação detectada: Guardrail de Descontinuados.")
 
-    # 2. Guardrail de Separação Temporal: deve ter Quick Wins e Estrutural
-    if "quick wins" not in draft.lower() or "30 dias" not in draft.lower():
+    # 2. Guardrail de Separação Temporal: valida se há marcadores de horizonte temporal (Quick Wins / 30 dias / Curto Prazo)
+    temporal_markers = [
+        "quick win", "curto prazo", "30 dia", "30d", "ação imediata",
+        "ações imediatas", "ganhos rápidos", "ganho rápido", "30/60/90", "30-60-90"
+    ]
+    if not any(m in draft.lower() for m in temporal_markers):
         violations.append(VIOLATION_TEMPORAL_MSG)
         logger.warning("[CRITIC] Violação detectada: Guardrail de Separação Temporal.")
 
