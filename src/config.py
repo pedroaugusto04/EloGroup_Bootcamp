@@ -4,6 +4,7 @@ Configurações centrais do projeto Vértice Analytics (EloGroup Bootcamp).
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Diretórios base
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -11,6 +12,9 @@ DATA_DIR = ROOT_DIR / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 REPORTS_DIR = ROOT_DIR / "relatorios_analise"
+
+# Carrega variáveis de ambiente do arquivo .env se presente
+load_dotenv(ROOT_DIR / ".env")
 
 # Banco DuckDB
 DB_PATH = DATA_DIR / "vertice_analytics.duckdb"

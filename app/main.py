@@ -5,7 +5,15 @@ Painel focado exclusivamente em visualização, métricas agregadas e gráficos 
 """
 
 import sys
+import logging
 from pathlib import Path
+
+# Configuração de logging padrão para saída em stdout (Docker logs)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -29,6 +37,7 @@ from app.views.v_06_hipotese_atendimento import show_hipotese_atendimento
 from app.views.v_05_hipotese_clientes import show_hipotese_clientes
 from app.views.v_07_hipotese_decisao_gestao import show_hipotese_decisao_gestao
 from app.views.v_08_plano_estrategico import show_plano_estrategico
+from app.views.v_11_agente_consultor import show_agente_consultor
 
 
 st.set_page_config(
@@ -55,8 +64,8 @@ def main():
     repo = get_repository()
 
     # Sidebar Estruturada e Alinhada com DEVELOPMENT.md
-    st.sidebar.markdown("### 🔍 Vértice Workbench")
-    st.sidebar.markdown("<p style='font-size: 12px; color: #9CA3AF; margin-top: -10px;'>Auditoria & Desenvolvimento</p>", unsafe_allow_html=True)
+    st.sidebar.markdown("### Vértice Analytics")
+    st.sidebar.markdown("<p style='font-size: 12px; color: #9CA3AF; margin-top: -10px;'>Workbench de Análise & Auditoria</p>", unsafe_allow_html=True)
     st.sidebar.markdown("---")
 
     paginas = {
@@ -74,7 +83,66 @@ def main():
         "6. Plano de Ação (30/60/90 Dias)": show_plano_estrategico,
     }
 
+    query_view = st.query_params.get("view", "")
+
+    # Se estiver em modo Copiloto (Deep Link do E-mail ou Botão)
+    if query_view in ["agente_consultor", "agent", "copiloto", "estoque", "7"]:
+        st.sidebar.markdown("### Copiloto de Estoque")
+        st.sidebar.markdown("<p style='font-size: 12px; color: #38BDF8;'>Consultoria & Diagnóstico</p>", unsafe_allow_html=True)
+        st.sidebar.markdown("---")
+        
+        import uuid
+        if st.sidebar.button("Nova Conversa", use_container_width=True, help="Reinicia a sessão e limpa o contexto da conversa."):
+            st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+            st.session_state["copilot_messages"] = []
+            st.rerun()
+
+        if st.sidebar.button("Voltar ao Workbench", use_container_width=True, help="Retorna ao painel completo de gráficos e auditoria analítica."):
+            st.query_params.clear()
+            st.rerun()
+
+        st.sidebar.markdown("---")
+        st.sidebar.markdown(
+            """
+            <div style="font-size: 11px; color: #71717A; line-height: 1.6;">
+                <b>Arquitetura:</b> ReAct com Memória<br>
+                <b>Base de Dados:</b> DuckDB OLAP (2026)<br>
+                <b>Status:</b> <span style="color: #10B981;">Conectado</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        show_agente_consultor(repo)
+        return
+
+    # Modo Normal do Workbench
     escolha = st.sidebar.radio("Selecione a Etapa da Análise:", list(paginas.keys()), index=0)
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### Rotinas de Auditoria")
+    st.sidebar.caption("Auditoria periódica de estoque e notificação.")
+
+    from src.agent.worker import run_autonomous_inventory_audit
+
+    if st.sidebar.button("Executar Auditoria & Enviar E-mail", type="primary", use_container_width=True, help="Executa a auditoria de estoque imediatamente e dispara o e-mail executivo via Resend."):
+        with st.sidebar.status("Executando auditoria & enviando e-mail...", expanded=True) as status_box:
+            status_box.write("Auditando estoque no DuckDB...")
+            res = run_autonomous_inventory_audit(send_email=True)
+            email_res = res.get("email_result") or {}
+            if email_res.get("status") == "sent":
+                status_box.update(label="Auditoria concluída e e-mail enviado.", state="complete", expanded=False)
+                st.sidebar.success(f"E-mail enviado via Resend para `{email_res.get('to')}`.")
+            elif email_res.get("status") == "simulated":
+                status_box.update(label="Auditoria concluída (Modo Simulação).", state="complete", expanded=False)
+                st.sidebar.info(f"{email_res.get('message')}")
+            else:
+                status_box.update(label="Auditoria finalizada com aviso.", state="error", expanded=False)
+                st.sidebar.warning(f"{email_res.get('error', 'Status indefinido')}")
+
+    if st.sidebar.button("Abrir Copiloto de Estoque", use_container_width=True, help="Abre a interface conversacional do Copiloto de Estoque com memória."):
+        st.query_params["view"] = "agent"
+        st.rerun()
 
     st.sidebar.markdown("---")
     st.sidebar.markdown(
@@ -82,7 +150,7 @@ def main():
         <div style="font-size: 11px; color: #71717A;">
             <b>Alinhamento:</b> DEVELOPMENT.md<br>
             <b>Motor:</b> DuckDB OLAP (5 Tabelas)<br>
-            <b>Modo:</b> Auditoria & Diagnóstico
+            <b>Ano Base:</b> 2026
         </div>
         """,
         unsafe_allow_html=True
@@ -92,5 +160,7 @@ def main():
     view_fn(repo)
 
 
+
 if __name__ == "__main__":
     main()
+
