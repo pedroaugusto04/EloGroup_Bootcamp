@@ -7,11 +7,20 @@ com template HTML corporativo responsivo e Deep Link para o Copiloto ReAct.
 
 import os
 import logging
+import re
 import textwrap
 from typing import Dict, Any, Optional, List
 import requests
 
 logger = logging.getLogger("vertice.email_service")
+
+
+def parse_recipient_emails(to: str) -> List[str]:
+    """Converte uma configuração de destinatários em uma lista para o Resend."""
+    recipients = [email.strip() for email in re.split(r"[,;\n]+", to or "") if email.strip()]
+
+    # Preserva a ordem configurada, evitando enviar duas vezes ao mesmo endereço.
+    return list(dict.fromkeys(recipients))
 
 
 class ResendEmailService:
@@ -39,12 +48,20 @@ class ResendEmailService:
         Envia e-mail via Resend API.
         Caso a API Key não esteja configurada, opera em modo de simulação com log transparente.
         """
+        recipients = parse_recipient_emails(to)
+        if not recipients:
+            return {
+                "success": False,
+                "status": "error",
+                "error": "Nenhum destinatário de e-mail foi configurado.",
+            }
+
         if not self.api_key:
             logger.info("RESEND_API_KEY não configurada. Operação executada em modo simulação (Mock).")
             return {
                 "success": True,
                 "status": "simulated",
-                "to": to,
+                "to": recipients,
                 "subject": subject,
                 "message": "E-mail processado e simulado com sucesso. Configure RESEND_API_KEY no .env para envio real."
             }
@@ -56,7 +73,7 @@ class ResendEmailService:
         
         payload: Dict[str, Any] = {
             "from": self.from_email,
-            "to": [to],
+            "to": recipients,
             "subject": subject,
             "html": html_content
         }
@@ -67,12 +84,12 @@ class ResendEmailService:
             response = requests.post(self.base_url, json=payload, headers=headers, timeout=10)
             if response.status_code in [200, 201]:
                 res_data = response.json()
-                logger.info("E-mail enviado com sucesso via Resend para '%s' (ID: %s)", to, res_data.get("id"))
+                logger.info("E-mail enviado com sucesso via Resend para '%s' (ID: %s)", recipients, res_data.get("id"))
                 return {
                     "success": True,
                     "status": "sent",
                     "id": res_data.get("id"),
-                    "to": to,
+                    "to": recipients,
                     "subject": subject
                 }
             else:

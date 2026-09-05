@@ -61,6 +61,24 @@ def test_resend_email_service_simulation_mode():
 
 
 @patch("requests.post")
+def test_resend_email_service_accepts_multiple_recipients(mock_post):
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {"id": "re_msg_multiple"}
+    mock_post.return_value = mock_resp
+
+    service = ResendEmailService(api_key="re_test_key_123")
+    service.send_email(
+        to="ceo@vertice.com.br, diretoria@vertice.com.br; ceo@vertice.com.br",
+        subject="Parecer Executivo",
+        html_content="<p>Relatório</p>",
+    )
+
+    called_payload = mock_post.call_args[1]["json"]
+    assert called_payload["to"] == ["ceo@vertice.com.br", "diretoria@vertice.com.br"]
+
+
+@patch("requests.post")
 def test_resend_email_service_http_call(mock_post):
     mock_resp = MagicMock()
     mock_resp.status_code = 200

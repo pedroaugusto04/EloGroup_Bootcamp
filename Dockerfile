@@ -1,7 +1,44 @@
 # ==============================================================================
 # Dockerfile: EloGroup AI Consulting Lab - Projeto Vértice Analytics
 # ==============================================================================
-FROM python:3.12-slim
+# Estágio de dependências de runtime. Mantemos a versão do Python alinhada ao
+# ambiente atual e isolamos os artefatos instalados para a imagem final.
+FROM python:3.12-slim AS runtime-deps
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+COPY requirements-runtime.txt .
+RUN pip install --prefix=/install -r requirements-runtime.txt
+
+# Estágio usado para gerar os Parquets e também pelos testes locais/CI.
+FROM runtime-deps AS builder
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/install/lib/python3.12/site-packages:/app \
+    PATH=/install/bin:$PATH \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+RUN pip install --prefix=/install "pytest>=8.0.0"
+
+COPY src/ /app/src/
+COPY data/raw/ /app/data/raw/
+RUN python -m src.infrastructure.preprocessor
+
+# Target opcional para executar testes sem adicionar pytest à imagem de runtime.
+FROM builder AS test
+ENV PYTHONPATH=/install/lib/python3.12/site-packages:/app
+COPY app/ /app/app/
+COPY tests/ /app/tests/
+CMD ["pytest", "tests/test_analytics.py"]
+
+# Imagem final de execução: não leva pytest, CSVs brutos nem o ambiente de
+# build para produção.
+FROM python:3.12-slim AS runtime
 
 # Defaults seguros para execução em produção. O compose local sobrescreve os
 # valores de desenvolvimento (hot reload e volumes).
@@ -15,6 +52,8 @@ ENV PYTHONUNBUFFERED=1 \
     STREAMLIT_SERVER_FILE_WATCHER_TYPE=none \
     STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
+COPY --from=runtime-deps /install /usr/local
+
 # Instala curl para checagem de saúde (healthcheck)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -23,20 +62,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Diretório de trabalho
 WORKDIR /app
 
-# 1. Instalação de dependências (aproveita cache de camadas)
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-# 2. Cópia do código-fonte, dados e testes
+# Código-fonte da aplicação
 COPY src/ /app/src/
 COPY app/ /app/app/
-COPY data/ /app/data/
-COPY tests/ /app/tests/
 
-# 3. Pré-processamento dos dados na imagem. Falhar aqui deve interromper o
-# build: uma imagem sem Parquets não é uma versão publicável.
-RUN python -m src.infrastructure.preprocessor
+# Copia somente os dados derivados gerados no estágio de build.
+COPY --from=builder /app/data/processed/ /app/data/processed/
 
 # Porta padrão do Streamlit
 EXPOSE 8501

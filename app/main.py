@@ -41,8 +41,8 @@ from app.views.v_11_agente_consultor import show_agente_consultor
 
 
 st.set_page_config(
-    page_title="Vértice Analytics - Workbench & Auditoria",
-    page_icon="🔍",
+    page_title="Vértice Analytics",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )

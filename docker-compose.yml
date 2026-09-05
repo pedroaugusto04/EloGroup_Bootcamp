@@ -35,6 +35,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: test
     container_name: vertice_analytics_tests
     command: ["pytest", "tests/test_analytics.py"]
     profiles:
@@ -45,4 +46,4 @@ services:
       - ./data:/app/data
       - ./tests:/app/tests
     environment:
-      - PYTHONPATH=/app
+      - PYTHONPATH=/install/lib/python3.12/site-packages:/app
