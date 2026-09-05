@@ -3,15 +3,16 @@
 # ==============================================================================
 FROM python:3.12-slim
 
-# Variáveis de ambiente para Python e Streamlit com Hot Reload ativo
+# Defaults seguros para execução em produção. O compose local sobrescreve os
+# valores de desenvolvimento (hot reload e volumes).
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/app \
     STREAMLIT_SERVER_PORT=8501 \
     STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
     STREAMLIT_SERVER_HEADLESS=true \
-    STREAMLIT_SERVER_RUN_ON_SAVE=true \
-    STREAMLIT_SERVER_FILE_WATCHER_TYPE=poll \
+    STREAMLIT_SERVER_RUN_ON_SAVE=false \
+    STREAMLIT_SERVER_FILE_WATCHER_TYPE=none \
     STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
 # Instala curl para checagem de saúde (healthcheck)
@@ -33,8 +34,9 @@ COPY app/ /app/app/
 COPY data/ /app/data/
 COPY tests/ /app/tests/
 
-# 3. Pré-processamento dos dados na inicialização/build
-RUN python -m src.infrastructure.preprocessor || true
+# 3. Pré-processamento dos dados na imagem. Falhar aqui deve interromper o
+# build: uma imagem sem Parquets não é uma versão publicável.
+RUN python -m src.infrastructure.preprocessor
 
 # Porta padrão do Streamlit
 EXPOSE 8501
