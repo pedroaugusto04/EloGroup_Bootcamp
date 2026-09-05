@@ -9,7 +9,7 @@
 WITH cost_vendas AS (
     SELECT 
         sku_id, 
-        ROUND(AVG(custo_produto / NULLIF(quantidade, 0)), 2) AS custo_medio_real
+        ROUND(AVG(custo_produto / NULLIF(quantidade, 0)), 2) AS custo_medio_historico_vendas
     FROM vendas
     WHERE status_pagamento = 'Aprovado'
     GROUP BY sku_id
@@ -20,8 +20,9 @@ raw_stranded AS (
         e.nome_produto,
         e.categoria,
         e.estoque_disponivel,
-        COALESCE(c.custo_medio_real, e.custo_unitario) AS custo_unitario_avaliado,
-        ROUND(e.estoque_disponivel * COALESCE(c.custo_medio_real, e.custo_unitario), 2) AS capital_travado_real,
+        e.custo_unitario AS custo_unitario_avaliado,
+        ROUND(e.estoque_disponivel * e.custo_unitario, 2) AS capital_travado_real,
+        c.custo_medio_historico_vendas,
         e.lead_time_reposicao AS lead_time_dias
     FROM estoque e
     LEFT JOIN cost_vendas c ON e.sku_id = c.sku_id

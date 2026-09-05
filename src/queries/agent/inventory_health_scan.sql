@@ -41,6 +41,7 @@ raw_health AS (
         COALESCE(s.margem_unitaria_real, 0.0) AS margem_unitaria_real,
         CASE 
             WHEN e.em_ruptura THEN 'RUPTURA_ATIVA'
+            WHEN COALESCE(s.total_unidades_periodo, 0) = 0 AND e.estoque_disponivel > 0 THEN 'SEM_GIRO_OBSOLETO'
             WHEN e.estoque_disponivel <= (e.lead_time_reposicao * COALESCE(s.total_unidades_periodo, 0) / {days_window}) THEN 'RISCO_CRITICO'
             WHEN e.estoque_disponivel < e.ponto_pedido THEN 'ABAIXO_PONTO_PEDIDO'
             WHEN (COALESCE(s.total_unidades_periodo, 0) > 0 AND (e.estoque_disponivel / (s.total_unidades_periodo / {days_window})) > 120.0) THEN 'EXCESSO_ESTOQUE'
@@ -54,7 +55,8 @@ SELECT
     *,
     COUNT(CASE WHEN em_ruptura THEN 1 END) OVER () AS total_rupturas_global,
     COUNT(CASE WHEN diagnostico_operacional = 'RISCO_CRITICO' THEN 1 END) OVER () AS total_criticos_global,
-    COUNT(CASE WHEN diagnostico_operacional IN ('RUPTURA_ATIVA', 'RISCO_CRITICO', 'ABAIXO_PONTO_PEDIDO') THEN 1 END) OVER () AS total_reposicao_global
+    COUNT(CASE WHEN diagnostico_operacional IN ('RUPTURA_ATIVA', 'RISCO_CRITICO', 'ABAIXO_PONTO_PEDIDO') THEN 1 END) OVER () AS total_reposicao_global,
+    COUNT(CASE WHEN diagnostico_operacional = 'SEM_GIRO_OBSOLETO' THEN 1 END) OVER () AS total_sem_giro_global
 FROM raw_health
 ORDER BY em_ruptura DESC, dias_cobertura ASC
 LIMIT {limit};

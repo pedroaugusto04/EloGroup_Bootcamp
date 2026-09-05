@@ -39,13 +39,14 @@ def _generate_fallback_report(structured_data: Dict[str, Any]) -> str:
     """Gera um relatório executivo analítico estruturado como fallback determinístico."""
     ruptura_cnt = structured_data.get("ruptura_count", 0)
     criticos_cnt = structured_data.get("criticos_count", 0)
+    sem_giro_cnt = structured_data.get("sem_giro_count", 0)
     stranded_cash = structured_data.get("total_stranded_cash", 0.0)
 
     return f"""# Relatório Executivo: Diagnóstico de Estoque & Otimização de Capital
 
 ## 1. Sumário Executivo & Diagnóstico Geral
-- **Taxa Geral de Ruptura**: Identificados {ruptura_cnt} SKUs em ruptura ativa e {criticos_cnt} em risco crítico.
-- **Capital Travado em Descontinuados**: Total de R$ {stranded_cash:,.2f} imobilizados em itens fora de linha.
+- **Saúde do Estoque Físico**: Identificados {ruptura_cnt} SKUs em ruptura ativa, {criticos_cnt} em risco crítico e {sem_giro_cnt} SKUs sem giro no período anualizado.
+- **Capital Travado em Descontinuados**: Total de R$ {stranded_cash:,.2f} imobilizados em itens fora de linha (custo contábil de estoque).
 
 ## 2. Matriz de Ações por Horizonte Temporal
 
@@ -180,11 +181,14 @@ def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
     if inv_health and "total_rupturas_global" in inv_health[0]:
         ruptura_count = int(inv_health[0]["total_rupturas_global"])
         criticos_count = int(inv_health[0]["total_criticos_global"])
+        sem_giro_count = int(inv_health[0].get("total_sem_giro_global", 0))
     else:
         ruptura_skus = [s for s in inv_health if s.get("em_ruptura")]
         criticos_skus = [s for s in inv_health if s.get("diagnostico_operacional") == "RISCO_CRITICO"]
+        sem_giro_skus = [s for s in inv_health if s.get("diagnostico_operacional") == "SEM_GIRO_OBSOLETO"]
         ruptura_count = len(ruptura_skus)
         criticos_count = len(criticos_skus)
+        sem_giro_count = len(sem_giro_skus)
 
     if stranded_data and "total_stranded_cash_global" in stranded_data[0]:
         total_stranded_cash = float(stranded_data[0]["total_stranded_cash_global"])
@@ -193,19 +197,22 @@ def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
 
     ruptura_skus_sample = [s for s in inv_health if s.get("em_ruptura")]
     criticos_skus_sample = [s for s in inv_health if s.get("diagnostico_operacional") == "RISCO_CRITICO"]
+    sem_giro_skus_sample = [s for s in inv_health if s.get("diagnostico_operacional") == "SEM_GIRO_OBSOLETO"]
 
     structured_data = {
         "period_label": period_label,
         "ruptura_count": ruptura_count,
         "criticos_count": criticos_count,
+        "sem_giro_count": sem_giro_count,
         "total_stranded_cash": total_stranded_cash,
         "top_critical_skus": (ruptura_skus_sample + criticos_skus_sample)[:10],
+        "top_sem_giro_skus": sem_giro_skus_sample[:5],
         "top_stranded_skus": stranded_data[:10],
         "top_returned_skus": returns_data[:10],
     }
 
-    logger.info("[CONSOLIDATOR] Métricas consolidadas (%s): %d rupturas, %d críticos, R$ %.2f em descontinuados.",
-                period_label, ruptura_count, criticos_count, total_stranded_cash)
+    logger.info("[CONSOLIDATOR] Métricas consolidadas (%s): %d rupturas, %d críticos, %d sem giro, R$ %.2f em descontinuados.",
+                period_label, ruptura_count, criticos_count, sem_giro_count, total_stranded_cash)
 
     llm = get_llm()
     draft = ""
@@ -218,6 +225,7 @@ def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
             Evidências Coletadas:
             - SKUs em Ruptura Ativa (Global): {ruptura_count}
             - SKUs em Risco Crítico de Ruptura (Global): {criticos_count}
+            - SKUs sem Giro / Obsolescência no Período (Global): {sem_giro_count}
             - Capital Total Travado em Descontinuados (Global): R$ {total_stranded_cash:,.2f}
             - Top SKUs Críticos Prioritários: {json.dumps(structured_data['top_critical_skus'][:5], ensure_ascii=False)}
             - Top Descontinuados com Maior Capital Imobilizado: {json.dumps(structured_data['top_stranded_skus'][:5], ensure_ascii=False)}
