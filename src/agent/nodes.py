@@ -26,7 +26,6 @@ from src.agent.constants import (
 from src.agent.tools import (
     tool_inventory_health_scan,
     tool_sales_demand_matrix,
-    tool_marketing_stock_mismatch,
     tool_returns_and_quality_risk,
     tool_discontinued_stranded_capital,
 )
@@ -41,19 +40,16 @@ def _generate_fallback_report(structured_data: Dict[str, Any]) -> str:
     ruptura_cnt = structured_data.get("ruptura_count", 0)
     criticos_cnt = structured_data.get("criticos_count", 0)
     stranded_cash = structured_data.get("total_stranded_cash", 0.0)
-    mkt_cats = ", ".join(structured_data.get("mkt_alert_categories", [])) or "Nenhuma"
 
     return f"""# Relatório Executivo: Diagnóstico de Estoque & Otimização de Capital
 
 ## 1. Sumário Executivo & Diagnóstico Geral
 - **Taxa Geral de Ruptura**: Identificados {ruptura_cnt} SKUs em ruptura ativa e {criticos_cnt} em risco crítico.
 - **Capital Travado em Descontinuados**: Total de R$ {stranded_cash:,.2f} imobilizados em itens fora de linha.
-- **Descompasso de Marketing**: Categorias com verba ativa e ruptura física: {mkt_cats}.
 
 ## 2. Matriz de Ações por Horizonte Temporal
 
 ### ⚡ Curto Prazo: Quick Wins (Até 30 Dias)
-- Pausar imediatamente campanhas de mídia nas categorias com alta taxa de ruptura ({mkt_cats}).
 - Realizar saldão promocional de queima controlada para estancar os R$ {stranded_cash:,.2f} em descontinuados.
 - Emitir ordens de compra emergenciais para os top SKUs Curva A com risco iminente de ruptura.
 
@@ -103,32 +99,43 @@ def executor_node(state: InventoryAgentState) -> Dict[str, Any]:
     step_id = current_step["step_id"]
     logger.info("Iniciando nó [EXECUTOR] - Etapa %d/%d: %s", step_idx + 1, len(plan), current_step["name"])
 
+    date_filter = state.get("date_filter") or ""
+    days_window = float(state.get("days_window") or 365.0)
+
     observations: List[Dict[str, Any]] = []
 
     if step_id == 1:
-        raw_health = tool_inventory_health_scan.invoke({"limit": 30})
+        raw_health = tool_inventory_health_scan.invoke({
+            "limit": 30,
+            "date_filter": date_filter,
+            "days_window": days_window,
+        })
         data = json.loads(raw_health)
         observations.append({"step": step_id, "type": "inventory_health", "data": data})
-        current_step["result"] = f"Auditados {len(data)} SKUs com diagnósticos de cobertura e risco de ruptura."
+        current_step["result"] = f"Auditados SKUs com diagnósticos de cobertura e risco de ruptura (Top {len(data)} destacados)."
         logger.info("[EXECUTOR] tool_inventory_health_scan retornou %d SKUs.", len(data))
 
     elif step_id == 2:
-        raw_demand = tool_sales_demand_matrix.invoke({"top_n": 25})
-        raw_mkt = tool_marketing_stock_mismatch.invoke({})
+        raw_demand = tool_sales_demand_matrix.invoke({
+            "top_n": 25,
+            "date_filter": date_filter,
+        })
         raw_stranded = tool_discontinued_stranded_capital.invoke({"limit": 15})
 
         d_demand = json.loads(raw_demand)
-        d_mkt = json.loads(raw_mkt)
         d_stranded = json.loads(raw_stranded)
 
         observations.append({"step": step_id, "type": "sales_demand", "data": d_demand})
-        observations.append({"step": step_id, "type": "marketing_mismatch", "data": d_mkt})
         observations.append({"step": step_id, "type": "stranded_capital", "data": d_stranded})
-        current_step["result"] = f"Mapeados {len(d_demand)} top SKUs em receita, {len(d_mkt)} categorias em marketing e {len(d_stranded)} itens descontinuados com capital imobilizado."
-        logger.info("[EXECUTOR] Cruzamento comercial: %d demand SKUs, %d mkt categorias, %d descontinuados.", len(d_demand), len(d_mkt), len(d_stranded))
+        current_step["result"] = f"Mapeados top {len(d_demand)} SKUs em receita e {len(d_stranded)} itens descontinuados prioritários."
+        logger.info("[EXECUTOR] Cruzamento comercial: %d demand SKUs, %d descontinuados.", len(d_demand), len(d_stranded))
 
     elif step_id == 3:
-        raw_returns = tool_returns_and_quality_risk.invoke({"min_orders": 10, "min_returns": 2})
+        raw_returns = tool_returns_and_quality_risk.invoke({
+            "min_orders": 10,
+            "min_returns": 2,
+            "date_filter": date_filter,
+        })
         d_returns = json.loads(raw_returns)
         observations.append({"step": step_id, "type": "returns_quality", "data": d_returns})
         current_step["result"] = f"Identificados {len(d_returns)} SKUs com índice relevante de devolução e atrito de entrega/qualidade."
@@ -161,32 +168,44 @@ def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
     t0 = time.time()
     logger.info("Iniciando nó [CONSOLIDATOR] - Agregando observações de todas as etapas.")
     obs = state["observations"]
+    period_label = state.get("period_label") or "Ano Fechado 2023"
 
     # Processa os dados estruturados de todas as observações
     inv_health = next((o["data"] for o in obs if o["type"] == "inventory_health"), [])
-    mkt_data = next((o["data"] for o in obs if o["type"] == "marketing_mismatch"), [])
     stranded_data = next((o["data"] for o in obs if o["type"] == "stranded_capital"), [])
     returns_data = next((o["data"] for o in obs if o["type"] == "returns_quality"), [])
     demand_data = next((o["data"] for o in obs if o["type"] == "sales_demand"), [])
 
-    # Métricas calculadas para síntese executiva
-    ruptura_skus = [s for s in inv_health if s.get("em_ruptura")]
-    criticos_skus = [s for s in inv_health if s.get("diagnostico_operacional") == "RISCO_CRITICO"]
-    total_stranded_cash = sum(float(s.get("capital_travado_real", 0)) for s in stranded_data)
-    mkt_alert_cats = [m for m in mkt_data if m.get("status_alinhamento") == "ALERTA_MKT_DESPERDICIO"]
+    # Métricas globais consolidadas
+    if inv_health and "total_rupturas_global" in inv_health[0]:
+        ruptura_count = int(inv_health[0]["total_rupturas_global"])
+        criticos_count = int(inv_health[0]["total_criticos_global"])
+    else:
+        ruptura_skus = [s for s in inv_health if s.get("em_ruptura")]
+        criticos_skus = [s for s in inv_health if s.get("diagnostico_operacional") == "RISCO_CRITICO"]
+        ruptura_count = len(ruptura_skus)
+        criticos_count = len(criticos_skus)
+
+    if stranded_data and "total_stranded_cash_global" in stranded_data[0]:
+        total_stranded_cash = float(stranded_data[0]["total_stranded_cash_global"])
+    else:
+        total_stranded_cash = sum(float(s.get("capital_travado_real", 0)) for s in stranded_data)
+
+    ruptura_skus_sample = [s for s in inv_health if s.get("em_ruptura")]
+    criticos_skus_sample = [s for s in inv_health if s.get("diagnostico_operacional") == "RISCO_CRITICO"]
 
     structured_data = {
-        "ruptura_count": len(ruptura_skus),
-        "criticos_count": len(criticos_skus),
+        "period_label": period_label,
+        "ruptura_count": ruptura_count,
+        "criticos_count": criticos_count,
         "total_stranded_cash": total_stranded_cash,
-        "mkt_alert_categories": [m["categoria"] for m in mkt_alert_cats],
-        "top_critical_skus": (ruptura_skus + criticos_skus)[:10],
+        "top_critical_skus": (ruptura_skus_sample + criticos_skus_sample)[:10],
         "top_stranded_skus": stranded_data[:10],
         "top_returned_skus": returns_data[:10],
     }
 
-    logger.info("[CONSOLIDATOR] Métricas consolidadas: %d rupturas, %d críticos, R$ %.2f em descontinuados.",
-                len(ruptura_skus), len(criticos_skus), total_stranded_cash)
+    logger.info("[CONSOLIDATOR] Métricas consolidadas (%s): %d rupturas, %d críticos, R$ %.2f em descontinuados.",
+                period_label, ruptura_count, criticos_count, total_stranded_cash)
 
     llm = get_llm()
     draft = ""
@@ -194,15 +213,15 @@ def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
         try:
             prompt_content = f"""
             Missão: {state.get('mission', 'Auditoria de Estoque')}
+            Janela de Análise de Dados: {period_label}
 
             Evidências Coletadas:
-            - SKUs em Ruptura Ativa: {len(ruptura_skus)}
-            - SKUs em Risco Crítico (cobertura < lead time): {len(criticos_skus)}
-            - Capital Total Travado em Descontinuados: R$ {total_stranded_cash:,.2f}
-            - Categorias com Risco de Desperdício em Marketing: {[m['categoria'] for m in mkt_alert_cats]}
-            - Top SKUs Críticos: {json.dumps(structured_data['top_critical_skus'][:5], ensure_ascii=False)}
-            - Top Descontinuados: {json.dumps(structured_data['top_stranded_skus'][:5], ensure_ascii=False)}
-            - Top Devoluções: {json.dumps(structured_data['top_returned_skus'][:5], ensure_ascii=False)}
+            - SKUs em Ruptura Ativa (Global): {ruptura_count}
+            - SKUs em Risco Crítico de Ruptura (Global): {criticos_count}
+            - Capital Total Travado em Descontinuados (Global): R$ {total_stranded_cash:,.2f}
+            - Top SKUs Críticos Prioritários: {json.dumps(structured_data['top_critical_skus'][:5], ensure_ascii=False)}
+            - Top Descontinuados com Maior Capital Imobilizado: {json.dumps(structured_data['top_stranded_skus'][:5], ensure_ascii=False)}
+            - Top Devoluções e Rejeições: {json.dumps(structured_data['top_returned_skus'][:5], ensure_ascii=False)}
             """
             response = llm.invoke([
                 SystemMessage(content=CONSOLIDATOR_SYSTEM_PROMPT),

@@ -23,19 +23,18 @@ Estrutura Obrigatória do Relatório:
 ## 1. Sumário Executivo & Diagnóstico Geral
 - Taxa geral de ruptura e principais categorias afetadas.
 - Volume de capital de giro imobilizado em SKUs descontinuados (R$).
-- Descompasso identificado entre campanhas de marketing e disponibilidade física.
 
 ## 2. Matriz de Ações por Horizonte Temporal
 
 ### ⚡ Curto Prazo: Quick Wins (Até 30 Dias)
-- Ações táticas imediatas para estancar queima de caixa e capturar receita rápida (ex: pausar anúncios em categorias com alta ruptura, saldão de desova para descontinuados, pedido emergencial para SKUs Curva A).
+- Ações táticas imediatas para estancar queima de caixa e capturar receita rápida (ex: saldão de desova para descontinuados, pedido emergencial para SKUs Curva A).
 
 ### Médio Prazo: Ajuste de Processos (60 Dias)
 - Recalibração de pontos de pedido com base no lead time real dos fornecedores.
 - Revisão de itens com alto índice de devolução antes de aprovar novas ordens de compra.
 
 ### Longo Prazo: Excelência Operacional (90 Dias)
-- Implantação de rotina integrada de S&OP (Sales & Operations Planning) sincronizando Marketing, Compras e Logística.
+- Implantação de rotina integrada de S&OP (Sales & Operations Planning) sincronizando Compras e Logística.
 - Governança cadastral para unificação definitiva de custos e preços entre sistemas de compras e PDV.
 
 ## 3. Top SKUs Críticos para Ação Imediata

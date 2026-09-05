@@ -28,3 +28,6 @@ class InventoryAgentState(TypedDict):
     revision_count: int
     final_report: Optional[str]
     structured_data: Optional[Dict[str, Any]]
+    date_filter: Optional[str]
+    days_window: Optional[float]
+    period_label: Optional[str]

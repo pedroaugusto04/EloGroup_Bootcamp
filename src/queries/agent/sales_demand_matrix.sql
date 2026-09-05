@@ -4,6 +4,7 @@
 -- Métricas: Receita líquida total, margem calculada e estoque disponível associado.
 -- Parâmetros dinâmicos:
 --   - {cat_filter}: Cláusula AND opcional para filtro por categoria
+--   - {date_filter}: Cláusula AND opcional para filtro por data em vendas
 --   - {top_n}: Limite de produtos retornados ordenados por receita líquida
 -- ==============================================================================
 
@@ -23,7 +24,7 @@ SELECT
     MAX(e.lead_time_reposicao) AS lead_time_dias
 FROM vendas v
 LEFT JOIN estoque e ON v.sku_id = e.sku_id
-WHERE v.status_pagamento = 'Aprovado' {cat_filter}
+WHERE v.status_pagamento = 'Aprovado' {date_filter} {cat_filter}
 GROUP BY v.sku_id, v.produto, v.categoria
 ORDER BY receita_liquida_total DESC
 LIMIT {top_n};

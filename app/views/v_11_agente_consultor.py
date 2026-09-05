@@ -143,14 +143,13 @@ def show_agente_consultor(repo: DuckDBRepository):
             ):
                 prompt_to_send = "Faça uma investigação detalhada 360° do produto SKU-00185."
 
-        with col2:
             if st.button(
-                "**Descompasso entre Marketing e Ruptura**\n\n"
-                "Identifica categorias com verba de mídia ativa e estoque em ruptura.",
+                "**Capital Travado em Descontinuados**\n\n"
+                "Identifica os itens fora de linha com maior valor de estoque parado.",
                 key="btn_sug_3",
                 width="stretch",
             ):
-                prompt_to_send = "Quais categorias apresentam descompasso crítico entre verba de marketing e ruptura de estoque?"
+                prompt_to_send = "Quais são os principais SKUs descontinuados com maior capital de giro travado no estoque?"
 
             if st.button(
                 "**Atrito Operacional e Devoluções**\n\n"

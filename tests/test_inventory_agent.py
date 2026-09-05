@@ -9,7 +9,6 @@ from src.infrastructure.database import DuckDBRepository
 from src.agent.tools import (
     tool_inventory_health_scan,
     tool_sales_demand_matrix,
-    tool_marketing_stock_mismatch,
     tool_returns_and_quality_risk,
     tool_discontinued_stranded_capital,
     tool_sku_deep_dive,
@@ -46,17 +45,6 @@ def test_tool_sales_demand_matrix():
     assert "receita_liquida_total" in first
     assert "margem_unit_media" in first
     assert "unidades_vendidas" in first
-
-
-def test_tool_marketing_stock_mismatch():
-    raw = tool_marketing_stock_mismatch.invoke({})
-    data = json.loads(raw)
-    assert isinstance(data, list)
-    assert len(data) > 0
-    first = data[0]
-    assert "categoria" in first
-    assert "taxa_ruptura_pct" in first
-    assert "status_alinhamento" in first
 
 
 def test_tool_returns_and_quality_risk():
@@ -280,6 +268,20 @@ def test_service_ask_copilot_with_history_propagation():
         history=history,
     )
     assert len(resp) > 10
+
+
+def test_inventory_agent_with_custom_period():
+    service = InventoryAgentService()
+    result = service.run_diagnostic(
+        date_filter="AND data_pedido >= '2023-10-01' AND data_pedido <= '2023-12-31'",
+        days_window=92.0,
+        period_label="Últimos 90 Dias (Q4 2023)",
+    )
+    assert "structured_data" in result
+    structured = result["structured_data"]
+    assert structured["period_label"] == "Últimos 90 Dias (Q4 2023)"
+    assert structured["total_stranded_cash"] > 0
+    assert structured["ruptura_count"] > 0
 
 
 

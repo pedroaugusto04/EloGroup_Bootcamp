@@ -18,20 +18,29 @@ def _get_repo() -> DuckDBRepository:
 
 
 @tool
-def tool_inventory_health_scan(categoria: Optional[str] = None, limit: int = 25) -> str:
+def tool_inventory_health_scan(
+    categoria: Optional[str] = None,
+    limit: int = 25,
+    date_filter: str = "",
+    days_window: float = 365.0,
+) -> str:
     """
     Audita a saúde do estoque identificando rupturas ativas e SKUs em risco iminente de falta.
-    Calcula velocidade diária de vendas (unidades/dia) e dias de cobertura física.
+    Calcula velocidade diária de vendas (unidades/dia) e dias de cobertura física considerando a janela de dias informada.
     
     Args:
         categoria: Categoria opcional para filtrar (ex: 'Beleza', 'Moda', 'Lifestyle', 'Decoração', 'Esportes').
         limit: Número máximo de registros retornados.
+        date_filter: Cláusula SQL opcional de filtro de data para vendas (ex: "AND data_pedido >= '2023-01-01' AND data_pedido <= '2023-12-31'").
+        days_window: Janela de dias para o cálculo da velocidade média de giro (padrão: 365.0).
     """
     repo = _get_repo()
     cat_filter = f"WHERE e.categoria = '{categoria}'" if categoria else ""
     query = load_query(
         "agent/inventory_health_scan.sql",
         cat_filter=cat_filter,
+        date_filter=date_filter,
+        days_window=float(days_window),
         limit=limit
     )
     df = repo.execute_sql(query)
@@ -39,7 +48,11 @@ def tool_inventory_health_scan(categoria: Optional[str] = None, limit: int = 25)
 
 
 @tool
-def tool_sales_demand_matrix(categoria: Optional[str] = None, top_n: int = 20) -> str:
+def tool_sales_demand_matrix(
+    categoria: Optional[str] = None,
+    top_n: int = 20,
+    date_filter: str = "",
+) -> str:
     """
     Gera a matriz de demanda e faturamento real de vendas, trazendo a Curva de Volume vs Receita Real.
     Permite identificar quais são os produtos mais vendidos em unidades e quais geram mais margem.
@@ -47,41 +60,42 @@ def tool_sales_demand_matrix(categoria: Optional[str] = None, top_n: int = 20) -
     Args:
         categoria: Categoria opcional para filtrar.
         top_n: Quantidade de top produtos a retornar.
+        date_filter: Cláusula SQL opcional de filtro temporal em vendas.
     """
     repo = _get_repo()
     cat_filter = f"AND v.categoria = '{categoria}'" if categoria else ""
     query = load_query(
         "agent/sales_demand_matrix.sql",
         cat_filter=cat_filter,
+        date_filter=date_filter,
         top_n=top_n
     )
     df = repo.execute_sql(query)
     return json.dumps(df.to_dict(orient="records"), ensure_ascii=False, indent=2)
 
 
-@tool
-def tool_marketing_stock_mismatch() -> str:
-    """
-    Identifica o descompasso entre campanhas de marketing pagas e a disponibilidade de estoque.
-    Detecta categorias com alta taxa de ruptura onde marketing continua investindo e gerando tráfego.
-    """
-    repo = _get_repo()
-    query = load_query("agent/marketing_stock_mismatch.sql")
-    df = repo.execute_sql(query)
-    return json.dumps(df.to_dict(orient="records"), ensure_ascii=False, indent=2)
-
 
 @tool
-def tool_returns_and_quality_risk(min_orders: int = 10, min_returns: int = 2) -> str:
+def tool_returns_and_quality_risk(
+    min_orders: int = 10,
+    min_returns: int = 2,
+    date_filter: str = "",
+) -> str:
     """
     Cruza dados de devoluções com produtos e motivos de atrito para diagnosticar problemas de qualidade.
     Evita repor ou manter em estoque produtos com alta taxa de devolução e rejeição.
+    
+    Args:
+        min_orders: Volume mínimo de pedidos.
+        min_returns: Volume mínimo de devoluções.
+        date_filter: Cláusula SQL opcional de filtro temporal em vendas.
     """
     repo = _get_repo()
     query = load_query(
         "agent/returns_and_quality_risk.sql",
         min_orders=min_orders,
-        min_returns=min_returns
+        min_returns=min_returns,
+        date_filter=date_filter
     )
     df = repo.execute_sql(query)
     return json.dumps(df.to_dict(orient="records"), ensure_ascii=False, indent=2)

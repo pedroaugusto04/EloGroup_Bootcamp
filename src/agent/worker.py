@@ -36,21 +36,28 @@ def get_deep_link_url() -> str:
 
 def run_autonomous_inventory_audit(
     send_email: bool = True,
-    to_email: Optional[str] = None
+    to_email: Optional[str] = None,
+    date_filter: str = "",
+    days_window: float = 365.0,
+    period_label: str = "Ano Fechado 2023",
 ) -> Dict[str, Any]:
     """
     Executa o ciclo completo de auditoria autônoma de estoque:
-    1. Varredura e raciocínio analítico no DuckDB via LangGraph.
+    1. Varredura e raciocínio analítico no DuckDB via LangGraph considerando a janela temporal selecionada.
     2. Validação contra os 4 guardrails de negócio pelo nó de reflexão.
     3. Renderização do parecer executivo em e-mail HTML corporativo.
     4. Envio de e-mail via Resend (se habilitado).
     5. Persistência do snapshot de auditoria para o Copiloto ReAct.
     """
-    logger.info("Iniciando execução do Worker Autônomo de Estoque...")
+    logger.info("Iniciando execução do Worker Autônomo de Estoque (%s)...", period_label)
     
     # 1. Executa auditoria no LangGraph
     service = InventoryAgentService()
-    diagnostic_result = service.run_diagnostic()
+    diagnostic_result = service.run_diagnostic(
+        date_filter=date_filter,
+        days_window=days_window,
+        period_label=period_label,
+    )
     report = diagnostic_result.get("final_report") or ""
     report_is_valid = (
         diagnostic_result.get("critic_approved") is True

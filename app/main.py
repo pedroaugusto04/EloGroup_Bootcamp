@@ -167,18 +167,57 @@ def main():
     st.sidebar.markdown("### Rotinas de Auditoria")
     st.sidebar.caption("Auditoria periódica de estoque e notificação.")
 
+    periodo_opcao = st.sidebar.selectbox(
+        "Janela de Vendas Analisada:",
+        [
+            "Ano Fechado 2023 (12 meses - Recomendado)",
+            "Últimos 90 Dias (Q4 2023 - Tático)",
+            "Primeiro Semestre 2023 (H1)",
+            "Segundo Semestre 2023 (H2)",
+            "Todo o Histórico (2023 - 2024)",
+        ],
+        index=0,
+        help="Define o recorte temporal de vendas para cálculo do giro diário, cobertura física e faturamento."
+    )
+
+    if "Ano Fechado" in periodo_opcao:
+        audit_date_filter = "AND data_pedido >= '2023-01-01' AND data_pedido <= '2023-12-31'"
+        audit_days_window = 365.0
+        audit_period_label = "Ano Fechado 2023"
+    elif "Últimos 90 Dias" in periodo_opcao:
+        audit_date_filter = "AND data_pedido >= '2023-10-01' AND data_pedido <= '2023-12-31'"
+        audit_days_window = 92.0
+        audit_period_label = "Últimos 90 Dias (Q4 2023)"
+    elif "Primeiro Semestre" in periodo_opcao:
+        audit_date_filter = "AND data_pedido >= '2023-01-01' AND data_pedido <= '2023-06-30'"
+        audit_days_window = 181.0
+        audit_period_label = "Primeiro Semestre 2023 (H1)"
+    elif "Segundo Semestre" in periodo_opcao:
+        audit_date_filter = "AND data_pedido >= '2023-07-01' AND data_pedido <= '2023-12-31'"
+        audit_days_window = 184.0
+        audit_period_label = "Segundo Semestre 2023 (H2)"
+    else:
+        audit_date_filter = ""
+        audit_days_window = 391.0
+        audit_period_label = "Todo o Histórico (2023-2024)"
+
     from src.agent.worker import run_autonomous_inventory_audit
 
     if st.sidebar.button("Executar Auditoria & Enviar E-mail", type="primary", width="stretch", help="Executa a auditoria de estoque imediatamente e dispara o e-mail executivo via Resend."):
-        with st.sidebar.status("Executando auditoria & enviando e-mail...", expanded=True) as status_box:
-            status_box.write("Auditando estoque no DuckDB...")
-            res = run_autonomous_inventory_audit(send_email=True)
+        with st.sidebar.status(f"Auditando estoque ({audit_period_label})...", expanded=True) as status_box:
+            status_box.write("Processando cruzamento no DuckDB...")
+            res = run_autonomous_inventory_audit(
+                send_email=True,
+                date_filter=audit_date_filter,
+                days_window=audit_days_window,
+                period_label=audit_period_label,
+            )
             email_res = res.get("email_result") or {}
             if email_res.get("status") == "sent":
-                status_box.update(label="Auditoria concluída e e-mail enviado.", state="complete", expanded=False)
+                status_box.update(label=f"Auditoria ({audit_period_label}) concluída e e-mail enviado.", state="complete", expanded=False)
                 st.sidebar.success(f"E-mail enviado via Resend para `{email_res.get('to')}`.")
             elif email_res.get("status") == "simulated":
-                status_box.update(label="Auditoria concluída (Modo Simulação).", state="complete", expanded=False)
+                status_box.update(label=f"Auditoria ({audit_period_label}) concluída (Modo Simulação).", state="complete", expanded=False)
                 st.sidebar.info(f"{email_res.get('message')}")
             else:
                 status_box.update(label="Auditoria finalizada com aviso.", state="error", expanded=False)

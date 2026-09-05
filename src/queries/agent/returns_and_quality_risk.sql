@@ -5,6 +5,7 @@
 -- Parâmetros dinâmicos:
 --   - {min_orders}: Volume mínimo de pedidos para relevância estatística
 --   - {min_returns}: Volume mínimo de devoluções registradas
+--   - {date_filter}: Cláusula AND opcional para filtro temporal em vendas
 -- ==============================================================================
 
 SELECT 
@@ -19,7 +20,7 @@ SELECT
     MAX(e.estoque_disponivel) AS estoque_disponivel
 FROM vendas v
 LEFT JOIN estoque e ON v.sku_id = e.sku_id
-WHERE v.status_pagamento = 'Aprovado'
+WHERE v.status_pagamento = 'Aprovado' {date_filter}
 GROUP BY v.sku_id, v.produto, v.categoria
 HAVING COUNT(v.order_id) >= {min_orders} AND SUM(CASE WHEN v.devolvido THEN 1 ELSE 0 END) >= {min_returns}
 ORDER BY taxa_devolucao_pct DESC, total_devolucoes DESC

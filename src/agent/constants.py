@@ -21,8 +21,8 @@ DEFAULT_PLAN_STEPS: List[Dict[str, Any]] = [
     },
     {
         "step_id": 2,
-        "name": "Cruzamento com Demanda, MKT e Capital Travado",
-        "description": "Cruzar faturamento real, descompasso com anúncios e quantificar capital em descontinuados.",
+        "name": "Cruzamento com Demanda e Capital Travado",
+        "description": "Cruzar faturamento real, curva de receita e quantificar capital imobilizado em descontinuados.",
         "status": "pending",
         "result": None,
     },

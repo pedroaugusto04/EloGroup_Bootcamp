@@ -21,10 +21,13 @@ class InventoryAgentService(IInventoryAgentService):
 
     def run_diagnostic(
         self,
-        mission: str = "Auditar a saúde de estoque da Vértice Retail, diagnosticar rupturas e descompasso com marketing, e estruturar plano de ação 30/60/90 dias com Quick Wins.",
+        mission: str = "Auditar a saúde de estoque da Vértice Retail, diagnosticar rupturas e capital travado em descontinuados, e estruturar plano de ação 30/60/90 dias com Quick Wins.",
+        date_filter: str = "",
+        days_window: float = 365.0,
+        period_label: str = "Ano Fechado 2023",
         on_step: Optional[Any] = None
     ) -> Dict[str, Any]:
-        """Executa a auditoria completa e retorna o estado consolidado com suporte a callbacks."""
+        """Executa a auditoria completa e retorna o estado consolidado com suporte a filtros temporais e callbacks."""
         initial_state: InventoryAgentState = {
             "mission": mission,
             "plan": [],
@@ -37,6 +40,9 @@ class InventoryAgentService(IInventoryAgentService):
             "revision_count": 0,
             "final_report": None,
             "structured_data": None,
+            "date_filter": date_filter,
+            "days_window": days_window,
+            "period_label": period_label,
         }
         
         audit_recursion_limit = int(os.environ.get("AUDIT_RECURSION_LIMIT", "25"))

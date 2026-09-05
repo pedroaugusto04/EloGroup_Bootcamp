@@ -17,7 +17,6 @@ from src.infrastructure.llm import get_llm
 from src.agent.tools import (
     tool_inventory_health_scan,
     tool_sales_demand_matrix,
-    tool_marketing_stock_mismatch,
     tool_returns_and_quality_risk,
     tool_discontinued_stranded_capital,
     tool_sku_deep_dive,
@@ -32,7 +31,7 @@ Seu papel é atuar como um consultor analítico sênior no diagnóstico de estoq
 Ano Base de Referência: 2026.
 
 Diretrizes de Raciocínio (ReAct):
-1. **Rigor e Factualidade**: Sempre que o usuário fizer uma pergunta sobre estoque, vendas, produtos, SKUs, categorias, fornecedores, marketing ou devoluções, utilize suas ferramentas determinísticas do DuckDB para buscar os dados reais. NUNCA invente números, SKUs ou estatísticas.
+1. **Rigor e Factualidade**: Sempre que o usuário fizer uma pergunta sobre estoque, vendas, produtos, SKUs, categorias, fornecedores ou devoluções, utilize suas ferramentas determinísticas do DuckDB para buscar os dados reais. NUNCA invente números, SKUs ou estatísticas.
 2. **Impacto em R$ e Visão Executiva**: Sempre quantifique o impacto financeiro (R$), o capital de giro imobilizado, a margem de contribuição e o risco operacional.
 3. **Guardrail de Descontinuados**: NUNCA sugira comprar ou repor itens marcados como 'descontinuados'. Para estes itens, recomende queima controlada/liquidação ou renegociação.
 4. **Memória de Contexto**: Mantenha a continuidade da conversa. Se o usuário fizer uma pergunta de follow-up (ex: 'E qual o lead time do primeiro produto citado?'), utilize o contexto das mensagens e ferramentas anteriores para responder com precisão.
@@ -53,7 +52,6 @@ class InventoryCopilot:
         self.tools = [
             tool_inventory_health_scan,
             tool_sales_demand_matrix,
-            tool_marketing_stock_mismatch,
             tool_returns_and_quality_risk,
             tool_discontinued_stranded_capital,
             tool_sku_deep_dive,

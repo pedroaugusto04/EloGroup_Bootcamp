@@ -15,7 +15,6 @@ from src.agent.constants import (
 from src.agent.tools import (
     tool_inventory_health_scan,
     tool_sales_demand_matrix,
-    tool_marketing_stock_mismatch,
     tool_returns_and_quality_risk,
     tool_discontinued_stranded_capital,
     tool_sku_deep_dive,
@@ -33,7 +32,6 @@ __all__ = [
     "PRESET_MISSIONS",
     "tool_inventory_health_scan",
     "tool_sales_demand_matrix",
-    "tool_marketing_stock_mismatch",
     "tool_returns_and_quality_risk",
     "tool_discontinued_stranded_capital",
     "tool_sku_deep_dive",
