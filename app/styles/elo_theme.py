@@ -61,9 +61,74 @@ def inject_elotarget_css():
             animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Transição em mensagens do chat */
+        /* Transição e Estilo em mensagens do chat */
         [data-testid="stChatMessage"] {
             animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Tabelas Markdown elegantes no Chat */
+        [data-testid="stChatMessage"] table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin: 12px 0 !important;
+            font-size: 13px !important;
+            background-color: #121215 !important;
+            border: 1px solid #27272A !important;
+            border-radius: 6px !important;
+            overflow: hidden !important;
+        }
+
+        [data-testid="stChatMessage"] th {
+            background-color: #18181B !important;
+            color: #F3F4F6 !important;
+            font-weight: 600 !important;
+            padding: 9px 12px !important;
+            border-bottom: 1px solid #3F3F46 !important;
+            text-align: left !important;
+        }
+
+        [data-testid="stChatMessage"] td {
+            padding: 8px 12px !important;
+            border-bottom: 1px solid #27272A !important;
+            color: #E2E8F0 !important;
+        }
+
+        [data-testid="stChatMessage"] tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        [data-testid="stChatMessage"] tr:hover {
+            background-color: rgba(255, 255, 255, 0.03) !important;
+        }
+
+        /* Callouts / Blockquotes no Chat */
+        [data-testid="stChatMessage"] blockquote {
+            border-left: 3px solid #38BDF8 !important;
+            background: rgba(56, 189, 248, 0.05) !important;
+            padding: 8px 14px !important;
+            margin: 10px 0 !important;
+            border-radius: 0 6px 6px 0 !important;
+            color: #E2E8F0 !important;
+        }
+
+        /* Destaques de código inline (R$ / SKUs) */
+        [data-testid="stChatMessage"] code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+            font-size: 12px !important;
+            background-color: #18181B !important;
+            color: #38BDF8 !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+            border: 1px solid #27272A !important;
+        }
+
+        /* Subtítulos no Chat */
+        [data-testid="stChatMessage"] h3 {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            color: #F9FAFB !important;
+            margin-top: 14px !important;
+            margin-bottom: 6px !important;
         }
 
         /* Customização de Spinner e Carregamento no Tema da Aplicação */

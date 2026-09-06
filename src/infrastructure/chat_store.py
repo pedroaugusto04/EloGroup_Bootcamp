@@ -6,15 +6,18 @@ Permite criação de threads, restauração de conversas passadas, auto-título 
 
 import json
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-from src.config import DATA_DIR
+from src.config import STORAGE_DIR
 
 logger = logging.getLogger("vertice.chat_store")
 
-DEFAULT_CHAT_STORE_PATH = DATA_DIR / "copilot_chats.json"
+DEFAULT_CHAT_STORE_PATH = Path(
+    os.environ.get("COPILOT_CHAT_STORE_PATH", str(STORAGE_DIR / "copilot_chats.json"))
+)
 
 
 class CopilotChatStore:

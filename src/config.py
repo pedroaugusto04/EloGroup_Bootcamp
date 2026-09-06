@@ -11,6 +11,8 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
+STORAGE_DIR = DATA_DIR / "storage"
+STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 REPORTS_DIR = ROOT_DIR / "relatorios_analise"
 
 # Carrega variáveis de ambiente do arquivo .env se presente
@@ -18,7 +20,7 @@ load_dotenv(ROOT_DIR / ".env")
 
 # Banco DuckDB
 DB_PATH = DATA_DIR / "vertice_analytics.duckdb"
-AUDIT_LOG_PATH = DATA_DIR / "audit_log.json"
+AUDIT_LOG_PATH = STORAGE_DIR / "audit_log.json"
 
 # Nomes dos arquivos brutos
 RAW_FILES = {
