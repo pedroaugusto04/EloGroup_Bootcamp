@@ -60,3 +60,19 @@ def test_chat_store_delete_and_clear(temp_chat_store):
 
     temp_chat_store.clear_all()
     assert len(temp_chat_store.list_threads()) == 0
+
+
+def test_chat_store_rename_thread(temp_chat_store):
+    temp_chat_store.save_thread("t1", [{"role": "user", "content": "Título Original"}])
+    assert temp_chat_store.rename_thread("t1", "Novo Título Customizado") is True
+    assert temp_chat_store.get_thread("t1")["title"] == "Novo Título Customizado"
+    assert temp_chat_store.rename_thread("non-existent", "Novo") is False
+
+
+def test_chat_store_list_grouped_threads(temp_chat_store):
+    temp_chat_store.save_thread("t1", [{"role": "user", "content": "Chat de Hoje"}])
+    grouped = temp_chat_store.list_grouped_threads()
+    assert "Hoje" in grouped
+    assert len(grouped["Hoje"]) == 1
+    assert grouped["Hoje"][0]["id"] == "t1"
+

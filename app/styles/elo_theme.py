@@ -44,6 +44,45 @@ def inject_elotarget_css():
             padding-top: 2rem !important;
             padding-bottom: 2rem !important;
         }
+
+        /* Animações e Transições Suaves */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(3px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Transição em mensagens do chat */
+        [data-testid="stChatMessage"] {
+            animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Customização de Spinner e Carregamento no Tema da Aplicação */
+        [data-testid="stSpinner"] {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        [data-testid="stSpinner"] i {
+            border-top-color: #38BDF8 !important;
+        }
+
+        [data-testid="stSpinner"] span {
+            color: #94A3B8 !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+        }
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)

@@ -12,10 +12,17 @@ from src.agent.service import InventoryAgentService
 from src.utils.formatters import sanitize_markdown_for_streamlit
 
 
+@st.cache_resource
+def get_inventory_agent_service() -> InventoryAgentService:
+    """Instancia em cache o serviço do agente de estoque, evitando recompilação de grafos no rerun."""
+    return InventoryAgentService()
+
+
 def show_agente_consultor(repo: DuckDBRepository):
     """Renderiza a interface de chat minimalista para o Copiloto de Estoque com persistência."""
-    service = InventoryAgentService()
+    service = get_inventory_agent_service()
     chat_store = CopilotChatStore()
+
 
     # Inicialização do ID da thread ativa
     if "copilot_thread_id" not in st.session_state:
@@ -83,7 +90,7 @@ def show_agente_consultor(repo: DuckDBRepository):
     thread_info = chat_store.get_thread(active_thread_id)
     chat_title = thread_info.get("title", "Nova Conversa") if thread_info else "Nova Conversa"
 
-    col_header, col_actions = st.columns([4, 1.2])
+    col_header, col_actions = st.columns([3.5, 1.5])
     with col_header:
         st.markdown(
             f"""
@@ -97,12 +104,29 @@ def show_agente_consultor(repo: DuckDBRepository):
             unsafe_allow_html=True,
         )
     with col_actions:
-        st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
-        if st.button("Nova Conversa", key="btn_new_chat_header", width="stretch", help="Inicia uma nova conversa e limpa o contexto da sessão."):
-            new_id = str(uuid.uuid4())
-            st.session_state["copilot_thread_id"] = new_id
-            st.session_state["copilot_messages"] = []
-            st.rerun()
+        st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+        c_new, c_opt = st.columns([0.65, 0.35])
+        with c_new:
+            if st.button("+ Novo Chat", key="btn_new_chat_header", use_container_width=True, help="Inicia uma nova conversa e limpa o contexto."):
+                new_id = str(uuid.uuid4())
+                st.session_state["copilot_thread_id"] = new_id
+                st.session_state["copilot_messages"] = []
+                st.rerun()
+        with c_opt:
+            with st.popover("...", help="Opções desta conversa"):
+                st.markdown("**Opções da Conversa**")
+                new_title_h = st.text_input("Título da conversa:", value=chat_title, key="rename_header_input")
+                if st.button("Salvar Título", key="btn_save_title_header", use_container_width=True):
+                    if new_title_h.strip():
+                        chat_store.rename_thread(active_thread_id, new_title_h.strip())
+                        st.rerun()
+
+                st.markdown("---")
+                if st.button("Excluir Conversa", key="btn_del_header", type="secondary", use_container_width=True):
+                    chat_store.delete_thread(active_thread_id)
+                    st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+                    st.session_state["copilot_messages"] = []
+                    st.rerun()
 
     st.markdown("<hr style='margin-top: 4px; margin-bottom: 24px; border: none; border-top: 1px solid rgba(255, 255, 255, 0.08);'>", unsafe_allow_html=True)
 
@@ -161,32 +185,32 @@ def show_agente_consultor(repo: DuckDBRepository):
 
         suggestions = [
             (
-                "⚡ **Simular Liquidação de Moda (-30%)**\n\nCalcula liberação de caixa e margem de contribuição.",
+                "**Simular Liquidação de Moda (-30%)**\n\nCalcula liberação de caixa e margem de contribuição.",
                 "Simule liquidar a categoria Moda com 30% de desconto e mostre o potencial de liberação de caixa e impacto financeiro.",
                 "btn_sug_liquidation",
             ),
             (
-                "📦 **Auditoria de Rupturas & Risco**\n\nIdentifica SKUs em falta e dias de cobertura crítica.",
+                "**Auditoria de Rupturas & Risco**\n\nIdentifica SKUs em falta e dias de cobertura crítica.",
                 "Faça uma varredura na saúde do estoque identificando quais SKUs estão em ruptura ou em risco crítico de falta nos próximos dias.",
                 "btn_sug_rupturas",
             ),
             (
-                "🔍 **Diagnóstico 360° (SKU-00185)**\n\nInvestigação de estoque, vendas, margem e devoluções.",
+                "**Diagnóstico 360° (SKU-00185)**\n\nInvestigação de estoque, vendas, margem e devoluções.",
                 "Faça uma investigação detalhada 360° do produto SKU-00185 (Camisa Social Clássico Nude).",
                 "btn_sug_sku_dive",
             ),
             (
-                "⚠️ **Capital em Descontinuados**\n\nRanking de itens fora de linha com capital imobilizado.",
+                "**Capital em Descontinuados**\n\nRanking de itens fora de linha com capital imobilizado.",
                 "Quais são os principais SKUs descontinuados com maior capital de giro travado no estoque?",
                 "btn_sug_stranded",
             ),
             (
-                "📊 **Matriz Volume vs Receita Real**\n\nCurva de faturamento e produtos com maior margem.",
+                "**Matriz Volume vs Receita Real**\n\nCurva de faturamento e produtos com maior margem.",
                 "Gere a matriz de demanda e faturamento de vendas identificando os produtos com maior volume e margem de contribuição.",
                 "btn_sug_demand_matrix",
             ),
             (
-                "🔄 **Atrito & Devoluções Críticas**\n\nProdutos com alta devolução e frete desperdiçado.",
+                "**Atrito & Devoluções Críticas**\n\nProdutos com alta devolução e frete desperdiçado.",
                 "Quais produtos têm a maior taxa de devolução, principais motivos de atrito e custo de frete desperdiçado?",
                 "btn_sug_returns_risk",
             ),
@@ -205,6 +229,7 @@ def show_agente_consultor(repo: DuckDBRepository):
                     if st.button(label_2, key=key_2, use_container_width=True):
                         prompt_to_send = prompt_2
         st.markdown('</div>', unsafe_allow_html=True)
+
 
     # =========================================================================
     # HISTÓRICO DE CONVERSAÇÃO (MENSAGENS)

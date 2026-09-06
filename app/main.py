@@ -92,55 +92,83 @@ def main():
         chat_store = CopilotChatStore()
 
         st.sidebar.markdown("### Copiloto de Estoque")
-        st.sidebar.markdown("<p style='font-size: 12px; color: #38BDF8; margin-top: -10px;'>Consultoria & Diagnóstico</p>", unsafe_allow_html=True)
+        st.sidebar.markdown("<p style='font-size: 12px; color: #38BDF8; margin-top: -10px; margin-bottom: 16px;'>Consultoria & Diagnóstico</p>", unsafe_allow_html=True)
         
         # Botão Nova Conversa
-        if st.sidebar.button("+ Nova Conversa", key="sidebar_new_chat_btn", type="primary", width="stretch", help="Inicia uma nova conversa do zero."):
+        if st.sidebar.button("+ Nova Conversa", key="sidebar_new_chat_btn", type="primary", use_container_width=True, help="Inicia uma nova conversa."):
             new_thread_id = str(uuid.uuid4())
             st.session_state["copilot_thread_id"] = new_thread_id
             st.session_state["copilot_messages"] = []
             st.rerun()
 
         st.sidebar.markdown("---")
-        st.sidebar.markdown("<p style='font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px;'>Histórico de Conversas</p>", unsafe_allow_html=True)
+        st.sidebar.markdown("<p style='font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px;'>Histórico de Conversas</p>", unsafe_allow_html=True)
 
-        threads = chat_store.list_threads()
+        grouped_threads = chat_store.list_grouped_threads()
         active_id = st.session_state.get("copilot_thread_id")
 
-        if threads:
-            for thread in threads:
-                t_id = thread["id"]
-                t_title = thread["title"]
-                t_count = thread["message_count"]
-                is_active = (t_id == active_id)
+        if grouped_threads:
+            for group_name, threads in grouped_threads.items():
+                st.sidebar.markdown(
+                    f"<p style='font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 14px; margin-bottom: 6px;'>{group_name}</p>",
+                    unsafe_allow_html=True
+                )
+                for thread in threads:
+                    t_id = thread["id"]
+                    t_title = thread["title"]
+                    t_count = thread["message_count"]
+                    is_active = (t_id == active_id)
 
-                prefix = "• " if not is_active else "► "
-                btn_label = f"{prefix}{t_title}"
-                
-                col_thread, col_del = st.sidebar.columns([4, 1])
-                with col_thread:
-                    if st.button(
-                        btn_label,
-                        key=f"thread_btn_{t_id}",
-                        width="stretch",
-                        help=f"Abrir conversa ({t_count} mensagens)"
-                    ):
-                        st.session_state["copilot_thread_id"] = t_id
-                        thread_data = chat_store.get_thread(t_id)
-                        st.session_state["copilot_messages"] = thread_data.get("messages", []) if thread_data else []
-                        st.rerun()
-                with col_del:
-                    if st.button("✕", key=f"del_thread_{t_id}", help="Excluir esta conversa"):
-                        chat_store.delete_thread(t_id)
-                        if t_id == active_id:
-                            st.session_state["copilot_thread_id"] = str(uuid.uuid4())
-                            st.session_state["copilot_messages"] = []
-                        st.rerun()
+                    col_thread, col_opt = st.sidebar.columns([0.80, 0.20])
+                    with col_thread:
+                        btn_label = f"[Ativo] {t_title}" if is_active else t_title
+                        if st.button(
+                            btn_label,
+                            key=f"thread_btn_{t_id}",
+                            use_container_width=True,
+                            type="primary" if is_active else "secondary",
+                            help=f"{t_title} ({t_count} mensagens)"
+                        ):
+                            st.session_state["copilot_thread_id"] = t_id
+                            thread_data = chat_store.get_thread(t_id)
+                            st.session_state["copilot_messages"] = thread_data.get("messages", []) if thread_data else []
+                            st.rerun()
+                    with col_opt:
+                        with st.popover("...", help="Opções da conversa"):
+                            st.markdown("**Gerenciar Conversa**")
+                            st.caption(f"ID: `{t_id[:8]}`")
+                            new_title = st.text_input("Renomear título:", value=t_title, key=f"rename_input_{t_id}")
+                            if st.button("Salvar Título", key=f"save_rename_{t_id}", use_container_width=True):
+                                if new_title.strip():
+                                    chat_store.rename_thread(t_id, new_title.strip())
+                                    st.rerun()
+
+                            st.markdown("---")
+                            st.caption("Ação irreversível")
+                            if st.button("Confirmar Exclusão", key=f"del_thread_{t_id}", type="secondary", use_container_width=True):
+                                chat_store.delete_thread(t_id)
+                                if t_id == active_id:
+                                    st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+                                    st.session_state["copilot_messages"] = []
+                                st.rerun()
         else:
-            st.sidebar.caption("Nenhuma conversa salva ainda.")
+            st.sidebar.markdown(
+                "<p style='font-size: 12px; color: #64748B; margin-top: 8px; margin-bottom: 8px;'>Nenhuma conversa registrada.</p>",
+                unsafe_allow_html=True
+            )
 
         st.sidebar.markdown("---")
-        if st.sidebar.button("Voltar ao Workbench", key="sidebar_back_workbench_btn", width="stretch", help="Retorna ao painel completo de gráficos e auditoria analítica."):
+        if grouped_threads:
+            with st.sidebar.popover("Limpar Histórico Geral"):
+                st.markdown("**Limpeza Completa**")
+                st.caption("Esta ação excluirá permanentemente todas as conversas do histórico.")
+                if st.button("Confirmar Limpeza Geral", key="btn_clear_all_history", type="secondary", use_container_width=True):
+                    chat_store.clear_all()
+                    st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+                    st.session_state["copilot_messages"] = []
+                    st.rerun()
+
+        if st.sidebar.button("Voltar ao Painel Analítico", key="sidebar_back_workbench_btn", use_container_width=True, help="Retorna ao painel completo de gráficos e auditoria analítica."):
             st.query_params.clear()
             st.rerun()
 
@@ -162,6 +190,7 @@ def main():
 
     # Modo Normal do Workbench
     escolha = st.sidebar.radio("Selecione a Etapa da Análise:", list(paginas.keys()), index=0)
+
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Rotinas de Auditoria")

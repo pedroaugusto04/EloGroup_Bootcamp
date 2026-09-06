@@ -104,6 +104,48 @@ class CopilotChatStore:
         result.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
         return result
 
+    def list_grouped_threads(self) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        Retorna as conversas organizadas por períodos temporais:
+        'Hoje', 'Ontem', 'Últimos 7 dias', 'Últimos 30 dias', 'Mais antigas'.
+        Apenas grupos que possuam ao menos uma conversa são retornados.
+        """
+        threads = self.list_threads()
+        if not threads:
+            return {}
+
+        now = datetime.now()
+        today_date = now.date()
+
+        grouped: Dict[str, List[Dict[str, Any]]] = {
+            "Hoje": [],
+            "Ontem": [],
+            "Últimos 7 dias": [],
+            "Últimos 30 dias": [],
+            "Mais antigas": [],
+        }
+
+        for thread in threads:
+            updated_str = thread.get("updated_at", "")
+            try:
+                dt = datetime.fromisoformat(updated_str)
+                delta_days = (today_date - dt.date()).days
+            except Exception:
+                delta_days = 999
+
+            if delta_days == 0:
+                grouped["Hoje"].append(thread)
+            elif delta_days == 1:
+                grouped["Ontem"].append(thread)
+            elif delta_days <= 7:
+                grouped["Últimos 7 dias"].append(thread)
+            elif delta_days <= 30:
+                grouped["Últimos 30 dias"].append(thread)
+            else:
+                grouped["Mais antigas"].append(thread)
+
+        return {k: v for k, v in grouped.items() if v}
+
     def get_thread(self, thread_id: str) -> Optional[Dict[str, Any]]:
         """Retorna o objeto completo da conversa (incluindo array de mensagens)."""
         data = self._read_data()
@@ -137,6 +179,19 @@ class CopilotChatStore:
         self._write_data(data)
         return thread_obj
 
+    def rename_thread(self, thread_id: str, new_title: str) -> bool:
+        """Renomeia uma conversa existente."""
+        data = self._read_data()
+        threads = data.get("threads", {})
+        if thread_id not in threads:
+            return False
+
+        clean_title = new_title.strip() if new_title else "Conversa sem título"
+        threads[thread_id]["title"] = clean_title
+        threads[thread_id]["updated_at"] = datetime.now().isoformat()
+        self._write_data(data)
+        return True
+
     def delete_thread(self, thread_id: str) -> bool:
         """Exclui uma conversa do histórico."""
         data = self._read_data()
@@ -150,3 +205,4 @@ class CopilotChatStore:
     def clear_all(self) -> None:
         """Limpa todo o histórico de conversas."""
         self._write_data({"threads": {}})
+
