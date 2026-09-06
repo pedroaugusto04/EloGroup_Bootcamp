@@ -5,8 +5,13 @@ Funções utilitárias de formatação monetária, percentual e renderização d
 
 import re
 from typing import Union, Optional
-import streamlit as st
-import streamlit.components.v1 as components
+
+try:
+    import streamlit as st
+    import streamlit.components.v1 as components
+except ImportError:
+    st = None
+    components = None
 
 
 def format_currency_brl(value: Union[int, float, None], decimals: int = 2) -> str:
@@ -47,6 +52,8 @@ def render_mermaid_diagram(code: str, height: Optional[int] = None) -> None:
     Renderiza um diagrama Mermaid interativo embutido no Streamlit com tema Dark harmonizado.
     Suporta timelines, diagramas de fluxo, gráficos de Gantt e matrizes.
     """
+    if components is None:
+        return
     clean_code = code.strip()
     # Se o bloco não contiver um comando inicial reconhecido, mas tiver sintaxe de timeline:
     known_keywords = (
@@ -140,7 +147,7 @@ def render_message_with_mermaid(content: str) -> None:
     Renderiza o conteúdo completo de uma mensagem no Streamlit, identificando e plotando
     visualmente diagramas Mermaid (como timelines de 30/60/90 dias) e textos Markdown adjacentes.
     """
-    if not content:
+    if not content or st is None:
         return
 
     # 1. Padrão para blocos delimitados ```mermaid ou ```timeline

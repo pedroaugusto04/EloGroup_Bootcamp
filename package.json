@@ -1,0 +1,12 @@
+{
+  "name": "vertice-retail-analytics",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:api": ".venv/bin/uvicorn src.api.main:app --reload --port 8501",
+    "build": "cd frontend && npm run build",
+    "test:api": "PYTHONPATH=. .venv/bin/pytest tests/test_api.py -v",
+    "test": "PYTHONPATH=. .venv/bin/pytest"
+  }
+}

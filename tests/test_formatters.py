@@ -21,9 +21,9 @@ def test_format_percentage():
     assert format_percentage(None) == "0,0%"
 
 
-@patch("src.utils.formatters.components.html")
-@patch("src.utils.formatters.st.markdown")
-def test_render_message_with_mermaid_fenced(mock_markdown, mock_html):
+@patch("src.utils.formatters.components")
+@patch("src.utils.formatters.st")
+def test_render_message_with_mermaid_fenced(mock_st, mock_components):
     content = """Aqui está o plano:
 
 ```mermaid
@@ -38,16 +38,16 @@ E a conclusão final."""
 
     render_message_with_mermaid(content)
 
-    assert mock_markdown.call_count == 2
-    assert mock_html.call_count == 1
-    html_arg = mock_html.call_args[0][0]
+    assert mock_st.markdown.call_count == 2
+    assert mock_components.html.call_count == 1
+    html_arg = mock_components.html.call_args[0][0]
     assert "mermaid" in html_arg
     assert "Estratégia de Recuperação" in html_arg
 
 
-@patch("src.utils.formatters.components.html")
-@patch("src.utils.formatters.st.markdown")
-def test_render_message_with_mermaid_raw_timeline(mock_markdown, mock_html):
+@patch("src.utils.formatters.components")
+@patch("src.utils.formatters.st")
+def test_render_message_with_mermaid_raw_timeline(mock_st, mock_components):
     content = """timeline
     title Estratégia de Recuperação Vértice Retail
     section 30 Dias: Quick Wins
@@ -55,7 +55,8 @@ def test_render_message_with_mermaid_raw_timeline(mock_markdown, mock_html):
 
     render_message_with_mermaid(content)
 
-    assert mock_html.call_count == 1
-    html_arg = mock_html.call_args[0][0]
+    assert mock_components.html.call_count == 1
+    html_arg = mock_components.html.call_args[0][0]
     assert "timeline" in html_arg
     assert "Liquidação de Descontinuados" in html_arg
+

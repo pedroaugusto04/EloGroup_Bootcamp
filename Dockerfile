@@ -1,8 +1,23 @@
 # ==============================================================================
-# Dockerfile: EloGroup AI Consulting Lab - Projeto Vértice Analytics
+# Dockerfile: EloGroup AI Consulting Lab - Projeto Vértice Analytics (v2.0)
+# Multi-Stage Build: Frontend (Vite + React + TS) + Backend (FastAPI + DuckDB)
 # ==============================================================================
-# Estágio de dependências de runtime. Mantemos a versão do Python alinhada ao
-# ambiente atual e isolamos os artefatos instalados para a imagem final.
+
+# ------------------------------------------------------------------------------
+# 1. Estágio de Build do Frontend (TypeScript + Vite)
+# ------------------------------------------------------------------------------
+FROM node:22-alpine AS frontend-builder
+WORKDIR /app/frontend
+
+COPY frontend/package.json ./
+RUN npm install
+
+COPY frontend/ ./
+RUN npm run build
+
+# ------------------------------------------------------------------------------
+# 2. Estágio de Dependências Python de Runtime
+# ------------------------------------------------------------------------------
 FROM python:3.12-slim AS runtime-deps
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
@@ -12,7 +27,9 @@ WORKDIR /app
 COPY requirements-runtime.txt .
 RUN pip install --prefix=/install -r requirements-runtime.txt
 
-# Estágio usado para gerar os Parquets e também pelos testes locais/CI.
+# ------------------------------------------------------------------------------
+# 3. Estágio de Pré-Processamento de Dados & Testes
+# ------------------------------------------------------------------------------
 FROM runtime-deps AS builder
 
 ENV PYTHONUNBUFFERED=1 \
@@ -29,28 +46,24 @@ COPY src/ /app/src/
 COPY data/raw/ /app/data/raw/
 RUN python -m src.infrastructure.preprocessor
 
-# Target opcional para executar testes sem adicionar pytest à imagem de runtime.
+# ------------------------------------------------------------------------------
+# 4. Target Opcional de Testes no CI
+# ------------------------------------------------------------------------------
 FROM builder AS test
 ENV PYTHONPATH=/install/lib/python3.12/site-packages:/app
-COPY app/ /app/app/
 COPY tests/ /app/tests/
-CMD ["pytest", "tests/test_analytics.py"]
+CMD ["pytest", "tests/"]
 
-# Imagem final de execução: não leva pytest, CSVs brutos nem o ambiente de
-# build para produção.
+# ------------------------------------------------------------------------------
+# 5. Imagem Final de Produção (FastAPI servindo API e Frontend Estático)
+# ------------------------------------------------------------------------------
 FROM python:3.12-slim AS runtime
 
-# Defaults seguros para execução em produção. O compose local sobrescreve os
-# valores de desenvolvimento (hot reload e volumes).
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/app \
-    STREAMLIT_SERVER_PORT=8501 \
-    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
-    STREAMLIT_SERVER_HEADLESS=true \
-    STREAMLIT_SERVER_RUN_ON_SAVE=false \
-    STREAMLIT_SERVER_FILE_WATCHER_TYPE=none \
-    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+    PORT=8501 \
+    HOST=0.0.0.0
 
 COPY --from=runtime-deps /install /usr/local
 
@@ -59,22 +72,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Diretório de trabalho
 WORKDIR /app
 
 # Código-fonte da aplicação
 COPY src/ /app/src/
-COPY app/ /app/app/
 
-# Copia somente os dados derivados gerados no estágio de build.
+# Dados pré-processados gerados
 COPY --from=builder /app/data/processed/ /app/data/processed/
 
-# Porta padrão do Streamlit
+# Frontend estático compilado
+COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
+
+# Porta padrão da aplicação
 EXPOSE 8501
 
-# Healthcheck nativo do Streamlit
+# Healthcheck nativo da API
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl --fail http://localhost:8501/_stcore/health || exit 1
+    CMD curl --fail http://localhost:8501/api/health || exit 1
 
-# Comando padrão
-CMD ["streamlit", "run", "app/main.py"]
+# Inicialização do servidor FastAPI
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8501"]
