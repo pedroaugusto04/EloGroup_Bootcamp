@@ -24,18 +24,15 @@ const isMermaidContent = (content: string, className?: string) => {
   if (className && className.includes('language-mermaid')) return true;
   const trimmed = content.trim();
   return (
-    trimmed.startsWith('timeline') ||
-    trimmed.startsWith('graph ') ||
-    trimmed.startsWith('graph\n') ||
-    trimmed.startsWith('flowchart ') ||
-    trimmed.startsWith('flowchart\n') ||
-    trimmed.startsWith('sequenceDiagram') ||
-    trimmed.startsWith('gantt') ||
-    trimmed.startsWith('pie ') ||
-    trimmed.startsWith('pie\n') ||
-    trimmed.startsWith('classDiagram') ||
-    trimmed.startsWith('erDiagram') ||
-    trimmed.startsWith('stateDiagram')
+    /^timeline\b/.test(trimmed) ||
+    /^graph\s+/.test(trimmed) ||
+    /^flowchart\s+/.test(trimmed) ||
+    /^sequenceDiagram\b/.test(trimmed) ||
+    /^gantt\b/.test(trimmed) ||
+    /^pie\b/.test(trimmed) ||
+    /^classDiagram\b/.test(trimmed) ||
+    /^erDiagram\b/.test(trimmed) ||
+    /^stateDiagram\b/.test(trimmed)
   );
 };
 
