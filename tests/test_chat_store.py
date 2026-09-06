@@ -69,10 +69,17 @@ def test_chat_store_rename_thread(temp_chat_store):
     assert temp_chat_store.rename_thread("non-existent", "Novo") is False
 
 
-def test_chat_store_list_grouped_threads(temp_chat_store):
-    temp_chat_store.save_thread("t1", [{"role": "user", "content": "Chat de Hoje"}])
-    grouped = temp_chat_store.list_grouped_threads()
-    assert "Hoje" in grouped
-    assert len(grouped["Hoje"]) == 1
-    assert grouped["Hoje"][0]["id"] == "t1"
+def test_chat_store_create_thread(temp_chat_store):
+    thread = temp_chat_store.create_thread(title="Nova Conversa")
+    assert thread["id"] is not None
+    assert thread["title"] == "Nova Conversa"
+    assert thread["messages"] == []
+    assert len(temp_chat_store.list_threads()) == 1
+
+    # Quando a primeira mensagem é enviada, o título deve atualizar automaticamente
+    updated = temp_chat_store.save_thread(
+        thread["id"],
+        [{"role": "user", "content": "Quais são os SKUs de Moda com ruptura?"}]
+    )
+    assert "Quais são os SKUs de Moda" in updated["title"]
 

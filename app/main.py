@@ -94,9 +94,10 @@ def main():
         st.sidebar.markdown("### Copiloto de Estoque")
         st.sidebar.markdown("<p style='font-size: 12px; color: #38BDF8; margin-top: -10px; margin-bottom: 16px;'>Consultoria & Diagnóstico</p>", unsafe_allow_html=True)
         
-        # Botão Nova Conversa
-        if st.sidebar.button("+ Nova Conversa", key="sidebar_new_chat_btn", type="primary", use_container_width=True, help="Inicia uma nova conversa."):
+        # Botão Nova Conversa - Cria card imediatamente no chat_store
+        if st.sidebar.button("+ Nova Conversa", key="sidebar_new_chat_btn", type="primary", use_container_width=True, help="Inicia uma nova conversa e gera card no histórico imediatamente."):
             new_thread_id = str(uuid.uuid4())
+            chat_store.create_thread(title="Nova Conversa", messages=[], thread_id=new_thread_id)
             st.session_state["copilot_thread_id"] = new_thread_id
             st.session_state["copilot_messages"] = []
             st.rerun()
@@ -119,9 +120,9 @@ def main():
                     t_count = thread["message_count"]
                     is_active = (t_id == active_id)
 
-                    col_thread, col_opt = st.sidebar.columns([0.80, 0.20])
+                    col_thread, col_edit, col_del = st.sidebar.columns([0.66, 0.17, 0.17])
                     with col_thread:
-                        btn_label = f"[Ativo] {t_title}" if is_active else t_title
+                        btn_label = f"▶ {t_title}" if is_active else t_title
                         if st.button(
                             btn_label,
                             key=f"thread_btn_{t_id}",
@@ -133,24 +134,29 @@ def main():
                             thread_data = chat_store.get_thread(t_id)
                             st.session_state["copilot_messages"] = thread_data.get("messages", []) if thread_data else []
                             st.rerun()
-                    with col_opt:
-                        with st.popover("...", help="Opções da conversa"):
-                            st.markdown("**Gerenciar Conversa**")
-                            st.caption(f"ID: `{t_id[:8]}`")
-                            new_title = st.text_input("Renomear título:", value=t_title, key=f"rename_input_{t_id}")
-                            if st.button("Salvar Título", key=f"save_rename_{t_id}", use_container_width=True):
+                    with col_edit:
+                        with st.popover("✏️", help=f"Editar título da conversa '{t_title}'"):
+                            st.markdown("**Editar Título**")
+                            new_title = st.text_input("Novo título:", value=t_title, key=f"rename_input_{t_id}")
+                            if st.button("Salvar", key=f"save_rename_{t_id}", use_container_width=True):
                                 if new_title.strip():
                                     chat_store.rename_thread(t_id, new_title.strip())
                                     st.rerun()
-
-                            st.markdown("---")
-                            st.caption("Ação irreversível")
-                            if st.button("Confirmar Exclusão", key=f"del_thread_{t_id}", type="secondary", use_container_width=True):
-                                chat_store.delete_thread(t_id)
-                                if t_id == active_id:
-                                    st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+                    with col_del:
+                        if st.button("🗑️", key=f"del_thread_{t_id}", help=f"Remover conversa '{t_title}'", use_container_width=True):
+                            chat_store.delete_thread(t_id)
+                            if t_id == active_id:
+                                remaining = chat_store.list_threads()
+                                if remaining:
+                                    st.session_state["copilot_thread_id"] = remaining[0]["id"]
+                                    t_data = chat_store.get_thread(remaining[0]["id"])
+                                    st.session_state["copilot_messages"] = t_data.get("messages", []) if t_data else []
+                                else:
+                                    new_tid = str(uuid.uuid4())
+                                    chat_store.create_thread(title="Nova Conversa", messages=[], thread_id=new_tid)
+                                    st.session_state["copilot_thread_id"] = new_tid
                                     st.session_state["copilot_messages"] = []
-                                st.rerun()
+                            st.rerun()
         else:
             st.sidebar.markdown(
                 "<p style='font-size: 12px; color: #64748B; margin-top: 8px; margin-bottom: 8px;'>Nenhuma conversa registrada.</p>",
@@ -158,16 +164,6 @@ def main():
             )
 
         st.sidebar.markdown("---")
-        if grouped_threads:
-            with st.sidebar.popover("Limpar Histórico Geral"):
-                st.markdown("**Limpeza Completa**")
-                st.caption("Esta ação excluirá permanentemente todas as conversas do histórico.")
-                if st.button("Confirmar Limpeza Geral", key="btn_clear_all_history", type="secondary", use_container_width=True):
-                    chat_store.clear_all()
-                    st.session_state["copilot_thread_id"] = str(uuid.uuid4())
-                    st.session_state["copilot_messages"] = []
-                    st.rerun()
-
         if st.sidebar.button("Voltar ao Painel Analítico", key="sidebar_back_workbench_btn", use_container_width=True, help="Retorna ao painel completo de gráficos e auditoria analítica."):
             st.query_params.clear()
             st.rerun()
@@ -241,6 +237,11 @@ def main():
                 days_window=audit_days_window,
                 period_label=audit_period_label,
             )
+            audit_tid = res.get("audit_thread_id")
+            if audit_tid:
+                st.session_state["copilot_thread_id"] = audit_tid
+                st.session_state["copilot_messages"] = res.get("messages", [])
+
             email_res = res.get("email_result") or {}
             if email_res.get("status") == "sent":
                 status_box.update(label=f"Auditoria ({audit_period_label}) concluída e e-mail enviado.", state="complete", expanded=False)

@@ -9,7 +9,7 @@ import streamlit as st
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.chat_store import CopilotChatStore
 from src.agent.service import InventoryAgentService
-from src.utils.formatters import sanitize_markdown_for_streamlit
+from src.utils.formatters import render_message_with_mermaid
 
 
 @st.cache_resource
@@ -23,8 +23,61 @@ def show_agente_consultor(repo: DuckDBRepository):
     service = get_inventory_agent_service()
     chat_store = CopilotChatStore()
 
+    # 1. Trata parâmetros de deep link (thread_id e source=email)
+    query_thread_id = st.query_params.get("thread_id")
+    source_param = str(st.query_params.get("source", "")).lower()
+    from_param = str(st.query_params.get("from", "")).lower()
+    is_from_email = (source_param == "email" or from_param == "email")
 
-    # Inicialização do ID da thread ativa
+    if query_thread_id:
+        target_thread = chat_store.get_thread(query_thread_id)
+        if target_thread:
+            st.session_state["copilot_thread_id"] = query_thread_id
+            st.session_state["copilot_messages"] = target_thread.get("messages", [])
+
+    elif is_from_email and "copilot_email_synced" not in st.session_state:
+        st.session_state["copilot_email_synced"] = True
+        from src.agent.worker import load_latest_audit_snapshot
+        snapshot = load_latest_audit_snapshot() or {}
+        snapshot_tid = snapshot.get("audit_thread_id")
+
+        if snapshot_tid and chat_store.get_thread(snapshot_tid):
+            st.session_state["copilot_thread_id"] = snapshot_tid
+            st.session_state["copilot_messages"] = chat_store.get_thread(snapshot_tid).get("messages", [])
+        else:
+            report_content = snapshot.get("final_report")
+            if report_content:
+                init_context = (
+                    f"{report_content}\n\n"
+                    "---\n"
+                    "**Como posso apoiar a sua análise?** Você pode solicitar simulações detalhadas, aprofundamento em SKUs específicos ou estratégias de liquidação."
+                )
+            else:
+                structured = snapshot.get("structured_data") or {}
+                total_stranded = structured.get("total_stranded_cash")
+                ruptura_count = structured.get("ruptura_count")
+                criticos_count = structured.get("criticos_count")
+                mkt_cats = structured.get("mkt_alert_categories", [])
+                summary = []
+                if total_stranded is not None:
+                    summary.append(f"- **Capital imobilizado**: `R$ {total_stranded:,.2f}`")
+                if ruptura_count is not None and criticos_count is not None:
+                    summary.append(f"- **Ruptura e risco**: `{ruptura_count + criticos_count} SKUs`")
+                if mkt_cats:
+                    summary.append(f"- **Categorias em alerta**: `{', '.join(mkt_cats)}`")
+                init_context = (
+                    "**Contexto da auditoria de estoque:**\n\n"
+                    + ("\n".join(summary) if summary else "Nenhum dado da auditoria está disponível no momento.")
+                    + "\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
+                )
+            new_audit_id = str(uuid.uuid4())
+            new_audit_msgs = [{"role": "assistant", "content": init_context}]
+            chat_store.save_thread(new_audit_id, new_audit_msgs, title="Auditoria de Estoque")
+            st.session_state["copilot_thread_id"] = new_audit_id
+            st.session_state["copilot_messages"] = new_audit_msgs
+            service.seed_copilot(thread_id=new_audit_id, initial_message=init_context)
+
+    # 2. Inicialização do ID da thread ativa se ainda não definido no session_state
     if "copilot_thread_id" not in st.session_state:
         threads = chat_store.list_threads()
         if threads:
@@ -32,7 +85,9 @@ def show_agente_consultor(repo: DuckDBRepository):
             thread_data = chat_store.get_thread(threads[0]["id"])
             st.session_state["copilot_messages"] = thread_data.get("messages", []) if thread_data else []
         else:
-            st.session_state["copilot_thread_id"] = str(uuid.uuid4())
+            new_id = str(uuid.uuid4())
+            chat_store.create_thread(title="Nova Conversa", messages=[], thread_id=new_id)
+            st.session_state["copilot_thread_id"] = new_id
             st.session_state["copilot_messages"] = []
 
     active_thread_id = st.session_state["copilot_thread_id"]
@@ -42,55 +97,13 @@ def show_agente_consultor(repo: DuckDBRepository):
         thread_data = chat_store.get_thread(active_thread_id)
         st.session_state["copilot_messages"] = thread_data.get("messages", []) if thread_data else []
 
-    # Verificação de origem por e-mail
-    source_param = str(st.query_params.get("source", "")).lower()
-    from_param = str(st.query_params.get("from", "")).lower()
-    is_from_email = (source_param == "email" or from_param == "email")
-
-    if is_from_email and len(st.session_state["copilot_messages"]) == 0:
-        from src.agent.worker import load_latest_audit_snapshot
-        snapshot = load_latest_audit_snapshot() or {}
-        report_content = snapshot.get("final_report")
-        
-        if report_content:
-            init_context = (
-                f"{report_content}\n\n"
-                "---\n"
-                "**Como posso apoiar a sua análise?** Você pode solicitar simulações detalhadas, aprofundamento em SKUs específicos ou estratégias de liquidação."
-            )
-        else:
-            structured = snapshot.get("structured_data") or {}
-            total_stranded = structured.get("total_stranded_cash")
-            ruptura_count = structured.get("ruptura_count")
-            criticos_count = structured.get("criticos_count")
-            mkt_cats = structured.get("mkt_alert_categories", [])
-            summary = []
-            if total_stranded is not None:
-                summary.append(f"- **Capital imobilizado**: `R$ {total_stranded:,.2f}`")
-            if ruptura_count is not None and criticos_count is not None:
-                summary.append(f"- **Ruptura e risco**: `{ruptura_count + criticos_count} SKUs`")
-            if mkt_cats:
-                summary.append(f"- **Categorias em alerta**: `{', '.join(mkt_cats)}`")
-            init_context = (
-                "**Contexto da auditoria de estoque:**\n\n"
-                + ("\n".join(summary) if summary else "Nenhum dado da auditoria está disponível no momento.")
-                + "\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
-            )
-            
-        st.session_state["copilot_messages"] = [{"role": "assistant", "content": init_context}]
-        chat_store.save_thread(active_thread_id, st.session_state["copilot_messages"], title="Auditoria de Estoque")
-        service.seed_copilot(
-            thread_id=active_thread_id,
-            initial_message=init_context
-        )
-
     # =========================================================================
-    # CABEÇALHO DO CHAT
+    # CABEÇALHO DO CHAT (MINIMALISTA)
     # =========================================================================
     thread_info = chat_store.get_thread(active_thread_id)
     chat_title = thread_info.get("title", "Nova Conversa") if thread_info else "Nova Conversa"
 
-    col_header, col_actions = st.columns([3.5, 1.5])
+    col_header, col_actions = st.columns([3.8, 1.2])
     with col_header:
         st.markdown(
             f"""
@@ -105,28 +118,12 @@ def show_agente_consultor(repo: DuckDBRepository):
         )
     with col_actions:
         st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
-        c_new, c_opt = st.columns([0.65, 0.35])
-        with c_new:
-            if st.button("+ Novo Chat", key="btn_new_chat_header", use_container_width=True, help="Inicia uma nova conversa e limpa o contexto."):
-                new_id = str(uuid.uuid4())
-                st.session_state["copilot_thread_id"] = new_id
-                st.session_state["copilot_messages"] = []
-                st.rerun()
-        with c_opt:
-            with st.popover("...", help="Opções desta conversa"):
-                st.markdown("**Opções da Conversa**")
-                new_title_h = st.text_input("Título da conversa:", value=chat_title, key="rename_header_input")
-                if st.button("Salvar Título", key="btn_save_title_header", use_container_width=True):
-                    if new_title_h.strip():
-                        chat_store.rename_thread(active_thread_id, new_title_h.strip())
-                        st.rerun()
-
-                st.markdown("---")
-                if st.button("Excluir Conversa", key="btn_del_header", type="secondary", use_container_width=True):
-                    chat_store.delete_thread(active_thread_id)
-                    st.session_state["copilot_thread_id"] = str(uuid.uuid4())
-                    st.session_state["copilot_messages"] = []
-                    st.rerun()
+        if st.button("+ Novo Chat", key="btn_new_chat_header", type="primary", use_container_width=True, help="Inicia uma nova conversa e gera card no histórico imediatamente."):
+            new_id = str(uuid.uuid4())
+            chat_store.create_thread(title="Nova Conversa", messages=[], thread_id=new_id)
+            st.session_state["copilot_thread_id"] = new_id
+            st.session_state["copilot_messages"] = []
+            st.rerun()
 
     st.markdown("<hr style='margin-top: 4px; margin-bottom: 24px; border: none; border-top: 1px solid rgba(255, 255, 255, 0.08);'>", unsafe_allow_html=True)
 
@@ -236,7 +233,7 @@ def show_agente_consultor(repo: DuckDBRepository):
     # =========================================================================
     for msg in st.session_state["copilot_messages"]:
         with st.chat_message(msg["role"]):
-            st.markdown(sanitize_markdown_for_streamlit(msg["content"]))
+            render_message_with_mermaid(msg["content"])
 
     # =========================================================================
     # BARRA DE ENTRADA DO CHAT (CHAT INPUT OU SUGESTÃO CLICADA)
@@ -249,7 +246,7 @@ def show_agente_consultor(repo: DuckDBRepository):
         st.session_state["copilot_messages"].append({"role": "user", "content": user_query})
         chat_store.save_thread(active_thread_id, st.session_state["copilot_messages"])
         with st.chat_message("user"):
-            st.markdown(user_query)
+            render_message_with_mermaid(user_query)
 
         # Executa ciclo ReAct com memória de thread e histórico contextual recente
         with st.chat_message("assistant"):
@@ -259,9 +256,8 @@ def show_agente_consultor(repo: DuckDBRepository):
                     thread_id=active_thread_id,
                     history=past_history,
                 )
-                safe_response = sanitize_markdown_for_streamlit(response_text)
-                st.markdown(safe_response)
+                render_message_with_mermaid(response_text)
 
-        st.session_state["copilot_messages"].append({"role": "assistant", "content": safe_response})
+        st.session_state["copilot_messages"].append({"role": "assistant", "content": response_text})
         chat_store.save_thread(active_thread_id, st.session_state["copilot_messages"])
         st.rerun()

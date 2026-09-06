@@ -154,6 +154,18 @@ class CopilotChatStore:
         data = self._read_data()
         return data.get("threads", {}).get(thread_id)
 
+    def create_thread(
+        self,
+        title: str = "Nova Conversa",
+        messages: Optional[List[Dict[str, str]]] = None,
+        thread_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Cria e persiste imediatamente uma nova conversa no histórico."""
+        import uuid
+        t_id = thread_id or str(uuid.uuid4())
+        msgs = messages or []
+        return self.save_thread(t_id, msgs, title=title)
+
     def save_thread(
         self,
         thread_id: str,
@@ -168,7 +180,15 @@ class CopilotChatStore:
         existing = threads.get(thread_id, {})
 
         created_at = existing.get("created_at", now_iso)
-        current_title = title or existing.get("title") or self._generate_title(messages)
+        current_title = title or existing.get("title")
+        if not title and (not current_title or current_title == "Nova Conversa"):
+            gen_title = self._generate_title(messages)
+            if gen_title != "Nova Conversa":
+                current_title = gen_title
+            elif not current_title:
+                current_title = "Nova Conversa"
+        elif not current_title:
+            current_title = "Nova Conversa"
 
         thread_obj = {
             "id": thread_id,
