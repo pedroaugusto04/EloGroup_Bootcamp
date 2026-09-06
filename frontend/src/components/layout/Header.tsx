@@ -26,8 +26,12 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
     subtitle: 'Auditoria de integridade relacional entre bases e detecção de dispersão e outliers (Tukey IQR).',
   },
   copilot: {
-    title: 'Copiloto de Estoque IA & Plano Estratégico',
-    subtitle: 'Consultoria conversacional inteligente via LangGraph ReAct e priorização do roadmap 30/60/90.',
+    title: 'Copiloto Analítico de Estoque IA',
+    subtitle: 'Consultor ReAct conectado ao DuckDB em tempo real para simulações e diagnósticos ad-hoc.',
+  },
+  roadmap: {
+    title: 'Plano de Ação Estratégico (30/60/90 Dias)',
+    subtitle: 'Síntese executiva transversal, matriz de esforço x impacto e cronograma de quick wins.',
   },
 };
 

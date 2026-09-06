@@ -5,6 +5,7 @@ import {
   Users,
   ShieldCheck,
   Bot,
+  Target,
   Layers,
   ChevronRight,
 } from 'lucide-react';
@@ -54,10 +55,17 @@ const navItems: NavItem[] = [
   },
   {
     id: 'copilot',
-    label: 'Copiloto IA & Roadmap',
+    label: 'Copiloto de Estoque IA',
     tag: '05',
     icon: Bot,
-    description: 'Consultor de estoque e plano 30/60/90 dias',
+    description: 'Assistente ReAct conectado ao DuckDB em tempo real',
+  },
+  {
+    id: 'roadmap',
+    label: 'Plano Estratégico 30/60/90',
+    tag: '06',
+    icon: Target,
+    description: 'Matriz de impacto, quick wins e iniciativas C-Level',
   },
 ];
 
@@ -80,9 +88,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
 
       {/* Navigation List */}
       <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
-        <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-[#71717a]">
-          Módulos Analíticos
-        </div>
 
         {navItems.map(item => {
           const Icon = item.icon;

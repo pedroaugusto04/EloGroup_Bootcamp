@@ -7,7 +7,8 @@ import { ExecutiveView } from './components/views/ExecutiveView';
 import { InventoryView } from './components/views/InventoryView';
 import { GrowthView } from './components/views/GrowthView';
 import { AuditView } from './components/views/AuditView';
-import { CopilotRoadmapView } from './components/views/CopilotRoadmapView';
+import { CopilotView } from './components/views/CopilotView';
+import { RoadmapView } from './components/views/RoadmapView';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ViewTab>('executive');
@@ -41,15 +42,21 @@ export const App: React.FC = () => {
         />
 
         {/* Dynamic View Container */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8" key={refreshKey}>
-          <div className="max-w-7xl mx-auto pb-12">
-            {activeTab === 'executive' && <ExecutiveView filterOptions={filterOptions} />}
-            {activeTab === 'inventory' && <InventoryView filterOptions={filterOptions} />}
-            {activeTab === 'growth' && <GrowthView filterOptions={filterOptions} />}
-            {activeTab === 'audit' && <AuditView />}
-            {activeTab === 'copilot' && <CopilotRoadmapView />}
+        {activeTab === 'copilot' ? (
+          <div className="flex-1 h-full min-h-0 overflow-hidden" key={refreshKey}>
+            <CopilotView />
           </div>
-        </main>
+        ) : (
+          <main className="flex-1 overflow-y-auto p-6 md:p-8" key={refreshKey}>
+            <div className="max-w-7xl mx-auto pb-12">
+              {activeTab === 'executive' && <ExecutiveView filterOptions={filterOptions} />}
+              {activeTab === 'inventory' && <InventoryView filterOptions={filterOptions} />}
+              {activeTab === 'growth' && <GrowthView filterOptions={filterOptions} />}
+              {activeTab === 'audit' && <AuditView />}
+              {activeTab === 'roadmap' && <RoadmapView />}
+            </div>
+          </main>
+        )}
       </div>
     </div>
   );
