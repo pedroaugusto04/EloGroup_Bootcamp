@@ -287,6 +287,78 @@
           "content": "**Parecer de Auditoria de Estoque (Ano Fechado 2023):**\n\n- **Ruptura e risco**: `3 SKUs`\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
         }
       ]
+    },
+    "71f0d6e5-72e5-4b43-b6c3-14de36c40530": {
+      "id": "71f0d6e5-72e5-4b43-b6c3-14de36c40530",
+      "title": "Auditoria: Ano Fechado 2023",
+      "created_at": "2026-09-06T17:25:40.150970",
+      "updated_at": "2026-09-06T17:25:40.150970",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "# Relatório Executivo: Diagnóstico de Estoque & Otimização de Capital\n\n## 1. Sumário Executivo & Diagnóstico Geral\n- **Saúde do Estoque Físico**: Identificados 99 SKUs em ruptura ativa, 3 em risco crítico e 116 SKUs sem giro no período anualizado.\n- **Capital Travado em Descontinuados**: Total de R$ 14,775,347.64 imobilizados em itens fora de linha (custo contábil de estoque).\n\n## 2. Matriz de Ações por Horizonte Temporal\n\n### ⚡ Curto Prazo: Quick Wins (Até 30 Dias)\n- Realizar saldão promocional de queima controlada para estancar os R$ 14,775,347.64 em descontinuados.\n- Emitir ordens de compra emergenciais para os top SKUs Curva A com risco iminente de ruptura.\n\n### Médio Prazo: Ajuste de Processos (60 Dias)\n- Recalibrar parâmetros de ponto de pedido e estoque de segurança considerando o lead time real dos fornecedores.\n- Bloquear recompras automáticas de SKUs com taxa de devolução superior a 10% até auditoria de qualidade.\n\n### Longo Prazo: Excelência Operacional (90 Dias)\n- Integrar rotina de S&OP (Sales & Operations Planning) sincronizando Marketing, Compras e Logística.\n- Implementar governança de cadastro para unificar custos contábeis e tabelas de preço no PDV.\n\n## 3. Top SKUs Críticos para Ação Imediata\nAuditoria concluída com base na base analítica DuckDB (Ano Base 2026).\n\n\n---\n**Como posso apoiar a sua análise?** Você pode solicitar simulações detalhadas, aprofundamento em SKUs específicos ou estratégias de liquidação e reposição."
+        }
+      ]
+    },
+    "142b84e1-782a-468c-a920-8b60fd0db6cd": {
+      "id": "142b84e1-782a-468c-a920-8b60fd0db6cd",
+      "title": "Auditoria: Ano Fechado 2023",
+      "created_at": "2026-09-06T17:25:40.156420",
+      "updated_at": "2026-09-06T17:25:40.156420",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "**Parecer de Auditoria de Estoque (Ano Fechado 2023):**\n\n- **Ruptura e risco**: `3 SKUs`\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
+        }
+      ]
+    },
+    "e598be83-c3b7-4d24-a2f2-d6606aeb8474": {
+      "id": "e598be83-c3b7-4d24-a2f2-d6606aeb8474",
+      "title": "Auditoria: Ano Fechado 2023",
+      "created_at": "2026-09-06T18:10:39.633741",
+      "updated_at": "2026-09-06T18:10:39.633741",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "# Relatório Executivo: Diagnóstico de Estoque & Otimização de Capital\n\n## 1. Sumário Executivo & Diagnóstico Geral\n- **Saúde do Estoque Físico**: Identificados 99 SKUs em ruptura ativa, 3 em risco crítico e 116 SKUs sem giro no período anualizado.\n- **Capital Travado em Descontinuados**: Total de R$ 14,775,347.64 imobilizados em itens fora de linha (custo contábil de estoque).\n\n## 2. Matriz de Ações por Horizonte Temporal\n\n### ⚡ Curto Prazo: Quick Wins (Até 30 Dias)\n- Realizar saldão promocional de queima controlada para estancar os R$ 14,775,347.64 em descontinuados.\n- Emitir ordens de compra emergenciais para os top SKUs Curva A com risco iminente de ruptura.\n\n### Médio Prazo: Ajuste de Processos (60 Dias)\n- Recalibrar parâmetros de ponto de pedido e estoque de segurança considerando o lead time real dos fornecedores.\n- Bloquear recompras automáticas de SKUs com taxa de devolução superior a 10% até auditoria de qualidade.\n\n### Longo Prazo: Excelência Operacional (90 Dias)\n- Integrar rotina de S&OP (Sales & Operations Planning) sincronizando Marketing, Compras e Logística.\n- Implementar governança de cadastro para unificar custos contábeis e tabelas de preço no PDV.\n\n## 3. Top SKUs Críticos para Ação Imediata\nAuditoria concluída com base na base analítica DuckDB (Ano Base 2026).\n\n\n---\n**Como posso apoiar a sua análise?** Você pode solicitar simulações detalhadas, aprofundamento em SKUs específicos ou estratégias de liquidação e reposição."
+        }
+      ]
+    },
+    "0ca55e3a-35e0-4a92-abd3-36167888a5f9": {
+      "id": "0ca55e3a-35e0-4a92-abd3-36167888a5f9",
+      "title": "Auditoria: Ano Fechado 2023",
+      "created_at": "2026-09-06T18:10:39.643284",
+      "updated_at": "2026-09-06T18:10:39.643284",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "**Parecer de Auditoria de Estoque (Ano Fechado 2023):**\n\n- **Ruptura e risco**: `3 SKUs`\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
+        }
+      ]
+    },
+    "a265fa5f-dcf2-49d6-999d-086ecf2a2b7e": {
+      "id": "a265fa5f-dcf2-49d6-999d-086ecf2a2b7e",
+      "title": "Auditoria: Ano Fechado 2023",
+      "created_at": "2026-09-06T18:25:06.641472",
+      "updated_at": "2026-09-06T18:25:06.641472",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "# Relatório Executivo: Diagnóstico de Estoque & Otimização de Capital\n\n## 1. Sumário Executivo & Diagnóstico Geral\n- **Saúde do Estoque Físico**: Identificados 99 SKUs em ruptura ativa, 3 em risco crítico e 116 SKUs sem giro no período anualizado.\n- **Capital Travado em Descontinuados**: Total de R$ 14,775,347.64 imobilizados em itens fora de linha (custo contábil de estoque).\n\n## 2. Matriz de Ações por Horizonte Temporal\n\n### ⚡ Curto Prazo: Quick Wins (Até 30 Dias)\n- Realizar saldão promocional de queima controlada para estancar os R$ 14,775,347.64 em descontinuados.\n- Emitir ordens de compra emergenciais para os top SKUs Curva A com risco iminente de ruptura.\n\n### Médio Prazo: Ajuste de Processos (60 Dias)\n- Recalibrar parâmetros de ponto de pedido e estoque de segurança considerando o lead time real dos fornecedores.\n- Bloquear recompras automáticas de SKUs com taxa de devolução superior a 10% até auditoria de qualidade.\n\n### Longo Prazo: Excelência Operacional (90 Dias)\n- Integrar rotina de S&OP (Sales & Operations Planning) sincronizando Marketing, Compras e Logística.\n- Implementar governança de cadastro para unificar custos contábeis e tabelas de preço no PDV.\n\n## 3. Top SKUs Críticos para Ação Imediata\nAuditoria concluída com base na base analítica DuckDB (Ano Base 2026).\n\n\n---\n**Como posso apoiar a sua análise?** Você pode solicitar simulações detalhadas, aprofundamento em SKUs específicos ou estratégias de liquidação e reposição."
+        }
+      ]
+    },
+    "f529df21-c827-42ea-a977-5234961ddb35": {
+      "id": "f529df21-c827-42ea-a977-5234961ddb35",
+      "title": "Auditoria: Ano Fechado 2023",
+      "created_at": "2026-09-06T18:25:06.648769",
+      "updated_at": "2026-09-06T18:25:06.648769",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "**Parecer de Auditoria de Estoque (Ano Fechado 2023):**\n\n- **Ruptura e risco**: `3 SKUs`\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
+        }
+      ]
     }
   }
 }

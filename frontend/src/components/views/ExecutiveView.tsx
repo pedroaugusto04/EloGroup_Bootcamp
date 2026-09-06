@@ -71,33 +71,37 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       className: 'font-mono text-[#38bdf8]',
       render: r => <span className="font-mono text-[#38bdf8]">{r.sku_id}</span>,
     },
-    { key: 'nome_produto', header: 'Produto' },
+    {
+      key: 'nome_produto',
+      header: 'Produto',
+      render: r => r.nome_produto || r.produto || '—',
+    },
     { key: 'categoria', header: 'Categoria' },
     {
       key: 'unidades_vendidas',
       header: 'Qtd Vendida',
       align: 'right',
-      render: r => Number(r.unidades_vendidas).toLocaleString('pt-BR'),
+      render: r => Number(r.unidades_vendidas || 0).toLocaleString('pt-BR'),
     },
     {
       key: 'receita_liquida',
       header: 'Receita Líquida',
       align: 'right',
-      render: r => `R$ ${Number(r.receita_liquida).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      render: r => `R$ ${Number(r.receita_liquida ?? r.receita_total ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
     },
     {
       key: 'margem_contribuicao',
       header: 'Margem (R$)',
       align: 'right',
-      render: r => `R$ ${Number(r.margem_contribuicao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      render: r => `R$ ${Number(r.margem_contribuicao ?? r.margem_total ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
     },
     {
       key: 'margem_pct',
       header: 'Margem %',
       align: 'right',
       render: r => (
-        <span className={`font-mono ${r.margem_pct >= 50 ? 'text-emerald-400' : r.margem_pct > 0 ? 'text-[#a1a1aa]' : 'text-rose-400'}`}>
-          {Number(r.margem_pct).toFixed(1)}%
+        <span className={`font-mono ${(r.margem_pct ?? 0) >= 50 ? 'text-emerald-400' : (r.margem_pct ?? 0) > 0 ? 'text-[#a1a1aa]' : 'text-rose-400'}`}>
+          {Number(r.margem_pct || 0).toFixed(1)}%
         </span>
       ),
     },

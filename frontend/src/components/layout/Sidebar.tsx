@@ -57,7 +57,7 @@ const navItems: NavItem[] = [
     label: 'Copiloto IA & Roadmap',
     tag: '05',
     icon: Bot,
-    description: 'Consultor ReAct LangGraph e plano 30/60/90 dias',
+    description: 'Consultor de estoque e plano 30/60/90 dias',
   },
 ];
 
@@ -73,12 +73,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
           <div>
             <div className="text-sm font-bold tracking-tight text-[#f4f4f5] flex items-center gap-1.5">
               <span>VÉRTICE</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#18181b] border border-[#27272a] text-[#38bdf8] rounded">
-                2026
-              </span>
-            </div>
-            <div className="text-[11px] font-mono text-[#71717a]">
-              EloGroup Analytics Workbench
             </div>
           </div>
         </div>
@@ -98,18 +92,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${
-                isActive
-                  ? 'bg-[#18181b] border-[#38bdf8]/50 shadow-[0_0_12px_rgba(56,189,248,0.08)]'
-                  : 'bg-transparent border-transparent hover:bg-[#18181b]/60 hover:border-[#27272a]'
-              }`}
+              className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${isActive
+                ? 'bg-[#18181b] border-[#38bdf8]/50 shadow-[0_0_12px_rgba(56,189,248,0.08)]'
+                : 'bg-transparent border-transparent hover:bg-[#18181b]/60 hover:border-[#27272a]'
+                }`}
             >
               <div
-                className={`mt-0.5 p-1.5 rounded-md transition-colors ${
-                  isActive
-                    ? 'bg-[#38bdf8]/15 text-[#38bdf8]'
-                    : 'bg-[#18181b] text-[#71717a] group-hover:text-[#a1a1aa]'
-                }`}
+                className={`mt-0.5 p-1.5 rounded-md transition-colors ${isActive
+                  ? 'bg-[#38bdf8]/15 text-[#38bdf8]'
+                  : 'bg-[#18181b] text-[#71717a] group-hover:text-[#a1a1aa]'
+                  }`}
               >
                 <Icon className="w-4 h-4" />
               </div>
@@ -117,9 +109,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <span
-                    className={`text-xs font-semibold truncate ${
-                      isActive ? 'text-[#f4f4f5]' : 'text-[#d4d4d8] group-hover:text-[#f4f4f5]'
-                    }`}
+                    className={`text-xs font-semibold truncate ${isActive ? 'text-[#f4f4f5]' : 'text-[#d4d4d8] group-hover:text-[#f4f4f5]'
+                      }`}
                   >
                     {item.label}
                   </span>
@@ -143,14 +134,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
       {/* Footer Info */}
       <div className="p-3 border-t border-[#27272a] bg-[#0d0d10] text-[11px] font-mono text-[#71717a]">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[#a1a1aa]">DuckDB Online</span>
-          </div>
           <span>v2.0.0</span>
         </div>
         <div className="mt-1 text-[10px] text-[#52525b]">
-          Bootcamp EloGroup • Ano Base 2026
+          Bootcamp EloGroup
         </div>
       </div>
     </aside>

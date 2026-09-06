@@ -59,11 +59,6 @@ export const Header: React.FC<HeaderProps> = ({
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#38bdf8]' : 'text-[#a1a1aa]'}`} />
           <span>Atualizar</span>
         </button>
-
-        <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#38bdf8]/10 border border-[#38bdf8]/25 text-[#38bdf8] text-xs font-mono">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>EloGroup Retail Suite</span>
-        </div>
       </div>
     </header>
   );

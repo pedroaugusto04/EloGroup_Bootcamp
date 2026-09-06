@@ -162,23 +162,21 @@ export const CopilotRoadmapView: React.FC = () => {
       <div className="flex items-center gap-2 border-b border-[#27272a] pb-3">
         <button
           onClick={() => setActiveTab('copilot')}
-          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors flex items-center gap-2 ${
-            activeTab === 'copilot'
+          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors flex items-center gap-2 ${activeTab === 'copilot'
               ? 'bg-[#18181b] border-[#38bdf8]/50 text-[#38bdf8]'
               : 'border-transparent text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b]/50'
-          }`}
+            }`}
         >
           <Bot className="w-4 h-4" />
-          <span>Copiloto de Estoque IA (ReAct LangGraph)</span>
+          <span>Copiloto de Estoque IA</span>
         </button>
 
         <button
           onClick={() => setActiveTab('roadmap')}
-          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors flex items-center gap-2 ${
-            activeTab === 'roadmap'
+          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors flex items-center gap-2 ${activeTab === 'roadmap'
               ? 'bg-[#18181b] border-[#38bdf8]/50 text-[#38bdf8]'
               : 'border-transparent text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b]/50'
-          }`}
+            }`}
         >
           <Target className="w-4 h-4" />
           <span>Plano de Ação Estratégico (30/60/90 Dias)</span>
@@ -189,13 +187,13 @@ export const CopilotRoadmapView: React.FC = () => {
       {/* TAB 1: COPILOTO RE-ACT CHAT */}
       {/* ========================================================================= */}
       {activeTab === 'copilot' && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[750px] rounded-lg border border-[#27272a] bg-[#11131a] overflow-hidden">
+        <div className="flex flex-col md:flex-row h-[780px] rounded-xl border border-[#27272a] bg-[#0c0d12] overflow-hidden shadow-2xl">
           {/* Threads Sidebar */}
-          <div className="md:col-span-1 border-r border-[#27272a] bg-[#121215] flex flex-col h-full">
+          <div className="w-full md:w-64 lg:w-72 shrink-0 border-r border-[#27272a] bg-[#11131a] flex flex-col h-full">
             <div className="p-3 border-b border-[#27272a]">
               <button
                 onClick={handleNewThread}
-                className="w-full py-2 px-3 rounded-md bg-[#18181b] border border-[#27272a] hover:border-[#38bdf8]/50 text-[#f4f4f5] text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-2 px-3 rounded-lg bg-[#18181b] border border-[#27272a] hover:border-[#38bdf8]/50 text-[#f4f4f5] text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5 text-[#38bdf8]" />
                 <span>Nova Conversa</span>
@@ -207,11 +205,10 @@ export const CopilotRoadmapView: React.FC = () => {
                 <div
                   key={thread.id}
                   onClick={() => selectThread(thread.id)}
-                  className={`group flex items-center justify-between p-2.5 rounded-md cursor-pointer text-xs transition-colors ${
-                    activeThreadId === thread.id
+                  className={`group flex items-center justify-between p-2.5 rounded-lg cursor-pointer text-xs transition-colors ${activeThreadId === thread.id
                       ? 'bg-[#18181b] border border-[#38bdf8]/40 text-[#f4f4f5]'
                       : 'hover:bg-[#18181b]/60 text-[#a1a1aa] border border-transparent'
-                  }`}
+                    }`}
                 >
                   <span className="truncate flex-1 font-medium">{thread.title || 'Conversa'}</span>
                   <button
@@ -225,114 +222,152 @@ export const CopilotRoadmapView: React.FC = () => {
               ))}
             </div>
 
-            <div className="p-3 border-t border-[#27272a] bg-[#0d0d10] text-[10px] font-mono text-[#71717a]">
-              Memória Persistente ReAct • DuckDB Live
+            <div className="p-3 border-t border-[#27272a] bg-[#0d0d10] text-[10px] font-mono text-[#71717a] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Memória ReAct • DuckDB Live</span>
             </div>
           </div>
 
           {/* Chat Window */}
-          <div className="md:col-span-3 flex flex-col h-full bg-[#09090b]">
+          <div className="flex-1 min-w-0 flex flex-col h-full bg-[#09090b]">
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
-                  <div className="w-12 h-12 rounded-full bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8]">
-                    <Sparkles className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#f4f4f5]">Copiloto de Estoque Vértice Retail</h3>
-                    <p className="text-xs text-[#71717a] max-w-md mt-1 font-sans">
-                      Assistente analítico conectado ao banco de dados DuckDB para diagnósticos, simulações de liquidação e investigação de SKUs em tempo real.
-                    </p>
-                  </div>
-
-                  {/* Quick Prompts */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl text-left mt-2">
-                    {SUGGESTED_PROMPTS.map((prompt, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleSendMessage(prompt)}
-                        className="p-2.5 rounded-lg bg-[#121215] border border-[#27272a] hover:border-[#38bdf8]/50 text-xs text-[#d4d4d8] hover:text-[#f4f4f5] transition-colors"
-                      >
-                        {prompt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                messages.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-start gap-3 ${
-                      msg.role === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    {msg.role === 'assistant' && (
-                      <div className="w-7 h-7 rounded-md bg-[#38bdf8]/15 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8] shrink-0 mt-0.5">
-                        <Bot className="w-4 h-4" />
-                      </div>
-                    )}
-
-                    <div
-                      className={`max-w-2xl rounded-lg p-3.5 text-xs ${
-                        msg.role === 'user'
-                          ? 'bg-[#2563eb]/20 border border-[#2563eb]/40 text-[#f4f4f5]'
-                          : 'bg-[#121215] border border-[#27272a] text-[#e4e4e7] prose prose-invert'
-                      }`}
-                    >
-                      {msg.role === 'user' ? (
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
-                      ) : (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {msg.content}
-                        </ReactMarkdown>
-                      )}
+            <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 min-w-0">
+              <div className="max-w-4xl mx-auto w-full space-y-6">
+                {messages.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center py-16 px-4 space-y-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#38bdf8]/20 to-[#818cf8]/20 border border-[#38bdf8]/40 flex items-center justify-center text-[#38bdf8] shadow-[0_0_20px_rgba(56,189,248,0.15)]">
+                      <Sparkles className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-[#f4f4f5]">Copiloto de Estoque Vértice Retail</h3>
+                      <p className="text-xs text-[#71717a] max-w-md mt-1 font-sans leading-relaxed">
+                        Assistente analítico conectado ao banco de dados DuckDB para diagnósticos, simulações de liquidação e investigação de SKUs em tempo real.
+                      </p>
                     </div>
 
-                    {msg.role === 'user' && (
-                      <div className="w-7 h-7 rounded-md bg-[#27272a] flex items-center justify-center text-[#a1a1aa] shrink-0 mt-0.5">
-                        <User className="w-4 h-4" />
-                      </div>
-                    )}
+                    {/* Quick Prompts */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full max-w-xl text-left mt-4">
+                      {SUGGESTED_PROMPTS.map((prompt, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSendMessage(prompt)}
+                          className="p-3 rounded-lg bg-[#121215] border border-[#27272a] hover:border-[#38bdf8]/50 text-xs text-[#d4d4d8] hover:text-[#f4f4f5] transition-all hover:bg-[#18181b]"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                ))
-              )}
+                ) : (
+                  messages.map((msg, idx) => (
+                    <div key={idx} className="w-full">
+                      {msg.role === 'user' ? (
+                        <div className="flex flex-col items-end gap-1.5 w-full">
+                          <div className="flex items-start gap-2.5 max-w-[85%] md:max-w-[75%]">
+                            <div className="rounded-2xl px-4 py-2.5 bg-[#2563eb]/20 border border-[#2563eb]/40 text-[#f4f4f5] text-xs leading-relaxed shadow-sm">
+                              <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                            </div>
+                            <div className="w-7 h-7 rounded-lg bg-[#27272a] flex items-center justify-center text-[#a1a1aa] shrink-0 mt-0.5">
+                              <User className="w-4 h-4" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3.5 w-full min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#38bdf8]/20 to-[#818cf8]/20 border border-[#38bdf8]/40 flex items-center justify-center text-[#38bdf8] shrink-0 mt-0.5 shadow-[0_0_12px_rgba(56,189,248,0.12)]">
+                            <Bot className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0 text-xs text-[#e4e4e7] leading-relaxed">
+                            <div className="prose prose-invert max-w-none text-xs">
+                              <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                  table: ({ node, ...props }) => (
+                                    <div className="overflow-x-auto my-3 rounded-lg border border-[#27272a] bg-[#121215]/90">
+                                      <table className="w-full text-left text-xs border-collapse" {...props} />
+                                    </div>
+                                  ),
+                                  thead: ({ node, ...props }) => (
+                                    <thead className="bg-[#18181b] text-[#f4f4f5] border-b border-[#27272a]" {...props} />
+                                  ),
+                                  th: ({ node, ...props }) => (
+                                    <th className="px-3 py-2 text-xs font-semibold text-[#f4f4f5] border-b border-[#27272a]" {...props} />
+                                  ),
+                                  td: ({ node, ...props }) => (
+                                    <td className="px-3 py-2 border-b border-[#27272a]/40 text-[#d4d4d8] font-mono text-[11px]" {...props} />
+                                  ),
+                                  p: ({ node, ...props }) => <p className="mb-2.5 leading-relaxed" {...props} />,
+                                  ul: ({ node, ...props }) => <ul className="list-disc pl-5 my-2 space-y-1 text-[#d4d4d8]" {...props} />,
+                                  ol: ({ node, ...props }) => <ol className="list-decimal pl-5 my-2 space-y-1 text-[#d4d4d8]" {...props} />,
+                                  li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
+                                  strong: ({ node, ...props }) => <strong className="font-semibold text-[#f4f4f5]" {...props} />,
+                                  code: ({ node, inline, className, children, ...props }: any) => {
+                                    if (inline) {
+                                      return (
+                                        <code className="bg-[#18181b] px-1.5 py-0.5 rounded text-[#38bdf8] font-mono text-[11px] border border-[#27272a]" {...props}>
+                                          {children}
+                                        </code>
+                                      );
+                                    }
+                                    return (
+                                      <div className="overflow-x-auto my-3 rounded-lg bg-[#121215] border border-[#27272a] p-3">
+                                        <code className="font-mono text-[11px] text-[#38bdf8]" {...props}>
+                                          {children}
+                                        </code>
+                                      </div>
+                                    );
+                                  },
+                                  blockquote: ({ node, ...props }) => (
+                                    <blockquote className="border-l-2 border-[#38bdf8] pl-3 py-1.5 my-2.5 text-[#a1a1aa] italic bg-[#38bdf8]/5 rounded-r" {...props} />
+                                  ),
+                                }}
+                              >
+                                {msg.content}
+                              </ReactMarkdown>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
 
-              {isSending && (
-                <div className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-md bg-[#38bdf8]/15 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8] shrink-0">
-                    <Bot className="w-4 h-4" />
+                {isSending && (
+                  <div className="flex items-start gap-3.5 w-full">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#38bdf8]/20 to-[#818cf8]/20 border border-[#38bdf8]/40 flex items-center justify-center text-[#38bdf8] shrink-0">
+                      <Bot className="w-4 h-4" />
+                    </div>
+                    <div className="py-2.5 px-3.5 rounded-lg bg-[#121215] border border-[#27272a] text-xs text-[#a1a1aa] flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-[#38bdf8] animate-ping" />
+                      <span>Consultando DuckDB e gerando raciocínio analítico...</span>
+                    </div>
                   </div>
-                  <div className="p-3 rounded-lg bg-[#121215] border border-[#27272a] text-xs text-[#71717a] flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#38bdf8] animate-ping" />
-                    <span>Consultando DuckDB e gerando raciocínio analítico...</span>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
+                )}
+                <div ref={messagesEndRef} />
+              </div>
             </div>
 
             {/* Input Bar */}
-            <div className="p-3 border-t border-[#27272a] bg-[#121215]">
+            <div className="p-3 md:p-4 border-t border-[#27272a] bg-[#0c0d12]">
               <form
                 onSubmit={e => {
                   e.preventDefault();
                   handleSendMessage();
                 }}
-                className="flex items-center gap-2"
+                className="max-w-4xl mx-auto flex items-center gap-2"
               >
                 <input
                   type="text"
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
                   placeholder="Pergunte ao Copiloto (ex: Qual o impacto de liquidar a categoria Beleza?)..."
-                  className="flex-1 bg-[#18181b] border border-[#27272a] rounded-md px-3.5 py-2 text-xs text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#38bdf8]/70 transition-colors"
+                  className="flex-1 bg-[#18181b] border border-[#27272a] rounded-lg px-4 py-2.5 text-xs text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#38bdf8]/70 transition-colors shadow-inner"
                   disabled={isSending}
                 />
                 <button
                   type="submit"
                   disabled={!inputText.trim() || isSending}
-                  className="px-3.5 py-2 rounded-md bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#09090b] font-semibold text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+                  className="px-4 py-2.5 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#09090b] font-semibold text-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Enviar</span>
@@ -384,11 +419,10 @@ export const CopilotRoadmapView: React.FC = () => {
                 <button
                   key={horizon}
                   onClick={() => setSelectedHorizon(horizon)}
-                  className={`text-[11px] px-3 py-1 rounded border transition-colors ${
-                    active
+                  className={`text-[11px] px-3 py-1 rounded border transition-colors ${active
                       ? 'bg-[#38bdf8]/15 border-[#38bdf8]/60 text-[#38bdf8] font-semibold'
                       : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46]'
-                  }`}
+                    }`}
                 >
                   {horizon}
                 </button>
@@ -409,11 +443,10 @@ export const CopilotRoadmapView: React.FC = () => {
                       {init.horizon}
                     </span>
                     <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold ${
-                        init.type.includes('Quick Win')
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold ${init.type.includes('Quick Win')
                           ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                           : 'bg-[#18181b] text-[#a1a1aa] border border-[#27272a]'
-                      }`}
+                        }`}
                     >
                       {init.type}
                     </span>

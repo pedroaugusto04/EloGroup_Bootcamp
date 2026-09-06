@@ -6,14 +6,14 @@
 -- ==============================================================================
 
 SELECT 
-    COALESCE(segmento_rfm, 'Não Definido') AS segmento,
+    COALESCE(segmento_rfm, 'Não Definido') AS segmento_rfm,
     COUNT(customer_id) AS total_clientes,
-    ROUND(COUNT(customer_id) * 100.0 / SUM(COUNT(customer_id)) OVER(), 2) AS pct_base,
+    ROUND(COUNT(customer_id) * 100.0 / SUM(COUNT(customer_id)) OVER(), 2) AS pct_base_clientes,
     ROUND(SUM(ltv_acumulado), 2) AS ltv_total,
     ROUND(SUM(ltv_acumulado) * 100.0 / SUM(SUM(ltv_acumulado)) OVER(), 2) AS pct_ltv_total,
     ROUND(AVG(ltv_acumulado), 2) AS ltv_medio,
-    ROUND(AVG(total_pedidos_historico), 1) AS media_pedidos,
-    ROUND(AVG(ticket_medio_historico), 2) AS ticket_medio_historico,
+    ROUND(AVG(total_pedidos_historico), 1) AS pedidos_medios,
+    ROUND(AVG(ticket_medio_historico), 2) AS ticket_medio_segmento,
     ROUND(AVG(renda_estimada), 2) AS renda_media,
     ROUND(AVG(idade), 1) AS idade_media
 FROM clientes

@@ -106,24 +106,29 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
 
   // Columns for Pareto Clientes
   const paretoColumns: Column<any>[] = [
-    { key: 'segmento_rfm', header: 'Segmento RFM', className: 'font-semibold text-[#f4f4f5]' },
+    {
+      key: 'segmento_rfm',
+      header: 'Segmento RFM',
+      className: 'font-semibold text-[#f4f4f5]',
+      render: r => r.segmento_rfm || r.segmento || 'Não Definido',
+    },
     {
       key: 'total_clientes',
       header: 'Clientes',
       align: 'right',
-      render: r => Number(r.total_clientes).toLocaleString('pt-BR'),
+      render: r => Number(r.total_clientes || 0).toLocaleString('pt-BR'),
     },
     {
       key: 'pct_base_clientes',
       header: '% Base',
       align: 'right',
-      render: r => `${Number(r.pct_base_clientes).toFixed(1)}%`,
+      render: r => `${Number(r.pct_base_clientes ?? r.pct_base ?? 0).toFixed(1)}%`,
     },
     {
       key: 'ltv_total',
       header: 'LTV Acumulado (CRM)',
       align: 'right',
-      render: r => `R$ ${((r.ltv_total || 0) / 1e6).toFixed(2)}M`,
+      render: r => `R$ ${((Number(r.ltv_total) || 0) / 1e6).toFixed(2)}M`,
     },
     {
       key: 'pct_ltv_total',
@@ -131,7 +136,7 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
       align: 'right',
       render: r => (
         <span className="font-mono font-bold text-emerald-400">
-          {Number(r.pct_ltv_total).toFixed(1)}%
+          {Number(r.pct_ltv_total || 0).toFixed(1)}%
         </span>
       ),
     },
@@ -139,13 +144,13 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
       key: 'ticket_medio_segmento',
       header: 'Ticket Médio',
       align: 'right',
-      render: r => `R$ ${Number(r.ticket_medio_segmento).toFixed(2)}`,
+      render: r => `R$ ${Number(r.ticket_medio_segmento ?? r.ticket_medio_historico ?? 0).toFixed(2)}`,
     },
     {
       key: 'pedidos_medios',
       header: 'Pedidos Médios',
       align: 'right',
-      render: r => Number(r.pedidos_medios).toFixed(1),
+      render: r => Number(r.pedidos_medios ?? r.media_pedidos ?? 0).toFixed(1),
     },
   ];
 

@@ -133,11 +133,10 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) =
                     setSelectedCats([...selectedCats, cat]);
                   }
                 }}
-                className={`text-[11px] px-2.5 py-0.5 rounded border transition-colors ${
-                  active
+                className={`text-[11px] px-2.5 py-0.5 rounded border transition-colors ${active
                     ? 'bg-[#38bdf8]/15 border-[#38bdf8]/60 text-[#38bdf8] font-medium'
                     : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46]'
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -164,7 +163,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) =
         <MetricCard
           label="SKUs em Ruptura Real"
           value={`${kpis.skus_ruptura || 99} SKUs`}
-          trend={{ value: 'Estoque = 0', isPositive: false }}
+          trend={{ value: 'Sem Estoque', isPositive: false }}
           subtitle="96 concentrados em Beleza"
           highlight
         />
