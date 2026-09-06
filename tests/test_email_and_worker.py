@@ -108,26 +108,29 @@ def test_deep_link_resolution():
 
 
 @patch.object(ResendEmailService, "send_email")
-def test_run_autonomous_inventory_audit_worker(mock_send):
+def test_run_autonomous_inventory_audit_worker(mock_send, tmp_path):
     mock_send.return_value = {"success": True, "status": "sent", "id": "re_test_123"}
+    test_snap_path = str(tmp_path / "test_snapshot.json")
     
-    # Executa o worker
-    result = run_autonomous_inventory_audit(send_email=True, to_email="test@vertice.com.br")
-    assert result["success"] is True
-    assert "timestamp" in result
-    assert "diagnostic" in result
-    assert "email_result" in result
-    assert os.path.exists(SNAPSHOT_FILE_PATH)
+    with patch("src.agent.worker.SNAPSHOT_FILE_PATH", test_snap_path):
+        result = run_autonomous_inventory_audit(send_email=True, to_email="test@vertice.com.br")
+        assert result["success"] is True
+        assert "timestamp" in result
+        assert "diagnostic" in result
+        assert "email_result" in result
+        assert os.path.exists(test_snap_path)
 
-    snapshot = load_latest_audit_snapshot()
-    assert snapshot is not None
-    assert "structured_data" in snapshot
-    assert "final_report" in snapshot
+        with patch("src.agent.worker.SNAPSHOT_FILE_PATH", test_snap_path):
+            snapshot = load_latest_audit_snapshot()
+            assert snapshot is not None
+            assert "structured_data" in snapshot
+            assert "final_report" in snapshot
 
 
 @patch("src.agent.worker.InventoryAgentService")
 @patch.object(ResendEmailService, "send_email")
-def test_worker_does_not_send_unvalidated_report(mock_send, mock_service):
+def test_worker_does_not_send_unvalidated_report(mock_send, mock_service, tmp_path):
+    test_snap_path = str(tmp_path / "test_snapshot_invalid.json")
     mock_service.return_value.run_diagnostic.return_value = {
         "critic_approved": False,
         "critic_reviewed": False,
@@ -136,8 +139,10 @@ def test_worker_does_not_send_unvalidated_report(mock_send, mock_service):
         "critic_feedback": "Revisão indisponível.",
     }
 
-    result = run_autonomous_inventory_audit(send_email=True)
+    with patch("src.agent.worker.SNAPSHOT_FILE_PATH", test_snap_path):
+        result = run_autonomous_inventory_audit(send_email=True)
 
-    assert result["success"] is False
-    assert result["email_result"] is None
-    mock_send.assert_not_called()
+        assert result["success"] is False
+        assert result["email_result"] is None
+        mock_send.assert_not_called()
+        assert os.path.exists(test_snap_path)

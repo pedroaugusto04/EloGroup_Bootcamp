@@ -120,6 +120,7 @@ def render_executive_email_template(
     structured = report_data.get("structured_data") or {}
     critic_feedback = report_data.get("critic_feedback")
     critic_approved = report_data.get("critic_approved") is True
+    logger.info("Renderizando e-mail executivo (Aprovado=%s, Parecer do Crítico='%s')", critic_approved, critic_feedback)
     
     total_stranded = structured.get("total_stranded_cash")
     ruptura_count = structured.get("ruptura_count")
@@ -247,12 +248,6 @@ def render_executive_email_template(
                                 {skus_rows_html}
                             </table>
 
-                            <!-- Parecer do Crítico de Reflexão -->
-                            {f'''<div style="background-color: #F8FAFC; border-left: 3px solid {badge_color}; padding: 13px 16px; margin-bottom: 30px;">
-                                <div style="font-size: 12px; font-weight: 700; color: #344054; text-transform: uppercase; margin-bottom: 4px;">Observação da análise</div>
-                                <div style="font-size: 13px; color: #475467; line-height: 1.5;">{critic_feedback}</div>
-                            </div>''' if critic_feedback else ''}
-
                             <!-- Botão CTA Deep Link -->
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 10px;">
                                 <tr>
@@ -277,7 +272,6 @@ def render_executive_email_template(
                         <td style="padding: 20px 32px; background-color: #F8FAFC; border-top: 1px solid #D9DEE5; text-align: center;">
                             <div style="font-size: 11px; color: #667085; line-height: 1.5;">
                                 Vértice Retail Analytics &bull; 2026<br>
-                                Material confidencial.
                             </div>
                         </td>
                     </tr>
