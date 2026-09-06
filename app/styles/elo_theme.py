@@ -131,22 +131,87 @@ def inject_elotarget_css():
             margin-bottom: 6px !important;
         }
 
-        /* Customização de Spinner e Carregamento no Tema da Aplicação */
+        /* Oculta o indicador padrão 'running...' no canto superior direito */
+        [data-testid="stStatusWidget"], .stStatusWidget {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        /* Centralização perfeita e alinhamento dos botões de ação e popovers na sidebar */
+        [data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] {
+            align-items: center !important;
+            gap: 4px !important;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] > button,
+        [data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] div[data-testid="stPopover"] > button {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            min-height: 36px !important;
+            height: 36px !important;
+            padding: 0 4px !important;
+            font-size: 13px !important;
+            border-radius: 6px !important;
+            box-sizing: border-box !important;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] > button p,
+        [data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] div[data-testid="stPopover"] > button p {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            text-align: center !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+        }
+
+        /* Botão de Excluir (✕) sutil e harmonizado */
+        [data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] > button:has(p:contains("✕")),
+        [data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] > button {
+            color: #94A3B8 !important;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] > button:hover {
+            color: #F43F5E !important;
+            border-color: rgba(244, 63, 94, 0.4) !important;
+            background-color: rgba(244, 63, 94, 0.08) !important;
+        }
+
+        /* Spinner Global Centralizado e Elegante */
         [data-testid="stSpinner"] {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px 0;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 18px 24px !important;
+            margin: 16px auto !important;
+            max-width: 480px !important;
+            background: rgba(15, 23, 42, 0.75) !important;
+            border: 1px solid rgba(56, 189, 248, 0.25) !important;
+            border-radius: 10px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+            backdrop-filter: blur(8px) !important;
         }
 
         [data-testid="stSpinner"] i {
+            border-color: rgba(56, 189, 248, 0.2) !important;
             border-top-color: #38BDF8 !important;
+            width: 20px !important;
+            height: 20px !important;
+            border-width: 2.5px !important;
         }
 
         [data-testid="stSpinner"] span {
-            color: #94A3B8 !important;
+            color: #E2E8F0 !important;
             font-size: 13px !important;
-            font-weight: 500 !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.3px !important;
         }
     </style>
     """

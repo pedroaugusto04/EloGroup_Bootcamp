@@ -120,7 +120,7 @@ def main():
                     t_count = thread["message_count"]
                     is_active = (t_id == active_id)
 
-                    col_thread, col_edit, col_del = st.sidebar.columns([0.66, 0.17, 0.17])
+                    col_thread, col_edit, col_del = st.sidebar.columns([0.68, 0.16, 0.16])
                     with col_thread:
                         btn_label = f"▶ {t_title}" if is_active else t_title
                         if st.button(
@@ -143,7 +143,7 @@ def main():
                                     chat_store.rename_thread(t_id, new_title.strip())
                                     st.rerun()
                     with col_del:
-                        if st.button("🗑️", key=f"del_thread_{t_id}", help=f"Remover conversa '{t_title}'", use_container_width=True):
+                        if st.button("✕", key=f"del_thread_{t_id}", help=f"Remover conversa '{t_title}'", use_container_width=True):
                             chat_store.delete_thread(t_id)
                             if t_id == active_id:
                                 remaining = chat_store.list_threads()
