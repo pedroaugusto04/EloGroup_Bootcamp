@@ -14,7 +14,7 @@ import {
   RoadmapInitiative
 } from '../types/analytics';
 
-const BASE_URL = '/api';
+const BASE_URL = 'api';
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
