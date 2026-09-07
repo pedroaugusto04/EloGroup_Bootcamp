@@ -5,8 +5,11 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { ExecutiveView } from './components/views/ExecutiveView';
 import { InventoryView } from './components/views/InventoryView';
-import { GrowthView } from './components/views/GrowthView';
-import { AuditView } from './components/views/AuditView';
+import { MarketingView } from './components/views/MarketingView';
+import { CustomersView } from './components/views/CustomersView';
+import { SupportView } from './components/views/SupportView';
+import { AuditRelationalView } from './components/views/AuditRelationalView';
+import { OutliersView } from './components/views/OutliersView';
 import { RoadmapView } from './components/views/RoadmapView';
 import { CopilotView } from './components/views/CopilotView';
 import { AuditEmailModal } from './components/common/AuditEmailModal';
@@ -30,9 +33,12 @@ const getInitialNavState = (): { tab: ViewTab; threadId: string | null } => {
     return { tab: 'copilot', threadId };
   }
 
+  if (viewParam === 'marketing' || viewParam === 'mkt' || viewParam === 'midia') return { tab: 'marketing', threadId: null };
+  if (viewParam === 'customers' || viewParam === 'clientes' || viewParam === 'rfm') return { tab: 'customers', threadId: null };
+  if (viewParam === 'support' || viewParam === 'atendimento' || viewParam === 'suporte') return { tab: 'support', threadId: null };
   if (viewParam === 'inventory' || viewParam === 'estoque') return { tab: 'inventory', threadId: null };
-  if (viewParam === 'growth' || viewParam === 'marketing' || viewParam === 'clientes') return { tab: 'growth', threadId: null };
-  if (viewParam === 'audit' || viewParam === 'auditoria') return { tab: 'audit', threadId: null };
+  if (viewParam === 'outliers' || viewParam === 'dispersao') return { tab: 'outliers', threadId: null };
+  if (viewParam === 'audit' || viewParam === 'auditoria' || viewParam === 'relacional') return { tab: 'audit', threadId: null };
   if (viewParam === 'roadmap' || viewParam === 'plano') return { tab: 'roadmap', threadId: null };
 
   return { tab: 'executive', threadId: null };
@@ -114,14 +120,17 @@ export const App: React.FC = () => {
           <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5 md:p-8" key={refreshKey}>
             <div className="max-w-7xl mx-auto pb-12 w-full">
               {activeTab === 'executive' && <ExecutiveView filterOptions={filterOptions} />}
+              {activeTab === 'marketing' && <MarketingView filterOptions={filterOptions} />}
+              {activeTab === 'customers' && <CustomersView filterOptions={filterOptions} />}
+              {activeTab === 'support' && <SupportView filterOptions={filterOptions} />}
               {activeTab === 'inventory' && (
                 <InventoryView
                   filterOptions={filterOptions}
                   onOpenAuditModal={() => setAuditModalOpen(true)}
                 />
               )}
-              {activeTab === 'growth' && <GrowthView filterOptions={filterOptions} />}
-              {activeTab === 'audit' && <AuditView />}
+              {activeTab === 'audit' && <AuditRelationalView />}
+              {activeTab === 'outliers' && <OutliersView />}
               {activeTab === 'roadmap' && <RoadmapView />}
             </div>
           </main>

@@ -1,6 +1,13 @@
-// Types for Analytics, Audit, Copilot and Roadmap
-
-export type ViewTab = 'executive' | 'inventory' | 'growth' | 'audit' | 'copilot' | 'roadmap';
+export type ViewTab =
+  | 'executive'
+  | 'marketing'
+  | 'customers'
+  | 'support'
+  | 'inventory'
+  | 'audit'
+  | 'outliers'
+  | 'roadmap'
+  | 'copilot';
 
 export interface FilterOptions {
   categories: string[];

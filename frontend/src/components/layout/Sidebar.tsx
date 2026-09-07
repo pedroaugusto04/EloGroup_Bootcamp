@@ -1,11 +1,14 @@
 import React from 'react';
 import {
   BarChart3,
-  Package,
+  TrendingUp,
   Users,
+  Headphones,
+  Package,
   ShieldCheck,
-  Bot,
+  SlidersHorizontal,
   Target,
+  Bot,
   Layers,
   ChevronRight,
   X,
@@ -27,48 +30,84 @@ interface NavItem {
   description: string;
 }
 
-const navItems: NavItem[] = [
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
   {
-    id: 'executive',
-    label: 'Visão Executiva & Vendas',
-    tag: '01',
-    icon: BarChart3,
-    description: 'KPIs macro, rentabilidade e decomposição de margem',
+    title: 'ANALYTICS & OPERAÇÃO',
+    items: [
+      {
+        id: 'executive',
+        label: 'Visão Executiva & Vendas',
+        tag: '01',
+        icon: BarChart3,
+        description: 'KPIs macro, rentabilidade e margem',
+      },
+      {
+        id: 'marketing',
+        label: 'Marketing & Mídia (ROAS)',
+        tag: '02',
+        icon: TrendingUp,
+        description: 'Funil de aquisição, CAC e conversões',
+      },
+      {
+        id: 'customers',
+        label: 'Clientes & RFM (Hipótese 5)',
+        tag: '03',
+        icon: Users,
+        description: 'Concentração de Pareto e LTV histórico',
+      },
+      {
+        id: 'support',
+        label: 'Atendimento & IA (Hipótese 4)',
+        tag: '04',
+        icon: Headphones,
+        description: 'Causas-raiz, SLA e economia com IA',
+      },
+      {
+        id: 'inventory',
+        label: 'Estoque & Suprimentos (Hip. 6)',
+        tag: '05',
+        icon: Package,
+        description: 'Ruptura em Beleza e descontinuados',
+      },
+    ],
   },
   {
-    id: 'inventory',
-    label: 'Estoque & Suprimentos',
-    tag: '02',
-    icon: Package,
-    description: 'Diagnóstico de ruptura e capital em descontinuados',
-  },
-  {
-    id: 'growth',
-    label: 'Growth, Clientes & Suporte',
-    tag: '03',
-    icon: Users,
-    description: 'Eficiência de canais, Pareto RFM e automação IA',
-  },
-  {
-    id: 'audit',
-    label: 'Auditoria & Integridade',
-    tag: '04',
-    icon: ShieldCheck,
-    description: 'Incoerências entre bases e análise de outliers IQR',
-  },
-  {
-    id: 'roadmap',
-    label: 'Plano Estratégico 30/60/90',
-    tag: '05',
-    icon: Target,
-    description: 'Matriz de impacto, quick wins e iniciativas C-Level',
-  },
-  {
-    id: 'copilot',
-    label: 'Copiloto de Estoque IA',
-    tag: '06',
-    icon: Bot,
-    description: 'Assistente ReAct em tempo real',
+    title: 'GOVERNANÇA & ESTRATÉGIA',
+    items: [
+      {
+        id: 'audit',
+        label: 'Auditoria Relacional de Dados',
+        tag: '06',
+        icon: ShieldCheck,
+        description: 'Confronto entre as 5 bases e assimetrias',
+      },
+      {
+        id: 'outliers',
+        label: 'Dispersão & Outliers (Tukey IQR)',
+        tag: '07',
+        icon: SlidersHorizontal,
+        description: 'Detecção de anomalias estatísticas',
+      },
+      {
+        id: 'roadmap',
+        label: 'Plano Estratégico 30/60/90',
+        tag: '08',
+        icon: Target,
+        description: 'Matriz de esforço x impacto e quick wins',
+      },
+      {
+        id: 'copilot',
+        label: 'Copiloto de Estoque IA',
+        tag: '09',
+        icon: Bot,
+        description: 'Consultor inteligente em tempo real',
+      },
+    ],
   },
 ];
 
@@ -123,56 +162,65 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Navigation List */}
-        <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
-          {navItems.map(item => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
+        {/* Navigation List by Section */}
+        <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
+          {navSections.map((section, sIdx) => (
+            <div key={sIdx} className="space-y-1">
+              <div className="px-2 py-1 text-[10px] font-mono font-bold tracking-wider text-[#71717a] uppercase">
+                {section.title}
+              </div>
+              <div className="space-y-1">
+                {section.items.map(item => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick(item.id)}
-                className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${
-                  isActive
-                    ? 'bg-[#18181b] border-[#38bdf8]/50 shadow-[0_0_12px_rgba(56,189,248,0.08)]'
-                    : 'bg-transparent border-transparent hover:bg-[#18181b]/60 hover:border-[#27272a]'
-                }`}
-              >
-                <div
-                  className={`mt-0.5 p-1.5 rounded-md transition-colors shrink-0 ${
-                    isActive
-                      ? 'bg-[#38bdf8]/15 text-[#38bdf8]'
-                      : 'bg-[#18181b] text-[#71717a] group-hover:text-[#a1a1aa]'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs font-semibold truncate ${
-                        isActive ? 'text-[#f4f4f5]' : 'text-[#d4d4d8] group-hover:text-[#f4f4f5]'
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleItemClick(item.id)}
+                      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${
+                        isActive
+                          ? 'bg-[#18181b] border-[#38bdf8]/50 shadow-[0_0_12px_rgba(56,189,248,0.08)]'
+                          : 'bg-transparent border-transparent hover:bg-[#18181b]/60 hover:border-[#27272a]'
                       }`}
                     >
-                      {item.label}
-                    </span>
-                    <span className="text-[10px] font-mono text-[#71717a] ml-1">
-                      {item.tag}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#71717a] truncate mt-0.5 font-sans leading-tight">
-                    {item.description}
-                  </p>
-                </div>
+                      <div
+                        className={`mt-0.5 p-1.5 rounded-md transition-colors shrink-0 ${
+                          isActive
+                            ? 'bg-[#38bdf8]/15 text-[#38bdf8]'
+                            : 'bg-[#18181b] text-[#71717a] group-hover:text-[#a1a1aa]'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                      </div>
 
-                {isActive && (
-                  <ChevronRight className="w-3.5 h-3.5 text-[#38bdf8] self-center shrink-0" />
-                )}
-              </button>
-            );
-          })}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`text-xs font-semibold truncate ${
+                              isActive ? 'text-[#f4f4f5]' : 'text-[#d4d4d8] group-hover:text-[#f4f4f5]'
+                            }`}
+                          >
+                            {item.label}
+                          </span>
+                          <span className="text-[10px] font-mono text-[#71717a] ml-1">
+                            {item.tag}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[#71717a] truncate mt-0.5 font-sans leading-tight">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      {isActive && (
+                        <ChevronRight className="w-3.5 h-3.5 text-[#38bdf8] self-center shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* Footer Info */}

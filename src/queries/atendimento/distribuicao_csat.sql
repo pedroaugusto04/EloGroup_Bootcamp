@@ -8,7 +8,7 @@
 
 SELECT 
     nota_csat,
-    COUNT(ticket_id) AS total_chamados
+    COUNT(ticket_id) AS total_avaliacoes
 FROM atendimento
 {where_sql}
 GROUP BY nota_csat

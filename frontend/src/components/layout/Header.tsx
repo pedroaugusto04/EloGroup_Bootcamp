@@ -15,17 +15,29 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
     title: 'Visão Executiva & Rentabilidade',
     subtitle: 'Métricas consolidadas de vendas, margem de contribuição, custos e top produtos.',
   },
+  marketing: {
+    title: 'Marketing & Eficiência de Mídia (ROAS)',
+    subtitle: 'Desempenho do funil de aquisição, ROAS declarado, CAC, CTR e conversões por canal.',
+  },
+  customers: {
+    title: 'Base de Clientes & RFM (Hipótese 5)',
+    subtitle: 'Matriz de segmentação RFM, curva de concentração de Pareto e LTV acumulado no CRM.',
+  },
+  support: {
+    title: 'Atendimento, CX & Automação com IA (Hipótese 4)',
+    subtitle: 'Canais de entrada, CSAT, SLA real de resolução e dimensionamento de custos evitáveis com IA.',
+  },
   inventory: {
-    title: 'Estoque, Suprimentos & Ruptura',
+    title: 'Estoque, Suprimentos & Ruptura (Hipótese 6)',
     subtitle: 'Diagnóstico de 99 SKUs zerados, 701 críticos e R$ 14,7M em produtos descontinuados.',
   },
-  growth: {
-    title: 'Growth, Segmentos RFM & Atendimento',
-    subtitle: 'Eficiência de canais de mídia, concentração de receita na base e causas-raiz de suporte.',
-  },
   audit: {
-    title: 'Auditoria & Integridade de Dados',
-    subtitle: 'Auditoria de integridade relacional entre bases e detecção de dispersão e outliers (Tukey IQR).',
+    title: 'Auditoria Relacional entre Bases',
+    subtitle: 'Diagnóstico de integridade, assimetria temporal e reconciliação ERP x CRM x MKT.',
+  },
+  outliers: {
+    title: 'Dispersão & Detecção de Outliers (Tukey IQR)',
+    subtitle: 'Análise estatística de anomalias, limites de quartis e desvios nas 5 tabelas.',
   },
   roadmap: {
     title: 'Plano de Ação Estratégico (30/60/90 Dias)',
@@ -33,7 +45,7 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
   },
   copilot: {
     title: 'Copiloto Analítico de Estoque IA',
-    subtitle: 'Consultor em tempo real para simulações e diagnósticos.',
+    subtitle: 'Consultor inteligente em tempo real para simulações de liquidação e reposição.',
   },
 };
 

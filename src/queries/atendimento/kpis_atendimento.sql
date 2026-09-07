@@ -10,7 +10,7 @@ SELECT
     COUNT(ticket_id) AS total_tickets,
     AVG(nota_csat) AS csat_medio,
     AVG(tempo_primeira_resposta_minutos) AS tempo_resposta_min,
-    AVG(tempo_resolucao_horas) AS tempo_resolucao_h,
+    ROUND(AVG(CASE WHEN strftime(data_fechamento, '%Y-%m-%d') != '2025-12-31' THEN tempo_resolucao_horas END), 1) AS tempo_resolucao_h,
     SUM(custo_operacional_ticket) AS custo_total
 FROM atendimento
 {where_sql};
