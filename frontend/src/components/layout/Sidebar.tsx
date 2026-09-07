@@ -37,42 +37,42 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    title: 'ANALYTICS & OPERAÇÃO',
+    title: '',
     items: [
       {
         id: 'executive',
         label: 'Visão Executiva & Vendas',
         tag: '01',
         icon: BarChart3,
-        description: 'KPIs macro, rentabilidade e margem',
+        description: '',
       },
       {
         id: 'marketing',
         label: 'Marketing & Mídia (ROAS)',
         tag: '02',
         icon: TrendingUp,
-        description: 'Funil de aquisição, CAC e conversões',
+        description: '',
       },
       {
         id: 'customers',
         label: 'Clientes & RFM (Hipótese 5)',
         tag: '03',
         icon: Users,
-        description: 'Concentração de Pareto e LTV histórico',
+        description: '',
       },
       {
         id: 'support',
         label: 'Atendimento & IA (Hipótese 4)',
         tag: '04',
         icon: Headphones,
-        description: 'Causas-raiz, SLA e economia com IA',
+        description: '',
       },
       {
         id: 'inventory',
         label: 'Estoque & Suprimentos (Hip. 6)',
         tag: '05',
         icon: Package,
-        description: 'Ruptura em Beleza e descontinuados',
+        description: '',
       },
     ],
   },
@@ -84,28 +84,28 @@ const navSections: NavSection[] = [
         label: 'Auditoria Relacional de Dados',
         tag: '06',
         icon: ShieldCheck,
-        description: 'Confronto entre as 5 bases e assimetrias',
+        description: '',
       },
       {
         id: 'outliers',
         label: 'Dispersão & Outliers (Tukey IQR)',
         tag: '07',
         icon: SlidersHorizontal,
-        description: 'Detecção de anomalias estatísticas',
+        description: '',
       },
       {
         id: 'roadmap',
         label: 'Plano Estratégico 30/60/90',
         tag: '08',
         icon: Target,
-        description: 'Matriz de esforço x impacto e quick wins',
+        description: '',
       },
       {
         id: 'copilot',
         label: 'Copiloto de Estoque IA',
         tag: '09',
         icon: Bot,
-        description: 'Consultor inteligente em tempo real',
+        description: '',
       },
     ],
   },
@@ -135,9 +135,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 sm:w-80 lg:w-64 xl:w-72 bg-[#121215] border-r border-[#27272a] flex flex-col h-full shrink-0 select-none transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 sm:w-80 lg:w-64 xl:w-72 bg-[#121215] border-r border-[#27272a] flex flex-col h-full shrink-0 select-none transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         {/* Brand Header */}
         <div className="p-4 border-b border-[#27272a] bg-[#0d0d10] flex items-center justify-between">
@@ -178,18 +177,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <button
                       key={item.id}
                       onClick={() => handleItemClick(item.id)}
-                      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${
-                        isActive
-                          ? 'bg-[#18181b] border-[#38bdf8]/50 shadow-[0_0_12px_rgba(56,189,248,0.08)]'
-                          : 'bg-transparent border-transparent hover:bg-[#18181b]/60 hover:border-[#27272a]'
-                      }`}
+                      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${isActive
+                        ? 'bg-[#18181b] border-[#38bdf8]/50 shadow-[0_0_12px_rgba(56,189,248,0.08)]'
+                        : 'bg-transparent border-transparent hover:bg-[#18181b]/60 hover:border-[#27272a]'
+                        }`}
                     >
                       <div
-                        className={`mt-0.5 p-1.5 rounded-md transition-colors shrink-0 ${
-                          isActive
-                            ? 'bg-[#38bdf8]/15 text-[#38bdf8]'
-                            : 'bg-[#18181b] text-[#71717a] group-hover:text-[#a1a1aa]'
-                        }`}
+                        className={`mt-0.5 p-1.5 rounded-md transition-colors shrink-0 ${isActive
+                          ? 'bg-[#38bdf8]/15 text-[#38bdf8]'
+                          : 'bg-[#18181b] text-[#71717a] group-hover:text-[#a1a1aa]'
+                          }`}
                       >
                         <Icon className="w-4 h-4" />
                       </div>
@@ -197,9 +194,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <span
-                            className={`text-xs font-semibold truncate ${
-                              isActive ? 'text-[#f4f4f5]' : 'text-[#d4d4d8] group-hover:text-[#f4f4f5]'
-                            }`}
+                            className={`text-xs font-semibold truncate ${isActive ? 'text-[#f4f4f5]' : 'text-[#d4d4d8] group-hover:text-[#f4f4f5]'
+                              }`}
                           >
                             {item.label}
                           </span>
@@ -226,10 +222,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Footer Info */}
         <div className="p-3 border-t border-[#27272a] bg-[#0d0d10] text-[11px] font-mono text-[#71717a]">
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              DuckDB Live
-            </span>
             <span>v2.0.0</span>
           </div>
           <div className="mt-1 text-[10px] text-[#52525b]">

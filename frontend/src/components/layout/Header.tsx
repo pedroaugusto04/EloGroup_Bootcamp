@@ -21,7 +21,7 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
   },
   customers: {
     title: 'Base de Clientes & RFM (Hipótese 5)',
-    subtitle: 'Matriz de segmentação RFM, curva de concentração de Pareto e LTV acumulado no CRM.',
+    subtitle: 'Matriz de segmentação RFM, curva de concentração de Pareto e LTV acumulado da base.',
   },
   support: {
     title: 'Atendimento, CX & Automação com IA (Hipótese 4)',
@@ -33,7 +33,7 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
   },
   audit: {
     title: 'Auditoria Relacional entre Bases',
-    subtitle: 'Diagnóstico de integridade, assimetria temporal e reconciliação ERP x CRM x MKT.',
+    subtitle: 'Diagnóstico de integridade, assimetria temporal e reconciliação entre Vendas, Clientes e Mídia.',
   },
   outliers: {
     title: 'Dispersão & Detecção de Outliers (Tukey IQR)',

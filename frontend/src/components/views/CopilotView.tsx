@@ -112,7 +112,7 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
   const selectThread = async (id: string) => {
     setActiveThreadId(id);
     setShowThreadsMobile(false);
-    
+
     // Atualiza a URL com o thread_id ativo sem recarregar a página
     try {
       const url = new URL(window.location.href);
@@ -213,9 +213,8 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
 
       {/* Threads Sidebar */}
       <div
-        className={`fixed md:static inset-y-0 left-0 z-40 w-72 sm:w-80 md:w-64 lg:w-72 shrink-0 border-r border-[#27272a] bg-[#11131a] flex flex-col h-full select-none transform transition-transform duration-300 ease-in-out ${
-          showThreadsMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`fixed md:static inset-y-0 left-0 z-40 w-72 sm:w-80 md:w-64 lg:w-72 shrink-0 border-r border-[#27272a] bg-[#11131a] flex flex-col h-full select-none transform transition-transform duration-300 ease-in-out ${showThreadsMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+          }`}
       >
         <div className="p-3 sm:p-3.5 border-b border-[#27272a] bg-[#0d0d10] flex flex-col gap-2">
           <button
@@ -241,11 +240,10 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
             <div
               key={thread.id}
               onClick={() => selectThread(thread.id)}
-              className={`group flex items-center justify-between p-2.5 sm:p-3 rounded-lg cursor-pointer text-xs transition-colors ${
-                activeThreadId === thread.id
+              className={`group flex items-center justify-between p-2.5 sm:p-3 rounded-lg cursor-pointer text-xs transition-colors ${activeThreadId === thread.id
                   ? 'bg-[#18181b] border border-[#38bdf8]/40 text-[#f4f4f5] shadow-sm'
                   : 'hover:bg-[#18181b]/60 text-[#a1a1aa] border border-transparent'
-              }`}
+                }`}
             >
               <span className="truncate flex-1 font-medium">{thread.title || 'Conversa'}</span>
               <button
@@ -260,10 +258,6 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
         </div>
 
         <div className="p-3 border-t border-[#27272a] bg-[#0d0d10] text-[11px] font-mono text-[#71717a] flex items-center justify-between">
-          <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            DuckDB Live
-          </span>
           <span className="text-[10px] text-[#52525b]">{threads.length} chats</span>
         </div>
       </div>

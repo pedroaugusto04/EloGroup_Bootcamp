@@ -77,37 +77,37 @@ def get_relational_audit():
     audit_findings = [
         {
             "dimension": "Janela Temporal",
-            "erp_coverage": "Jan/2023 a 26/Jan/2024 (27.753 pedidos)",
-            "external_coverage": "Atendimento, Mkt e Estoque cobrem 2023 a 2025/2026",
-            "impact": "Incompatibilidade temporal direta para análises de 2024 e 2025 no ERP.",
+            "erp_coverage": "Jan/2023 a 26/Jan/2024 (27.753 pedidos em Vendas)",
+            "external_coverage": "Atendimento, Marketing e Estoque cobrem 2023 a 2025/2026",
+            "impact": "Incompatibilidade temporal direta para análises de 2024 e 2025 na tabela de Vendas.",
             "severity": "Alta"
         },
         {
-            "dimension": "Vínculo CRM x ERP",
+            "dimension": "Vínculo Clientes x Vendas",
             "erp_coverage": "Apenas 346 dos 15.000 clientes cadastrados (2,3%) aparecem em Vendas",
             "external_coverage": "1 cliente concentra 11.282 compras (40,6%) e 14.355 tickets (40,0%)",
-            "impact": "LTV e histórico de pedidos do CRM não reconciliam com o ERP financeiro.",
+            "impact": "LTV e histórico de pedidos da base de Clientes não reconciliam com o transacional de Vendas.",
             "severity": "Crítica"
         },
         {
             "dimension": "Atribuição de Mídia",
-            "erp_coverage": "Receita Líquida ERP: R$ 14,2M | 20,8k vendas efetivas",
+            "erp_coverage": "Receita Líquida em Vendas: R$ 14,2M | 20,8k vendas efetivas",
             "external_coverage": "Mídia Declarada: R$ 210,4M investidos | R$ 878,6M receita declarada",
-            "impact": "Mídia reporta ROAS inflado por atribuição de plataformas, não caixa real.",
+            "impact": "Mídia reporta ROAS inflado por métricas declaradas de campanhas, não pelo faturamento transacional.",
             "severity": "Crítica"
         },
         {
             "dimension": "Custo de Estoque x Vendas",
-            "erp_coverage": "Custo unitário em Vendas (CMV)",
-            "external_coverage": "Custo unitário em WMS Estoque (Correlação r = 0.008)",
-            "impact": "Custos do catálogo de estoque não coincidem com o histórico transacional.",
+            "erp_coverage": "Custo unitário na tabela de Vendas (CMV)",
+            "external_coverage": "Custo unitário na tabela de Estoque (Correlação r = 0.008)",
+            "impact": "Custos do catálogo de Estoque não coincidem com o histórico transacional de Vendas.",
             "severity": "Média"
         },
         {
-            "dimension": "Tickets sem Pedido no ERP",
-            "erp_coverage": "IDs de pedidos no ERP limitados a ~27k",
-            "external_coverage": "65,4% dos chamados de suporte apontam para IDs de pedidos inexistentes no ERP",
-            "impact": "Suporte opera sobre transações não extraídas no extrato do ERP.",
+            "dimension": "Tickets sem Pedido em Vendas",
+            "erp_coverage": "IDs de pedidos na tabela Vendas limitados a ~27k",
+            "external_coverage": "65,4% dos chamados de suporte apontam para IDs de pedidos inexistentes em Vendas",
+            "impact": "Atendimento opera sobre transações não extraídas no extrato de Vendas.",
             "severity": "Alta"
         }
     ]

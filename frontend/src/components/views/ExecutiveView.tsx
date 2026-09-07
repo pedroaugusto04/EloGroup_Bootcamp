@@ -111,7 +111,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
     <div className="space-y-6 view-enter">
       <ScopeBadge
         tables={['vendas']}
-        scope="27.753 transações (ERP) • Jan/2023 a 26/Jan/2024"
+        scope="27.753 transações (Vendas) • Jan/2023 a 26/Jan/2024"
         devSection="Seção 3: Observações por Tabela (Receita/Margem & Devoluções)"
       />
 
@@ -201,7 +201,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
         <MetricCard
           label="Total de Pedidos"
           value={Number(kpis.total_pedidos || 0).toLocaleString('pt-BR')}
-          subtitle="Transações ERP"
+          subtitle="Transações de Vendas"
         />
         <MetricCard
           label="Ticket Médio"
@@ -225,7 +225,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
         <div className="text-xs font-semibold text-[#f4f4f5] mb-2 sm:mb-3 flex items-center justify-between">
           <span>Decomposição da Receita Bruta à Margem Líquida</span>
-          <span className="hidden sm:inline font-mono text-[11px] text-[#71717a]">ERP Vendas 2023/2024</span>
+          <span className="hidden sm:inline font-mono text-[11px] text-[#71717a]">Tabela Vendas 2023/2024</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
           <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">

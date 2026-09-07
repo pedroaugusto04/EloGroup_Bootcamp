@@ -79,7 +79,7 @@ export const AuditRelationalView = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-1.5 text-[11px] font-mono bg-[#18181b] p-2 rounded border border-[#27272a]">
                 <div>
-                  <span className="text-[#71717a] block">Extrato ERP:</span>
+                  <span className="text-[#71717a] block">Base Vendas:</span>
                   <span className="text-[#d4d4d8]">{finding.erp_coverage}</span>
                 </div>
                 <div>
@@ -98,7 +98,7 @@ export const AuditRelationalView = () => {
 
       <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
         <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-          <span className="truncate">Atribuição de Mídia vs. Receita Real do ERP</span>
+          <span className="truncate">Atribuição de Mídia vs. Receita Real de Vendas</span>
         </div>
         <div className="h-64 sm:h-72 w-full mt-2">
           <ResponsiveContainer width="100%" height="100%">

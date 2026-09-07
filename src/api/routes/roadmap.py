@@ -44,7 +44,7 @@ STRATEGIC_INITIATIVES = [
         "financial_impact_label": "Proteção de Recompra (46,7% da base)",
         "financial_impact_value": 650000,
         "effort_days": 30,
-        "category": "CRM & Vendas",
+        "category": "Clientes & Vendas",
         "description": "Disparo automatizado de e-mails com cupons segmentados para incentivar segunda e terceira compras em clientes das faixas 'Em Risco' e 'Hibernando'.",
         "metrics_to_watch": ["Taxa de recompra", "Conversão de cupons", "Taxa de retenção RFM"]
     },
@@ -63,19 +63,6 @@ STRATEGIC_INITIATIVES = [
     },
     {
         "id": "init-05",
-        "title": "Priorização de Investimento em Influenciadores",
-        "hypothesis": "Hipótese 5 (Segmentação)",
-        "type": "Médio Prazo",
-        "horizon": "60 Dias",
-        "financial_impact_label": "Maior Ticket Médio (R$ 901,91) & Margem 52,3%",
-        "financial_impact_value": 1200000,
-        "effort_days": 50,
-        "category": "Marketing",
-        "description": "Realocação do orçamento de mídia para o canal de Influenciadores, que apresenta o maior ticket médio da base e margem saudável, apesar de maior desconto.",
-        "metrics_to_watch": ["ROAS real no ERP", "Ticket médio por canal", "LTV dos clientes adquiridos"]
-    },
-    {
-        "id": "init-06",
         "title": "Ajuste no Mecanismo de Compras e Alertas de Ruptura",
         "hypothesis": "Hipótese 6 (Decisão & Estoque)",
         "type": "Médio / Longo Prazo",
@@ -88,8 +75,8 @@ STRATEGIC_INITIATIVES = [
         "metrics_to_watch": ["Taxa de ruptura (%)", "SKUs abaixo do ponto de pedido", "Perdas de vendas por indisponibilidade"]
     },
     {
-        "id": "init-07",
-        "title": "Auditoria de Integridade & Unificação ERP x CRM",
+        "id": "init-06",
+        "title": "Auditoria de Integridade & Unificação de Dados",
         "hypothesis": "Integridade das Bases",
         "type": "Médio / Longo Prazo",
         "horizon": "90 Dias",
@@ -97,8 +84,8 @@ STRATEGIC_INITIATIVES = [
         "financial_impact_value": 500000,
         "effort_days": 60,
         "category": "Engenharia de Dados",
-        "description": "Estruturação de pipeline de reconciliação de dados entre o ERP de Vendas e o CRM de Clientes/Suporte para sanar discrepâncias de cobertura e clientes desbalanceados.",
-        "metrics_to_watch": ["Taxa de conciliação CRM x ERP", "Cobertura de IDs de clientes", "Precisão de LTV"]
+        "description": "Estruturação de pipeline de reconciliação entre o histórico de Vendas e os cadastros de Clientes/Suporte para sanar discrepâncias de cobertura e clientes desbalanceados.",
+        "metrics_to_watch": ["Taxa de conciliação Clientes x Vendas", "Cobertura de IDs de clientes", "Precisão de LTV"]
     }
 ]
 

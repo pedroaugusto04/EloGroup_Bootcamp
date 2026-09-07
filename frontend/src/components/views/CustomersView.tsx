@@ -59,7 +59,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
     },
     {
       key: 'ltv_total',
-      header: 'LTV Acumulado (CRM)',
+      header: 'LTV Acumulado',
       align: 'right',
       render: r => `R$ ${((Number(r.ltv_total) || 0) / 1e6).toFixed(2)}M`,
     },
@@ -95,7 +95,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
     <div className="space-y-6 view-enter">
       <ScopeBadge
         tables={['clientes']}
-        scope="15.000 clientes cadastrados (CRM) • Ano Base 2026"
+        scope="15.000 clientes cadastrados • Ano Base 2026"
         devSection="Seção 3 & Seção 5: Hipótese 5 (Segmentos de Clientes & Concentração)"
       />
 
@@ -103,7 +103,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
         <MetricCard
           label="Total de Clientes"
           value={Number(custData?.kpis.total_clientes || 15000).toLocaleString('pt-BR')}
-          subtitle="Base total CRM"
+          subtitle="Base total de clientes"
         />
         <MetricCard
           label="LTV Médio"
