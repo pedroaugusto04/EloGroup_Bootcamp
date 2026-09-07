@@ -38,7 +38,10 @@ class ChatMessageRequest(BaseModel):
 class AuditRunRequest(BaseModel):
     mission: Optional[str] = "Auditar a saúde de estoque da Vértice Retail, diagnosticar rupturas e capital travado em descontinuados, e estruturar plano de ação 30/60/90 dias com Quick Wins."
     date_filter: Optional[str] = ""
+    days_window: Optional[float] = 365.0
     period_label: Optional[str] = "Ano Fechado 2023"
+    send_email: Optional[bool] = True
+    to_email: Optional[str] = None
 
 
 # =========================================================================
@@ -136,15 +139,11 @@ def get_latest_audit():
 
 @router.post("/audit/run")
 def run_audit(req: AuditRunRequest):
-    service = get_service()
-    result = service.run_diagnostic(
-        mission=req.mission,
+    result = run_autonomous_inventory_audit(
+        send_email=req.send_email if req.send_email is not None else True,
+        to_email=req.to_email,
         date_filter=req.date_filter or "",
-        period_label=req.period_label or "Ano Fechado 2023"
+        days_window=req.days_window if req.days_window is not None else 365.0,
+        period_label=req.period_label or "Ano Fechado 2023",
     )
-    return {
-        "status": "completed",
-        "final_report": result.get("final_report"),
-        "structured_data": result.get("structured_data"),
-        "critic_approved": result.get("critic_approved")
-    }
+    return result

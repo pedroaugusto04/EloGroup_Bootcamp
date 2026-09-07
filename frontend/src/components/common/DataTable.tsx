@@ -55,8 +55,8 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className="w-full rounded-lg border border-[#27272a] bg-[#11131a] overflow-hidden">
       {/* Search Header */}
-      <div className="p-3 border-b border-[#27272a] flex items-center justify-between gap-4 bg-[#121215]">
-        <div className="relative flex-1 max-w-sm">
+      <div className="p-2.5 sm:p-3 border-b border-[#27272a] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 bg-[#121215]">
+        <div className="relative flex-1 w-full sm:max-w-sm">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
           <input
             type="text"
@@ -70,20 +70,20 @@ export function DataTable<T extends Record<string, any>>({
           />
         </div>
 
-        <div className="text-[11px] font-mono text-[#71717a]">
+        <div className="text-[11px] font-mono text-[#71717a] text-right sm:text-left self-end sm:self-center">
           {filteredData.length} registros
         </div>
       </div>
 
       {/* Table Content */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs text-left">
+      <div className="overflow-x-auto touch-pan-x">
+        <table className="w-full text-xs text-left min-w-[500px] sm:min-w-full">
           <thead className="bg-[#18181b] text-[#a1a1aa] font-medium border-b border-[#27272a]">
             <tr>
               {columns.map(col => (
                 <th
                   key={col.key}
-                  className={`py-2.5 px-3.5 tracking-tight ${
+                  className={`py-2 px-2.5 sm:py-2.5 sm:px-3.5 tracking-tight whitespace-nowrap ${
                     col.align === 'right'
                       ? 'text-right'
                       : col.align === 'center'
@@ -101,7 +101,7 @@ export function DataTable<T extends Record<string, any>>({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="py-8 text-center text-[#71717a] font-mono"
+                  className="py-8 text-center text-[#71717a] font-mono text-xs"
                 >
                   {emptyMessage}
                 </td>
@@ -115,7 +115,7 @@ export function DataTable<T extends Record<string, any>>({
                   {columns.map(col => (
                     <td
                       key={col.key}
-                      className={`py-2.5 px-3.5 ${
+                      className={`py-2 px-2.5 sm:py-2.5 sm:px-3.5 ${
                         col.align === 'right'
                           ? 'text-right font-mono'
                           : col.align === 'center'
@@ -135,24 +135,26 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="p-3 border-t border-[#27272a] bg-[#121215] flex items-center justify-between text-xs text-[#a1a1aa]">
+        <div className="p-2.5 sm:p-3 border-t border-[#27272a] bg-[#121215] flex items-center justify-between text-xs text-[#a1a1aa]">
           <div>
-            Página <span className="font-mono text-[#f4f4f5]">{currentPage}</span> de{' '}
+            Pág. <span className="font-mono text-[#f4f4f5]">{currentPage}</span> de{' '}
             <span className="font-mono text-[#f4f4f5]">{totalPages}</span>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-1 rounded bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-[#f4f4f5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-[#f4f4f5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-95"
+              aria-label="Página anterior"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-1 rounded bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-[#f4f4f5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-[#f4f4f5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-95"
+              aria-label="Próxima página"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

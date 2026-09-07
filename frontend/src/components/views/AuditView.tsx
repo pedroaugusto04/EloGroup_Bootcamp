@@ -82,10 +82,10 @@ export const AuditView: React.FC = () => {
   return (
     <div className="space-y-6 view-enter">
       {/* Sub-tab Switcher */}
-      <div className="flex items-center gap-2 border-b border-[#27272a] pb-3">
+      <div className="flex items-center gap-1.5 sm:gap-2 border-b border-[#27272a] pb-3 overflow-x-auto no-scrollbar touch-pan-x">
         <button
           onClick={() => setActiveSubTab('relational')}
-          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
+          className={`px-3 py-1.5 text-xs font-semibold rounded-md border whitespace-nowrap transition-colors ${
             activeSubTab === 'relational'
               ? 'bg-[#18181b] border-[#38bdf8]/50 text-[#38bdf8]'
               : 'border-transparent text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b]/50'
@@ -95,13 +95,13 @@ export const AuditView: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveSubTab('outliers')}
-          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
+          className={`px-3 py-1.5 text-xs font-semibold rounded-md border whitespace-nowrap transition-colors ${
             activeSubTab === 'outliers'
               ? 'bg-[#18181b] border-[#38bdf8]/50 text-[#38bdf8]'
               : 'border-transparent text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b]/50'
           }`}
         >
-          Dispersão & Detecção de Outliers (Tukey IQR)
+          Dispersão & Outliers (Tukey IQR)
         </button>
       </div>
 
@@ -113,7 +113,7 @@ export const AuditView: React.FC = () => {
           <ScopeBadge
             tables={['vendas', 'marketing', 'estoque', 'clientes', 'atendimento']}
             scope="Cruzamento Relacional Global (5 Bases)"
-            devSection="Seção 4: Observações Gerais (Incoerências & Integridade das Bases)"
+            devSection="Seção 4: Incoerências & Integridade das Bases"
           />
 
           {/* Audit Alert Banners */}
@@ -121,9 +121,9 @@ export const AuditView: React.FC = () => {
             {(relData?.audit_findings || []).map((finding, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-lg bg-[#11131a] border border-[#27272a] flex items-start gap-3 text-xs"
+                className="p-3 sm:p-3.5 rounded-lg bg-[#11131a] border border-[#27272a] flex items-start gap-2.5 sm:gap-3 text-xs"
               >
-                <div className="mt-0.5">
+                <div className="mt-0.5 shrink-0">
                   {finding.severity === 'Crítica' ? (
                     <ShieldAlert className="w-4 h-4 text-rose-400" />
                   ) : (
@@ -133,11 +133,11 @@ export const AuditView: React.FC = () => {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="font-semibold text-[#f4f4f5] text-xs">
+                    <span className="font-semibold text-[#f4f4f5] text-xs truncate">
                       {finding.dimension}
                     </span>
                     <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold ${
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold shrink-0 ${
                         finding.severity === 'Crítica'
                           ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
                           : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
@@ -147,7 +147,7 @@ export const AuditView: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 my-1.5 text-[11px] font-mono bg-[#18181b] p-2 rounded border border-[#27272a]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-1.5 text-[11px] font-mono bg-[#18181b] p-2 rounded border border-[#27272a]">
                     <div>
                       <span className="text-[#71717a] block">Extrato ERP:</span>
                       <span className="text-[#d4d4d8]">{finding.erp_coverage}</span>
@@ -158,7 +158,7 @@ export const AuditView: React.FC = () => {
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-[#a1a1aa] mt-1 font-sans">
+                  <p className="text-[11px] text-[#a1a1aa] mt-1 font-sans leading-relaxed">
                     <strong className="text-[#e4e4e7]">Impacto Analítico:</strong> {finding.impact}
                   </p>
                 </div>
@@ -167,29 +167,29 @@ export const AuditView: React.FC = () => {
           </div>
 
           {/* Marketing vs Sales Real Comparison Chart */}
-          <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+          <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
             <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-              <span>Atribuição de Mídia Declarada vs. Receita Líquida Real do ERP</span>
+              <span className="truncate">Atribuição de Mídia vs. Receita Real do ERP</span>
             </div>
-            <div className="h-72 w-full mt-2">
+            <div className="h-64 sm:h-72 w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={relData?.mkt_vs_sales || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                <BarChart data={relData?.mkt_vs_sales || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                  <XAxis dataKey="ano_mes" stroke="#71717a" fontSize={11} tickLine={false} />
+                  <XAxis dataKey="ano_mes" stroke="#71717a" fontSize={10} tickLine={false} />
                   <YAxis
                     stroke="#71717a"
-                    fontSize={11}
-                    tickFormatter={v => `R$ ${(v / 1e6).toFixed(0)}M`}
+                    fontSize={10}
+                    tickFormatter={v => `${(v / 1e6).toFixed(0)}M`}
                     tickLine={false}
                   />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                     formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                   />
-                  <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
-                  <Bar dataKey="investimento_mkt" name="Investimento Mídia (R$)" fill="#94a3b8" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="receita_declarada_mkt" name="Receita Declarada Mídia (R$)" fill="#f59e0b" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="receita_liquida_real" name="Receita Real ERP (R$)" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
+                  <Bar dataKey="investimento_mkt" name="Invest. Mídia (R$)" fill="#94a3b8" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="receita_declarada_mkt" name="Receita Mídia (R$)" fill="#f59e0b" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="receita_liquida_real" name="Receita Real (R$)" fill="#38bdf8" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -209,8 +209,8 @@ export const AuditView: React.FC = () => {
           />
 
           {/* Table & Metric Controls */}
-          <div className="flex flex-wrap items-center gap-3 p-3.5 rounded-lg bg-[#11131a] border border-[#27272a]">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-lg bg-[#11131a] border border-[#27272a]">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="text-xs text-[#a1a1aa] font-medium">Tabela:</span>
               <select
                 value={selectedTable}
@@ -218,7 +218,7 @@ export const AuditView: React.FC = () => {
                   setSelectedTable(e.target.value);
                   setSelectedMetric(undefined);
                 }}
-                className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+                className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
               >
                 {(outliersData?.available_tables || ['vendas', 'estoque', 'clientes', 'atendimento', 'marketing']).map(t => (
                   <option key={t} value={t}>{t.toUpperCase()}</option>
@@ -226,12 +226,12 @@ export const AuditView: React.FC = () => {
               </select>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[#a1a1aa] font-medium">Métrica Numérica:</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-xs text-[#a1a1aa] font-medium">Métrica:</span>
               <select
                 value={selectedMetric || outliersData?.selected_metric || ''}
                 onChange={e => setSelectedMetric(e.target.value)}
-                className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+                className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
               >
                 {(outliersData?.available_metrics || []).map(m => (
                   <option key={m} value={m}>{m}</option>
@@ -242,37 +242,39 @@ export const AuditView: React.FC = () => {
 
           {/* Overall Stats Cards */}
           {outliersData && (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
               <MetricCard
-                label="Q1 (25º Percentil)"
-                value={Number(outliersData.overall_stats.q1).toFixed(2)}
-                subtitle="Limite inferior de dispersão"
+                label="Q1 (25%)"
+                value={Number(outliersData.overall_stats.q1).toFixed(1)}
+                subtitle="Limite inferior"
               />
               <MetricCard
                 label="Mediana (50%)"
-                value={Number(outliersData.overall_stats.median).toFixed(2)}
-                subtitle="Tendência central robusta"
+                value={Number(outliersData.overall_stats.median).toFixed(1)}
+                subtitle="Tendência central"
               />
               <MetricCard
-                label="Q3 (75º Percentil)"
-                value={Number(outliersData.overall_stats.q3).toFixed(2)}
-                subtitle="Limite superior de dispersão"
+                label="Q3 (75%)"
+                value={Number(outliersData.overall_stats.q3).toFixed(1)}
+                subtitle="Limite superior"
               />
               <MetricCard
-                label="IQR (Q3 - Q1)"
-                value={Number(outliersData.overall_stats.iqr).toFixed(2)}
-                subtitle="Intervalo Interquartil"
+                label="IQR"
+                value={Number(outliersData.overall_stats.iqr).toFixed(1)}
+                subtitle="Interquartil"
               />
-              <MetricCard
-                label="Total de Outliers"
-                value={`${outliersData.overall_stats.outliers_count}`}
-                trend={{
-                  value: `${Number(outliersData.overall_stats.outliers_pct).toFixed(1)}%`,
-                  isPositive: false,
-                }}
-                subtitle="Valores além de 1.5x IQR"
-                highlight
-              />
+              <div className="col-span-2 sm:col-span-1 lg:col-span-1">
+                <MetricCard
+                  label="Total Outliers"
+                  value={`${outliersData.overall_stats.outliers_count}`}
+                  trend={{
+                    value: `${Number(outliersData.overall_stats.outliers_pct).toFixed(1)}%`,
+                    isPositive: false,
+                  }}
+                  subtitle="Além de 1.5x IQR"
+                  highlight
+                />
+              </div>
             </div>
           )}
 

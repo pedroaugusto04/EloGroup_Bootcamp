@@ -26,8 +26,8 @@ SNAPSHOT_FILE_PATH = os.environ.get(
 
 def get_deep_link_url(thread_id: Optional[str] = None) -> str:
     """Resolve a URL de Deep Link para o Copiloto ReAct com base nas variáveis de ambiente e thread_id."""
-    base_url = os.environ.get("APP_BASE_URL", "http://localhost:8501").rstrip("/")
-    deep_path = os.environ.get("AGENT_DEEP_LINK_PATH", "/?view=agent&source=email")
+    base_url = os.environ.get("APP_BASE_URL", "http://localhost:5173").rstrip("/")
+    deep_path = os.environ.get("AGENT_DEEP_LINK_PATH", "/?view=copilot&source=email")
     if not deep_path.startswith("/"):
         deep_path = f"/{deep_path}"
     

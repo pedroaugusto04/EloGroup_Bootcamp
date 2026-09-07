@@ -107,6 +107,12 @@ def render_mermaid_diagram(code: str, height: Optional[int] = None) -> None:
                 max-width: 100% !important;
                 height: auto !important;
             }}
+            svg text, svg tspan, svg .labelText, svg .nodeLabel, svg .timeline-box text {{
+                fill: #ffffff !important;
+                font-family: inherit !important;
+                font-weight: 500 !important;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.7) !important;
+            }}
         </style>
     </head>
     <body>
@@ -124,12 +130,27 @@ def render_mermaid_diagram(code: str, height: Optional[int] = None) -> None:
                     themeVariables: {{
                         darkMode: true,
                         background: '#0B1329',
+                        mainBkg: '#18181B',
                         primaryColor: '#0284C7',
-                        primaryTextColor: '#F3F4F6',
+                        primaryTextColor: '#FFFFFF',
                         primaryBorderColor: '#38BDF8',
                         lineColor: '#94A3B8',
                         secondaryColor: '#1E293B',
-                        tertiaryColor: '#0F172A'
+                        secondaryTextColor: '#FFFFFF',
+                        tertiaryColor: '#2E1065',
+                        tertiaryTextColor: '#FFFFFF',
+                        cScale0: '#0284C7',
+                        cScaleLabel0: '#FFFFFF',
+                        cScale1: '#0D9488',
+                        cScaleLabel1: '#FFFFFF',
+                        cScale2: '#6366F1',
+                        cScaleLabel2: '#FFFFFF',
+                        cScale3: '#8B5CF6',
+                        cScaleLabel3: '#FFFFFF',
+                        cScale4: '#D97706',
+                        cScaleLabel4: '#FFFFFF',
+                        cScale5: '#E11D48',
+                        cScaleLabel5: '#FFFFFF'
                     }}
                 }});
             }} catch (err) {{

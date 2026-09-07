@@ -18,8 +18,11 @@ import {
   Cell,
 } from 'recharts';
 
+import { Sparkles, Mail } from 'lucide-react';
+
 interface InventoryViewProps {
   filterOptions?: FilterOptions;
+  onOpenAuditModal?: () => void;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -29,7 +32,7 @@ const STATUS_COLORS: Record<string, string> = {
   'Excesso': '#38bdf8',
 };
 
-export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) => {
+export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onOpenAuditModal }) => {
   const [loading, setLoading] = useState(true);
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
   const [data, setData] = useState<InventoryAnalyticsData | null>(null);
@@ -117,9 +120,33 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) =
         devSection="Seção 3 & Seção 5: Hipótese 6 (Descompasso de Estoque & Ruptura)"
       />
 
+      {/* Autonomous Inventory Audit & Email Dispatch Banner */}
+      {onOpenAuditModal && (
+        <div className="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-[#18181b] via-[#151720] to-[#121624] border border-[#38bdf8]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="p-2 sm:p-2.5 rounded-lg bg-[#38bdf8]/15 border border-[#38bdf8]/30 text-[#38bdf8]">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-xs sm:text-sm font-semibold text-[#f4f4f5]">Auditoria Autônoma de Estoque</h4>
+              <p className="text-[11px] sm:text-xs text-[#a1a1aa]">
+                Execute o parecer executivo via IA com diagnóstico de ruptura, liquidação e envio por e-mail.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onOpenAuditModal}
+            className="w-full sm:w-auto px-3.5 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#0284c7] text-[#09090b] font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-[#38bdf8]/20 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <Mail className="w-4 h-4" />
+            <span>Gerar Auditoria</span>
+          </button>
+        </div>
+      )}
+
       {/* Category Filter */}
       {filterOptions?.categories && (
-        <div className="flex items-center gap-2 p-3.5 rounded-lg bg-[#11131a] border border-[#27272a] flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-lg bg-[#11131a] border border-[#27272a] flex-wrap">
           <span className="text-xs text-[#a1a1aa] font-medium mr-1">Filtrar Categoria:</span>
           {filterOptions.categories.map(cat => {
             const active = selectedCats.includes(cat);
@@ -133,7 +160,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) =
                     setSelectedCats([...selectedCats, cat]);
                   }
                 }}
-                className={`text-[11px] px-2.5 py-0.5 rounded border transition-colors ${active
+                className={`text-[10px] sm:text-[11px] px-2 sm:px-2.5 py-0.5 rounded border transition-colors ${active
                     ? 'bg-[#38bdf8]/15 border-[#38bdf8]/60 text-[#38bdf8] font-medium'
                     : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46]'
                   }`}
@@ -145,7 +172,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) =
           {selectedCats.length > 0 && (
             <button
               onClick={() => setSelectedCats([])}
-              className="text-[11px] text-[#71717a] hover:text-[#f4f4f5] ml-1 underline"
+              className="text-[10px] sm:text-[11px] text-[#71717a] hover:text-[#f4f4f5] ml-1 underline"
             >
               Limpar
             </button>
@@ -154,64 +181,66 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) =
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
         <MetricCard
           label="Total de SKUs"
           value={Number(kpis.total_skus || 5000).toLocaleString('pt-BR')}
-          subtitle="Catálogo completo WMS"
+          subtitle="Catálogo WMS"
         />
         <MetricCard
-          label="SKUs em Ruptura Real"
+          label="SKUs em Ruptura"
           value={`${kpis.skus_ruptura || 99} SKUs`}
           trend={{ value: 'Sem Estoque', isPositive: false }}
-          subtitle="96 concentrados em Beleza"
+          subtitle="96 em Beleza"
           highlight
         />
         <MetricCard
-          label="SKUs em Nível Crítico"
+          label="Estoque Crítico"
           value={`${kpis.skus_criticos || 701} SKUs`}
           trend={{ value: '<= Ponto Pedido', isPositive: false }}
-          subtitle="Risco iminente de falta"
+          subtitle="Risco de falta"
         />
         <MetricCard
-          label="Capital em Descontinuados"
+          label="Descontinuados"
           value={`R$ ${((kpis.capital_parado || 14775347) / 1e6).toFixed(1)}M`}
           trend={{ value: '207 SKUs', isPositive: false }}
-          subtitle="Imobilizado sem giro (Hipótese 6)"
+          subtitle="Capital parado"
         />
-        <MetricCard
-          label="Lead Time Médio"
-          value={`${Math.round(kpis.lead_time_medio || 20)} dias`}
-          subtitle="Tempo de reposição fabril"
-        />
+        <div className="col-span-2 sm:col-span-1 lg:col-span-1">
+          <MetricCard
+            label="Lead Time Médio"
+            value={`${Math.round(kpis.lead_time_medio || 20)} dias`}
+            subtitle="Reposição fabril"
+          />
+        </div>
       </div>
 
       {/* Key Finding Executive Callout */}
-      <div className="p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-3">
+      <div className="p-3 sm:p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
         <div className="w-2 h-2 rounded-full bg-[#38bdf8] mt-1.5 shrink-0" />
-        <div>
+        <div className="leading-relaxed">
           <span className="font-semibold text-[#f4f4f5]">Diagnóstico Executivo de Estoque (Hipótese 6):</span>{' '}
-          Existe um descompasso estrutural entre excesso e falta. Mais de <span className="font-mono text-[#38bdf8]">R$ 14,7M</span> estão imobilizados em 207 produtos fora de linha (descontinuados), enquanto <span className="font-mono text-rose-400">96 dos 99 SKUs zerados</span> pertencem exclusivamente à categoria <span className="font-semibold text-[#f4f4f5]">Beleza</span>. Recomendação de Quick Win: liquidação imediata para liberar caixa e reabastecimento urgente dos 701 SKUs críticos.
+          Existe um descompasso estrutural entre excesso e falta. Mais de <span className="font-mono text-[#38bdf8]">R$ 14,7M</span> estão imobilizados em 207 produtos fora de linha (descontinuados), enquanto <span className="font-mono text-rose-400">96 dos 99 SKUs zerados</span> pertencem exclusivamente à categoria <span className="font-semibold text-[#f4f4f5]">Beleza</span>.
         </div>
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         {/* Rupture by Category Stacked */}
-        <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-            <span>Necessidade de Reposição por Categoria (Severidade)</span>
+            <span className="truncate">Necessidade de Reposição por Categoria</span>
           </div>
-          <div className="h-72 w-full mt-2">
+          <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data?.categories_rupture || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+              <BarChart data={data?.categories_rupture || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                <XAxis dataKey="categoria" stroke="#71717a" fontSize={11} tickLine={false} />
-                <YAxis stroke="#71717a" fontSize={11} tickLine={false} />
+                <XAxis dataKey="categoria" stroke="#71717a" fontSize={10} tickLine={false} />
+                <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="skus_ruptura" name="Ruptura Real (Estoque = 0)" fill="#ef4444" stackId="a" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="skus_estoque_critico" name="Estoque Crítico (<= Ponto Pedido)" fill="#f59e0b" stackId="a" radius={[3, 3, 0, 0]} />
               </BarChart>
@@ -220,19 +249,19 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) =
         </div>
 
         {/* Capital Breakdown by Status */}
-        <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-            <span>Capital em Estoque por Status de Disponibilidade (Hipótese 6)</span>
+            <span className="truncate">Capital em Estoque por Status</span>
           </div>
-          <div className="h-72 w-full mt-2">
+          <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data?.status_breakdown || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+              <BarChart data={data?.status_breakdown || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                <XAxis dataKey="status_disponibilidade" stroke="#71717a" fontSize={11} tickLine={false} />
+                <XAxis dataKey="status_disponibilidade" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis
                   stroke="#71717a"
-                  fontSize={11}
-                  tickFormatter={v => `R$ ${(v / 1e6).toFixed(1)}M`}
+                  fontSize={10}
+                  tickFormatter={v => `${(v / 1e6).toFixed(1)}M`}
                   tickLine={false}
                 />
                 <Tooltip
@@ -256,12 +285,12 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions }) =
       {/* Critical SKUs Table */}
       <div className="flex flex-col">
         <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-          <span>Tabela de SKUs Críticos & em Ruptura (Ação Prioritária de Compras)</span>
+          <span>Tabela de SKUs Críticos & em Ruptura (Reposição Urgente)</span>
         </div>
         <DataTable
           columns={criticalColumns}
           data={data?.critical_skus || []}
-          searchPlaceholder="Buscar por SKU ou Nome do Produto..."
+          searchPlaceholder="Buscar por SKU ou Nome..."
           searchKey="nome_produto"
           pageSize={8}
         />

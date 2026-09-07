@@ -42,7 +42,7 @@ export const RoadmapView: React.FC = () => {
       />
 
       {/* Roadmap Macro Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
         <MetricCard
           label="Total de Iniciativas Mapeadas"
           value={`${roadmapSummary?.total_initiatives || 7} Iniciativas`}
@@ -50,28 +50,28 @@ export const RoadmapView: React.FC = () => {
         />
         <MetricCard
           label="Quick Wins Imediatos (30 Dias)"
-          value={`${roadmapSummary?.quick_wins_count || 2} Ações de Alto Impacto`}
+          value={`${roadmapSummary?.quick_wins_count || 2} Ações`}
           trend={{ value: 'R$ 14,9M Potencial', isPositive: true }}
-          subtitle="Rastreio WhatsApp + Liquidação Estoque"
+          subtitle="WhatsApp + Liquidação"
           highlight
         />
         <MetricCard
           label="Valor Financeiro Mapeado"
           value={`R$ ${(((roadmapSummary?.total_potential_value || 24000000)) / 1e6).toFixed(1)}M`}
-          subtitle="Redução de custos e liberação de caixa"
+          subtitle="Redução de custos e caixa"
         />
       </div>
 
       {/* Horizon Filters */}
-      <div className="flex items-center gap-2 p-3.5 rounded-xl bg-[#11131a] border border-[#27272a] flex-wrap shadow-sm">
-        <span className="text-xs text-[#a1a1aa] font-medium mr-1.5">Filtrar Horizonte:</span>
+      <div className="flex items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-xl bg-[#11131a] border border-[#27272a] overflow-x-auto no-scrollbar touch-pan-x shadow-sm">
+        <span className="text-xs text-[#a1a1aa] font-medium mr-1 whitespace-nowrap">Filtrar Horizonte:</span>
         {['Todos', 'Quick Wins', '30 Dias', '60 Dias', '90 Dias'].map(horizon => {
           const active = selectedHorizon === horizon;
           return (
             <button
               key={horizon}
               onClick={() => setSelectedHorizon(horizon)}
-              className={`text-xs px-3.5 py-1.5 rounded-lg border transition-all ${
+              className={`text-xs px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg border whitespace-nowrap transition-all ${
                 active
                   ? 'bg-[#38bdf8]/15 border-[#38bdf8]/60 text-[#38bdf8] font-semibold shadow-sm'
                   : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46] hover:text-[#f4f4f5]'
@@ -84,19 +84,19 @@ export const RoadmapView: React.FC = () => {
       </div>
 
       {/* Initiative Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         {filteredInitiatives.map(init => (
           <div
             key={init.id}
-            className="p-5 rounded-xl bg-[#11131a] border border-[#27272a] hover:border-[#38bdf8]/40 transition-all flex flex-col justify-between space-y-4 shadow-sm"
+            className="p-4 sm:p-5 rounded-xl bg-[#11131a] border border-[#27272a] hover:border-[#38bdf8]/40 transition-all flex flex-col justify-between space-y-3 sm:space-y-4 shadow-sm"
           >
             <div>
-              <div className="flex items-center justify-between gap-2 mb-2.5">
-                <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md bg-[#18181b] border border-[#27272a] text-[#38bdf8]">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="text-xs font-mono font-semibold px-2 sm:px-2.5 py-0.5 rounded-md bg-[#18181b] border border-[#27272a] text-[#38bdf8]">
                   {init.horizon}
                 </span>
                 <span
-                  className={`text-xs font-mono px-2.5 py-0.5 rounded-md font-semibold ${
+                  className={`text-xs font-mono px-2 sm:px-2.5 py-0.5 rounded-md font-semibold ${
                     init.type.includes('Quick Win')
                       ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                       : 'bg-[#18181b] text-[#a1a1aa] border border-[#27272a]'
@@ -106,10 +106,10 @@ export const RoadmapView: React.FC = () => {
                 </span>
               </div>
 
-              <h4 className="text-base font-bold text-[#f4f4f5] tracking-tight mb-1">
+              <h4 className="text-sm sm:text-base font-bold text-[#f4f4f5] tracking-tight mb-1">
                 {init.title}
               </h4>
-              <div className="text-xs text-[#71717a] font-mono mb-2.5">
+              <div className="text-[11px] sm:text-xs text-[#71717a] font-mono mb-2">
                 {init.hypothesis} • {init.category}
               </div>
 
@@ -118,17 +118,17 @@ export const RoadmapView: React.FC = () => {
               </p>
             </div>
 
-            <div className="pt-3.5 border-t border-[#27272a] flex items-center justify-between text-xs">
+            <div className="pt-3 border-t border-[#27272a] flex items-center justify-between text-xs">
               <div>
-                <span className="text-[11px] text-[#71717a] block">Impacto Financeiro Estimado:</span>
-                <span className="font-mono font-bold text-[#38bdf8] text-sm">
+                <span className="text-[10px] sm:text-[11px] text-[#71717a] block">Impacto Estimado:</span>
+                <span className="font-mono font-bold text-[#38bdf8] text-xs sm:text-sm">
                   {init.financial_impact_label}
                 </span>
               </div>
 
               <div className="text-right">
-                <span className="text-[11px] text-[#71717a] block">Prazo Estimado:</span>
-                <span className="font-mono text-[#f4f4f5] text-sm">
+                <span className="text-[10px] sm:text-[11px] text-[#71717a] block">Prazo:</span>
+                <span className="font-mono text-[#f4f4f5] text-xs sm:text-sm">
                   {init.effort_days} dias
                 </span>
               </div>

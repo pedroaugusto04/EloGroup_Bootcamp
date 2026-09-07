@@ -111,4 +111,18 @@ export const api = {
     }),
 
   getLatestAudit: () => fetchJson<{ snapshot: any }>(`${BASE_URL}/copilot/audit/latest`),
+
+  runAudit: (params?: { date_filter?: string; days_window?: number; period_label?: string; send_email?: boolean; to_email?: string }) =>
+    fetchJson<{
+      success: boolean;
+      timestamp: string;
+      audit_thread_id: string;
+      email_result?: any;
+      deep_link_url: string;
+      diagnostic: any;
+    }>(`${BASE_URL}/copilot/audit/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params || {}),
+    }),
 };

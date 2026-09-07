@@ -206,10 +206,10 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
   return (
     <div className="space-y-6 view-enter">
       {/* Sub-tab Switcher */}
-      <div className="flex items-center gap-2 border-b border-[#27272a] pb-3">
+      <div className="flex items-center gap-1.5 sm:gap-2 border-b border-[#27272a] pb-3 overflow-x-auto no-scrollbar touch-pan-x">
         <button
           onClick={() => setActiveSubTab('mkt')}
-          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
+          className={`px-3 py-1.5 text-xs font-semibold rounded-md border whitespace-nowrap transition-colors ${
             activeSubTab === 'mkt'
               ? 'bg-[#18181b] border-[#38bdf8]/50 text-[#38bdf8]'
               : 'border-transparent text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b]/50'
@@ -219,23 +219,23 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
         </button>
         <button
           onClick={() => setActiveSubTab('clients')}
-          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
+          className={`px-3 py-1.5 text-xs font-semibold rounded-md border whitespace-nowrap transition-colors ${
             activeSubTab === 'clients'
               ? 'bg-[#18181b] border-[#38bdf8]/50 text-[#38bdf8]'
               : 'border-transparent text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b]/50'
           }`}
         >
-          Clientes & Segmentação RFM (Hipótese 5)
+          Clientes & RFM (Hipótese 5)
         </button>
         <button
           onClick={() => setActiveSubTab('support')}
-          className={`px-3.5 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
+          className={`px-3 py-1.5 text-xs font-semibold rounded-md border whitespace-nowrap transition-colors ${
             activeSubTab === 'support'
               ? 'bg-[#18181b] border-[#38bdf8]/50 text-[#38bdf8]'
               : 'border-transparent text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b]/50'
           }`}
         >
-          Suporte & Automação com IA (Hipótese 4)
+          Suporte & IA (Hipótese 4)
         </button>
       </div>
 
@@ -250,58 +250,60 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
             devSection="Seção 3: Observações por Tabela (Marketing & ROAS Declarado)"
           />
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
             <MetricCard
-              label="Investimento Total (Mídia)"
+              label="Investimento Mídia"
               value={`R$ ${((mktData?.kpis.invest_total || 0) / 1e6).toFixed(1)}M`}
-              subtitle="Gasto declarado nas plataformas"
+              subtitle="Gasto em plataformas"
             />
             <MetricCard
-              label="Receita Gerada (Mídia)"
+              label="Receita Gerada"
               value={`R$ ${((mktData?.kpis.rec_total || 0) / 1e6).toFixed(1)}M`}
-              subtitle="Retorno atribuído pelas redes"
+              subtitle="Atribuído pelas redes"
             />
             <MetricCard
-              label="ROAS Declarado Global"
+              label="ROAS Global"
               value={`${Number(mktData?.kpis.roas_global || 0).toFixed(2)}x`}
               trend={{ value: 'Plataformas', isPositive: true }}
-              subtitle="Retorno aparente de mídia"
+              subtitle="Retorno aparente"
               highlight
             />
             <MetricCard
               label="CAC Médio"
               value={`R$ ${Number(mktData?.kpis.cac_medio || 0).toFixed(2)}`}
-              subtitle="Custo médio de aquisição"
+              subtitle="Custo de aquisição"
             />
-            <MetricCard
-              label="Total Conversões"
-              value={`${((mktData?.kpis.conv_total || 0) / 1e6).toFixed(1)}M`}
-              subtitle="Conversões declaradas"
-            />
+            <div className="col-span-2 sm:col-span-1 lg:col-span-1">
+              <MetricCard
+                label="Total Conversões"
+                value={`${((mktData?.kpis.conv_total || 0) / 1e6).toFixed(1)}M`}
+                subtitle="Conversões declaradas"
+              />
+            </div>
           </div>
 
           {/* Marketing Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
-              <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+            <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+              <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
                 Investimento vs. Receita por Canal de Mídia
               </div>
-              <div className="h-72 w-full mt-2">
+              <div className="h-64 sm:h-72 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={mktData?.channels || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <BarChart data={mktData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                    <XAxis dataKey="canal" stroke="#71717a" fontSize={11} tickLine={false} />
+                    <XAxis dataKey="canal" stroke="#71717a" fontSize={10} tickLine={false} />
                     <YAxis
                       stroke="#71717a"
-                      fontSize={11}
-                      tickFormatter={v => `R$ ${(v / 1e6).toFixed(0)}M`}
+                      fontSize={10}
+                      tickFormatter={v => `${(v / 1e6).toFixed(0)}M`}
                       tickLine={false}
                     />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                       formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                     />
-                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                    <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                     <Bar dataKey="investimento" name="Investimento (R$)" fill="#94a3b8" radius={[3, 3, 0, 0]} />
                     <Bar dataKey="receita_gerada" name="Receita Declarada (R$)" fill="#38bdf8" radius={[3, 3, 0, 0]} />
                   </BarChart>
@@ -309,20 +311,20 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
-              <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+            <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+              <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
                 Eficiência Relativa: ROAS vs. CAC por Canal
               </div>
-              <div className="h-72 w-full mt-2">
+              <div className="h-64 sm:h-72 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={mktData?.channels || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <BarChart data={mktData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                    <XAxis dataKey="canal" stroke="#71717a" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#71717a" fontSize={11} tickLine={false} />
+                    <XAxis dataKey="canal" stroke="#71717a" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                     />
-                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                    <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                     <Bar dataKey="roas" name="ROAS (x)" fill="#38bdf8" radius={[3, 3, 0, 0]} />
                     <Bar dataKey="cac" name="CAC (R$)" fill="#f59e0b" radius={[3, 3, 0, 0]} />
                   </BarChart>
@@ -357,7 +359,7 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
             devSection="Seção 3 & Seção 5: Hipótese 5 (Segmentos de Clientes & Concentração)"
           />
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
             <MetricCard
               label="Total de Clientes"
               value={Number(custData?.kpis.total_clientes || 15000).toLocaleString('pt-BR')}
@@ -365,48 +367,50 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
             />
             <MetricCard
               label="LTV Médio"
-              value={`R$ ${Number(custData?.kpis.ltv_medio || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-              subtitle="Média histórica declarada"
+              value={`R$ ${Number(custData?.kpis.ltv_medio || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`}
+              subtitle="Média histórica"
               highlight
             />
             <MetricCard
               label="Frequência Média"
-              value={`${Number(custData?.kpis.frequencia_media || 0).toFixed(1)} pedidos`}
+              value={`${Number(custData?.kpis.frequencia_media || 0).toFixed(1)} ped.`}
               subtitle="Compras por cliente"
             />
             <MetricCard
               label="Renda Média"
-              value={`R$ ${Number(custData?.kpis.renda_media || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+              value={`R$ ${Number(custData?.kpis.renda_media || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`}
               subtitle="Perfil cadastral"
             />
-            <MetricCard
-              label="Idade Média"
-              value={`${Math.round(custData?.kpis.idade_media || 42)} anos`}
-              subtitle="Calculado sobre ano 2026"
-            />
+            <div className="col-span-2 sm:col-span-1 lg:col-span-1">
+              <MetricCard
+                label="Idade Média"
+                value={`${Math.round(custData?.kpis.idade_media || 42)} anos`}
+                subtitle="Ano base 2026"
+              />
+            </div>
           </div>
 
           {/* Pareto Callout */}
-          <div className="p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-3">
+          <div className="p-3 sm:p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
             <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-            <div>
+            <div className="leading-relaxed">
               <span className="font-semibold text-[#f4f4f5]">Diagnóstico de Concentração de Clientes (Hipótese 5):</span>{' '}
-              Clientes dos segmentos <span className="font-semibold text-[#f4f4f5]">Campeões</span> e <span className="font-semibold text-[#f4f4f5]">Fiéis</span> são poucos em volume, mas representam a maior fatia do LTV acumulado. Em contrapartida, <span className="font-mono text-amber-400 font-semibold">46,7% da base</span> está nas faixas de risco (Em Risco, Hibernando e Churn), exigindo réguas automatizadas de retenção e cupons de recompra.
+              Clientes dos segmentos <span className="font-semibold text-[#f4f4f5]">Campeões</span> e <span className="font-semibold text-[#f4f4f5]">Fiéis</span> são poucos em volume, mas representam a maior fatia do LTV acumulado. Em contrapartida, <span className="font-mono text-amber-400 font-semibold">46,7% da base</span> está nas faixas de risco.
             </div>
           </div>
 
           {/* RFM Distribution Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
-              <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+            <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+              <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
                 Distribuição de Clientes por Segmento RFM
               </div>
-              <div className="h-72 w-full mt-2">
+              <div className="h-64 sm:h-72 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={custData?.segments || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <BarChart data={custData?.segments || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                    <XAxis dataKey="segmento" stroke="#71717a" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#71717a" fontSize={11} tickLine={false} />
+                    <XAxis dataKey="segmento" stroke="#71717a" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                     />
@@ -416,19 +420,19 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
-              <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+            <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+              <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
                 LTV Médio por Segmento RFM (R$)
               </div>
-              <div className="h-72 w-full mt-2">
+              <div className="h-64 sm:h-72 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={custData?.segments || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <BarChart data={custData?.segments || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                    <XAxis dataKey="segmento" stroke="#71717a" fontSize={11} tickLine={false} />
+                    <XAxis dataKey="segmento" stroke="#71717a" fontSize={10} tickLine={false} />
                     <YAxis
                       stroke="#71717a"
-                      fontSize={11}
-                      tickFormatter={v => `R$ ${(v / 1e3).toFixed(0)}k`}
+                      fontSize={10}
+                      tickFormatter={v => `${(v / 1e3).toFixed(0)}k`}
                       tickLine={false}
                     />
                     <Tooltip
@@ -468,7 +472,7 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
             devSection="Seção 3 & Seção 5: Hipótese 4 (Causas Raiz & Automação com IA)"
           />
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
             <MetricCard
               label="Total de Chamados"
               value={Number(supData?.kpis.total_tickets || 35840).toLocaleString('pt-BR')}
@@ -480,45 +484,47 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
               subtitle="Satisfação geral neutra"
             />
             <MetricCard
-              label="Custo Operacional Total"
+              label="Custo Operacional"
               value={`R$ ${((supData?.kpis.custo_operacional_total || 537600) / 1e3).toFixed(1)}k`}
               subtitle="Gasto direto com tickets"
             />
             <MetricCard
-              label="Economia com IA (Quick Win)"
+              label="Economia IA (Quick Win)"
               value="R$ 238,5k"
               trend={{ value: '44% do custo', isPositive: true }}
-              subtitle="Rastreio + Dúvidas Técnicas"
+              subtitle="Rastreio + Dúvidas"
               highlight
             />
-            <MetricCard
-              label="1ª Resposta Média"
-              value={`${Math.round(supData?.kpis.primeira_resposta_minutos || 122)} min`}
-              subtitle="SLA médio de atendimento"
-            />
+            <div className="col-span-2 sm:col-span-1 lg:col-span-1">
+              <MetricCard
+                label="1ª Resposta Média"
+                value={`${Math.round(supData?.kpis.primeira_resposta_minutos || 122)} min`}
+                subtitle="SLA médio"
+              />
+            </div>
           </div>
 
           {/* Quick Win Callout */}
-          <div className="p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-3">
+          <div className="p-3 sm:p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
             <div className="w-2 h-2 rounded-full bg-[#38bdf8] mt-1.5 shrink-0" />
-            <div>
+            <div className="leading-relaxed">
               <span className="font-semibold text-[#f4f4f5]">Oportunidade Imediata de IA & Notificação (Hipótese 4):</span>{' '}
-              O motivo <span className="font-semibold text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#38bdf8] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), logo o atrito é puramente ansiedade e falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento resolve o problema com esforço de 15 dias.
+              O motivo <span className="font-semibold text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#38bdf8] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), logo o atrito é puramente ansiedade e falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento resolve o problema.
             </div>
           </div>
 
           {/* Support Breakdown Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
-              <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+            <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+              <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
                 Volume de Chamados por Canal de Entrada
               </div>
-              <div className="h-72 w-full mt-2">
+              <div className="h-64 sm:h-72 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={supData?.channels || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <BarChart data={supData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                    <XAxis dataKey="canal_entrada" stroke="#71717a" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#71717a" fontSize={11} tickLine={false} />
+                    <XAxis dataKey="canal_entrada" stroke="#71717a" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                     />
@@ -528,16 +534,16 @@ export const GrowthView: React.FC<GrowthViewProps> = () => {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
-              <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+            <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+              <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
                 Distribuição das Notas CSAT (1 a 5)
               </div>
-              <div className="h-72 w-full mt-2">
+              <div className="h-64 sm:h-72 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={supData?.csat_distribution || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                  <BarChart data={supData?.csat_distribution || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                    <XAxis dataKey="nota_csat" stroke="#71717a" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#71717a" fontSize={11} tickLine={false} />
+                    <XAxis dataKey="nota_csat" stroke="#71717a" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                     />

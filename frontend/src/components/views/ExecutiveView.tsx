@@ -116,13 +116,13 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       />
 
       {/* Filter Controls */}
-      <div className="flex flex-wrap items-center gap-3 p-3.5 rounded-lg bg-[#11131a] border border-[#27272a]">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-lg bg-[#11131a] border border-[#27272a]">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-xs text-[#a1a1aa] font-medium">Status:</span>
           <select
             value={status}
             onChange={e => setStatus(e.target.value)}
-            className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+            className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
           >
             <option value="Aprovado">Aprovado</option>
             <option value="Todos">Todos</option>
@@ -131,12 +131,12 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
           </select>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-xs text-[#a1a1aa] font-medium">Ano:</span>
           <select
             value={selectedYear}
             onChange={e => setSelectedYear(e.target.value)}
-            className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+            className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
           >
             <option value="Todos">Todos os Anos</option>
             <option value="2023">2023</option>
@@ -145,7 +145,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
         </div>
 
         {filterOptions?.categories && filterOptions.categories.length > 0 && (
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-[#27272a]/50">
             <span className="text-xs text-[#a1a1aa] font-medium mr-1">Categorias:</span>
             {filterOptions.categories.map(cat => {
               const active = selectedCats.includes(cat);
@@ -159,7 +159,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
                       setSelectedCats([...selectedCats, cat]);
                     }
                   }}
-                  className={`text-[11px] px-2.5 py-0.5 rounded border transition-colors ${
+                  className={`text-[10px] sm:text-[11px] px-2 sm:px-2.5 py-0.5 rounded border transition-colors ${
                     active
                       ? 'bg-[#38bdf8]/15 border-[#38bdf8]/60 text-[#38bdf8] font-medium'
                       : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46]'
@@ -172,7 +172,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
             {selectedCats.length > 0 && (
               <button
                 onClick={() => setSelectedCats([])}
-                className="text-[11px] text-[#71717a] hover:text-[#f4f4f5] ml-1 underline"
+                className="text-[10px] sm:text-[11px] text-[#71717a] hover:text-[#f4f4f5] ml-1 underline"
               >
                 Limpar
               </button>
@@ -182,7 +182,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       </div>
 
       {/* Macro Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
         <MetricCard
           label="Receita Líquida"
           value={`R$ ${((kpis.liquida || 0) / 1e6).toFixed(2)}M`}
@@ -196,57 +196,59 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
             value: `${(((kpis.margem || 0) / (kpis.liquida || 1)) * 100).toFixed(1)}%`,
             isPositive: true,
           }}
-          subtitle="Margem de contribuição efetiva"
+          subtitle="Margem efetiva"
         />
         <MetricCard
           label="Total de Pedidos"
           value={Number(kpis.total_pedidos || 0).toLocaleString('pt-BR')}
-          subtitle="Volume de transações ERP"
+          subtitle="Transações ERP"
         />
         <MetricCard
           label="Ticket Médio"
           value={`R$ ${Number(kpis.ticket_medio || 0).toFixed(2)}`}
-          subtitle="Média por pedido aprovado"
+          subtitle="Média por pedido"
         />
-        <MetricCard
-          label="Taxa Devolução"
-          value={`${Number(kpis.taxa_devolucao || 0).toFixed(1)}%`}
-          trend={{
-            value: `${Number(kpis.taxa_devolucao || 0).toFixed(1)}%`,
-            isPositive: false,
-          }}
-          subtitle="Impacto de estornos"
-        />
+        <div className="col-span-2 sm:col-span-1 lg:col-span-1">
+          <MetricCard
+            label="Taxa Devolução"
+            value={`${Number(kpis.taxa_devolucao || 0).toFixed(1)}%`}
+            trend={{
+              value: `${Number(kpis.taxa_devolucao || 0).toFixed(1)}%`,
+              isPositive: false,
+            }}
+            subtitle="Impacto de estornos"
+          />
+        </div>
       </div>
 
       {/* Margin Decomposition Mini-Bar */}
-      <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
-        <div className="text-xs font-semibold text-[#f4f4f5] mb-3 flex items-center justify-between">
+      <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+        <div className="text-xs font-semibold text-[#f4f4f5] mb-2 sm:mb-3 flex items-center justify-between">
           <span>Decomposição da Receita Bruta à Margem Líquida</span>
-          <span className="font-mono text-[11px] text-[#71717a]">ERP Vendas 2023/2024</span>
+          <span className="hidden sm:inline font-mono text-[11px] text-[#71717a]">ERP Vendas 2023/2024</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="p-2.5 rounded bg-[#18181b] border border-[#27272a]">
-            <span className="text-[#a1a1aa] block text-[11px]">Receita Bruta Total</span>
-            <span className="font-mono font-bold text-sm text-[#f4f4f5]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
+          <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">
+            <span className="text-[#a1a1aa] block text-[10px] sm:text-[11px]">Receita Bruta Total</span>
+            <span className="font-mono font-bold text-xs sm:text-sm text-[#f4f4f5]">
               R$ {((decomp.bruta || 0) / 1e6).toFixed(2)}M
             </span>
           </div>
-          <div className="p-2.5 rounded bg-[#18181b] border border-[#27272a]">
-            <span className="text-[#a1a1aa] block text-[11px]">Descontos Concedidos</span>
-            <span className="font-mono font-bold text-sm text-rose-400">
-              -R$ {((decomp.descontos || 0) / 1e6).toFixed(2)}M ({((decomp.descontos / (decomp.bruta || 1)) * 100).toFixed(1)}%)
+          <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">
+            <span className="text-[#a1a1aa] block text-[10px] sm:text-[11px]">Descontos Concedidos</span>
+            <span className="font-mono font-bold text-xs sm:text-sm text-rose-400">
+              -R$ {((decomp.descontos || 0) / 1e6).toFixed(2)}M
             </span>
           </div>
-          <div className="p-2.5 rounded bg-[#18181b] border border-[#27272a]">
-            <span className="text-[#a1a1aa] block text-[11px]">Custo Produtos (CMV)</span>
-            <span className="font-mono font-bold text-sm text-[#e4e4e7]">
+          <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">
+            <span className="text-[#a1a1aa] block text-[10px] sm:text-[11px]">Custo Produtos (CMV)</span>
+            <span className="font-mono font-bold text-xs sm:text-sm text-[#e4e4e7]">
               R$ {((decomp.custo_prod || 0) / 1e6).toFixed(2)}M
             </span>
           </div>
-          <div className="p-2.5 rounded bg-[#18181b] border border-[#27272a]">
-            <span className="text-[#a1a1aa] block text-[11px]">Custo Total Frete</span>
-            <span className="font-mono font-bold text-sm text-[#e4e4e7]">
+          <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">
+            <span className="text-[#a1a1aa] block text-[10px] sm:text-[11px]">Custo Total Frete</span>
+            <span className="font-mono font-bold text-xs sm:text-sm text-[#e4e4e7]">
               R$ {((decomp.custo_frete || 0) / 1e6).toFixed(2)}M
             </span>
           </div>
@@ -254,56 +256,56 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         {/* Monthly Trend */}
-        <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-            <span>Evolução Mensal (Receita Líquida vs. Margem de Contribuição)</span>
+            <span className="truncate">Evolução Mensal (Receita vs. Margem)</span>
           </div>
-          <div className="h-72 w-full mt-2">
+          <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={execData?.monthly_trend || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+              <ComposedChart data={execData?.monthly_trend || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                <XAxis dataKey="ano_mes" stroke="#71717a" fontSize={11} tickLine={false} />
+                <XAxis dataKey="ano_mes" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis
                   stroke="#71717a"
-                  fontSize={11}
-                  tickFormatter={v => `R$ ${(v / 1e6).toFixed(1)}M`}
+                  fontSize={10}
+                  tickFormatter={v => `${(v / 1e6).toFixed(1)}M`}
                   tickLine={false}
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="margem_contribuicao" name="Margem Contribuição" fill="#94a3b8" opacity={0.7} radius={[3, 3, 0, 0]} />
-                <Line type="monotone" dataKey="receita_liquida" name="Receita Líquida" stroke="#38bdf8" strokeWidth={2.5} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="receita_liquida" name="Receita Líquida" stroke="#38bdf8" strokeWidth={2.5} dot={{ r: 2.5 }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Channel Performance */}
-        <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-            <span>Desempenho por Canal de Venda (Receita vs. Margem)</span>
+            <span className="truncate">Desempenho por Canal de Venda</span>
           </div>
-          <div className="h-72 w-full mt-2">
+          <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={execData?.channels || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+              <ComposedChart data={execData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
-                <XAxis dataKey="canal" stroke="#71717a" fontSize={11} tickLine={false} />
+                <XAxis dataKey="canal" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis
                   stroke="#71717a"
-                  fontSize={11}
-                  tickFormatter={v => `R$ ${(v / 1e6).toFixed(1)}M`}
+                  fontSize={10}
+                  tickFormatter={v => `${(v / 1e6).toFixed(1)}M`}
                   tickLine={false}
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="receita_liquida" name="Receita Líquida" fill="#38bdf8" radius={[3, 3, 0, 0]} />
                 <Bar dataKey="margem_contribuicao" name="Margem Contribuição" fill="#94a3b8" radius={[3, 3, 0, 0]} />
               </ComposedChart>
@@ -313,16 +315,16 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       </div>
 
       {/* Bottom Grid: Returns Impact & Top SKUs */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
         {/* Returns Reasons Pie */}
-        <div className="p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-1">
-            Impacto Financeiro por Motivo de Devolução
+            Impacto por Motivo de Devolução
           </div>
           <div className="text-[11px] text-[#71717a] mb-2">
             Total estornado: R$ {(((salesData?.returns_impact || []).reduce((acc, r) => acc + r.valor_devolvido, 0)) / 1e6).toFixed(2)}M
           </div>
-          <div className="h-60 w-full">
+          <div className="h-56 sm:h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -331,8 +333,8 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
                   nameKey="motivo_devolucao"
                   cx="50%"
                   cy="50%"
-                  innerRadius={45}
-                  outerRadius={75}
+                  innerRadius={38}
+                  outerRadius={68}
                   paddingAngle={3}
                 >
                   {(salesData?.returns_impact || []).map((_, index) => (
@@ -343,7 +345,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
                   contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '11px' }}
                   formatter={(v: any) => `R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                 />
-                <Legend wrapperStyle={{ fontSize: '11px' }} />
+                <Legend wrapperStyle={{ fontSize: '10px' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -357,7 +359,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
           <DataTable
             columns={skuColumns}
             data={salesData?.top_skus || []}
-            searchPlaceholder="Buscar SKU ou Nome de Produto..."
+            searchPlaceholder="Buscar SKU ou Produto..."
             searchKey="nome_produto"
             pageSize={7}
           />
