@@ -431,6 +431,30 @@
           "content": "**Parecer de Auditoria de Estoque (Ano Fechado 2023):**\n\n- **Ruptura e risco**: `3 SKUs`\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
         }
       ]
+    },
+    "4f616fa5-7284-479e-992a-5e5f4d2244fa": {
+      "id": "4f616fa5-7284-479e-992a-5e5f4d2244fa",
+      "title": "Auditoria: Ano Fechado 2023",
+      "created_at": "2026-09-07T11:39:57.722228",
+      "updated_at": "2026-09-07T11:39:57.722228",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "# Relatório Executivo: Diagnóstico de Estoque & Otimização de Capital\n\n## 1. Sumário Executivo & Diagnóstico Geral\n- **Saúde do Estoque Físico**: Identificados 99 SKUs em ruptura ativa, 3 em risco crítico e 116 SKUs sem giro no período anualizado.\n- **Capital Travado em Descontinuados**: Total de R$ 14,775,347.64 imobilizados em itens fora de linha (custo contábil de estoque).\n\n## 2. Matriz de Ações por Horizonte Temporal\n\n### ⚡ Curto Prazo: Quick Wins (Até 30 Dias)\n- Realizar saldão promocional de queima controlada para estancar os R$ 14,775,347.64 em descontinuados.\n- Emitir ordens de compra emergenciais para os top SKUs Curva A com risco iminente de ruptura.\n\n### Médio Prazo: Ajuste de Processos (60 Dias)\n- Recalibrar parâmetros de ponto de pedido e estoque de segurança considerando o lead time real dos fornecedores.\n- Bloquear recompras automáticas de SKUs com taxa de devolução superior a 10% até auditoria de qualidade.\n\n### Longo Prazo: Excelência Operacional (90 Dias)\n- Integrar rotina de S&OP (Sales & Operations Planning) sincronizando Marketing, Compras e Logística.\n- Implementar governança de cadastro para unificar custos contábeis e tabelas de preço no PDV.\n\n## 3. Top SKUs Críticos para Ação Imediata\nAuditoria concluída com base na base analítica DuckDB (Ano Base 2026).\n\n\n---\n**Como posso apoiar a sua análise?** Você pode solicitar simulações detalhadas, aprofundamento em SKUs específicos ou estratégias de liquidação e reposição."
+        }
+      ]
+    },
+    "a17512bc-474c-413f-bb0f-3ac09b8886b4": {
+      "id": "a17512bc-474c-413f-bb0f-3ac09b8886b4",
+      "title": "Auditoria: Ano Fechado 2023",
+      "created_at": "2026-09-07T11:39:57.726152",
+      "updated_at": "2026-09-07T11:39:57.726152",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "**Parecer de Auditoria de Estoque (Ano Fechado 2023):**\n\n- **Ruptura e risco**: `3 SKUs`\n\n**Como posso apoiar a sua análise?** Você pode solicitar simulações, investigações de SKUs específicos ou estratégias de abastecimento."
+        }
+      ]
     }
   }
 }

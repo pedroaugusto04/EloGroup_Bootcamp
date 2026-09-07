@@ -90,6 +90,13 @@ def get_relational_audit():
             "severity": "Crítica"
         },
         {
+            "dimension": "Concentração de Demanda & Atendimento",
+            "erp_coverage": "27 clientes concentram 93,6% dos pedidos (25.989 compras) e 93,5% da receita bruta",
+            "external_coverage": "Os mesmos 27 clientes geram 93,05% dos tickets de suporte (33.350 chamados)",
+            "impact": "A taxa de suporte por pedido é homogênea (~1,28), revelando clientes corporativos/B2B com compras massivas e risco extremo de dependência de receita.",
+            "severity": "Crítica"
+        },
+        {
             "dimension": "Atribuição de Mídia",
             "erp_coverage": "Receita Líquida em Vendas: R$ 14,2M | 20,8k vendas efetivas",
             "external_coverage": "Mídia Declarada: R$ 210,4M investidos | R$ 878,6M receita declarada",
