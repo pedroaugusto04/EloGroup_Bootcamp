@@ -76,7 +76,7 @@ STRATEGIC_INITIATIVES = [
     },
     {
         "id": "init-06",
-        "title": "Auditoria de Integridade & Unificação de Dados",
+        "title": "Governança & Unificação das 5 Bases de Dados (MDM / Lakehouse)",
         "hypothesis": "Integridade das Bases",
         "type": "Médio / Longo Prazo",
         "horizon": "90 Dias",
@@ -84,8 +84,12 @@ STRATEGIC_INITIATIVES = [
         "financial_impact_value": 500000,
         "effort_days": 60,
         "category": "Engenharia de Dados",
-        "description": "Estruturação de pipeline de reconciliação entre o histórico de Vendas e os cadastros de Clientes/Suporte para sanar discrepâncias de cobertura e clientes desbalanceados.",
-        "metrics_to_watch": ["Taxa de conciliação Clientes x Vendas", "Cobertura de IDs de clientes", "Precisão de LTV"]
+        "description": "Estruturação de pipeline unificado (Single Source of Truth) integrando as 5 fontes do ecossistema (Vendas, Clientes, Atendimento, Estoque e Marketing), sanando descompassos de atribuição de mídia, custos de catálogo e conciliação de clientes.",
+        "metrics_to_watch": [
+            "Taxa de conciliação global entre bases (%)",
+            "Precisão do ROAS e LTV contábil",
+            "Cobertura unificada de IDs de clientes e SKUs"
+        ]
     }
 ]
 
