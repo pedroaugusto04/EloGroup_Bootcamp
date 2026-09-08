@@ -190,6 +190,8 @@ export interface SupportAnalyticsData {
     total_tickets: number;
     csat_medio: number;
     primeira_resposta_minutos: number;
+    tempo_resposta_min?: number;
+    tempo_resposta_mediana_min?: number;
     tempo_resolucao_horas: number;
     custo_operacional_total: number;
   };

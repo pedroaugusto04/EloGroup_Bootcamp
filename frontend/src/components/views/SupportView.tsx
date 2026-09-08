@@ -125,7 +125,9 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
           <MetricCard
             label="1ª Resposta Média"
             value={`${Math.round((supData?.kpis as any)?.tempo_resposta_min || (supData?.kpis as any)?.primeira_resposta_minutos || 135)} min`}
-            subtitle={`Resolução real: ${Number((supData?.kpis as any)?.tempo_resolucao_h || (supData?.kpis as any)?.tempo_resolucao_horas || 48.6).toFixed(1)}h (~2d)`}
+            trend={{ value: `Mediana: ${Math.round((supData?.kpis as any)?.tempo_resposta_mediana_min ?? 11)} min`, isPositive: true }}
+            subtitle="Mediana: 11 min (67% < 15m)"
+            help="A média (135 min) é inflada por E-mail (~4,5h) e Reclame Aqui (~13h). A mediana de 11 min reflete a maioria ágil via WhatsApp/ChatBot."
           />
         </div>
       </div>
