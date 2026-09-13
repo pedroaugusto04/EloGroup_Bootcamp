@@ -19,22 +19,18 @@ from src.agent.worker import (
 
 def test_render_executive_email_template():
     mock_data = {
-        "critic_approved": True,
-        "critic_feedback": "[Nota 10/10] Parecer em total conformidade com os guardrails.",
-        "structured_data": {
-            "total_stranded_cash": 42500.00,
-            "ruptura_count": 5,
-            "criticos_count": 3,
-            "mkt_alert_categories": ["Moda"],
-            "top_critical_skus": [
-                {
-                    "sku_id": "SKU-00185",
-                    "nome_produto": "Camisa Social",
-                    "categoria": "Moda",
-                    "estoque_disponivel": 0,
-                    "dias_cobertura": 0.0,
-                }
-            ],
+        "deterministic_approved": True,
+        "factual_package": {
+            "meta": {"sales_start": "2023-01-01", "sales_end": "2024-01-26"},
+            "summary": {
+                "methodology_banner": "Posição de estoque fornecida — data de referência não informada. Tendência de vendas observada entre 01/01/2023 e 26/01/2024.",
+                "capital": {"capital_disponivel": 42500, "skus_com_custo_vendas": 10, "total_skus": 11},
+                "operational": {"ruptura_atual": 5, "ponto_pedido": 3},
+                "lead_time_exposure": {"skus": 1, "margem_potencialmente_exposta": 123.45},
+                "liquidation": {"central_scenario": {"receita_ajustada_devolucoes": 1000, "capital_historico_envolvido": 800}},
+                "top_attention_category": {"categoria": "Moda"},
+            },
+            "items": [{"sku_id": "SKU-00185", "nome_produto": "Camisa Social", "categoria": "Moda", "margem_potencialmente_exposta": 123.45}],
         },
     }
     deep_link = "http://localhost:8501/?view=agente_consultor"
@@ -42,7 +38,7 @@ def test_render_executive_email_template():
 
     assert "<!DOCTYPE html>" in html
     assert "Vértice Retail" in html or "VÉRTICE" in html
-    assert "R$ 42,500.00" in html or "42.500" in html or "42,500" in html
+    assert "R$ 42.500,00" in html
     assert "SKU-00185" in html
     assert deep_link in html
     assert "Acessar Copiloto de Estoque no App" in html
@@ -123,7 +119,8 @@ def test_run_autonomous_inventory_audit_worker(mock_send, tmp_path):
         with patch("src.agent.worker.SNAPSHOT_FILE_PATH", test_snap_path):
             snapshot = load_latest_audit_snapshot()
             assert snapshot is not None
-            assert "structured_data" in snapshot
+            assert snapshot["schema_version"] == 2
+            assert "factual_package" in snapshot
             assert "final_report" in snapshot
 
 
@@ -132,11 +129,9 @@ def test_run_autonomous_inventory_audit_worker(mock_send, tmp_path):
 def test_worker_does_not_send_unvalidated_report(mock_send, mock_service, tmp_path):
     test_snap_path = str(tmp_path / "test_snapshot_invalid.json")
     mock_service.return_value.run_diagnostic.return_value = {
-        "critic_approved": False,
-        "critic_reviewed": False,
+        "deterministic_approved": False,
         "final_report": None,
-        "structured_data": {"ruptura_count": 2, "criticos_count": 1},
-        "critic_feedback": "Revisão indisponível.",
+        "factual_package": None,
     }
 
     with patch("src.agent.worker.SNAPSHOT_FILE_PATH", test_snap_path):

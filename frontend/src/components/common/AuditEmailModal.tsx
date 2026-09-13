@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { api } from '../../api/client';
+import { PeriodKey, PeriodMeta } from '../../types/analytics';
 import { Mail, CheckCircle2, AlertCircle, Loader2, X, ExternalLink, Sparkles } from 'lucide-react';
 
 interface AuditEmailModalProps {
@@ -14,11 +15,18 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
   onSuccess,
 }) => {
   const [toEmail, setToEmail] = useState('');
-  const [periodLabel, setPeriodLabel] = useState('Ano Fechado 2023');
+  const [periodKey, setPeriodKey] = useState<PeriodKey>('full_history');
+  const [periods, setPeriods] = useState<PeriodMeta[]>([]);
   const [sendEmail, setSendEmail] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      api.getCopilotPeriods().then(res => setPeriods(res.periods || [])).catch(() => setPeriods([]));
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -29,14 +37,14 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
 
     try {
       const res = await api.runAudit({
-        period_label: periodLabel,
+        period_key: periodKey,
         send_email: sendEmail,
         to_email: toEmail.trim() ? toEmail.trim() : undefined,
       });
 
       setResult(res);
     } catch (err: any) {
-      setError(err.message || 'Falha ao executar auditoria autônoma.');
+      setError(err.message || 'Falha ao executar a análise de estoque.');
     } finally {
       setLoading(false);
     }
@@ -60,10 +68,10 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
             </div>
             <div>
               <h3 className="text-sm font-bold text-[#f4f4f5] tracking-tight">
-                Disparar Auditoria & E-mail Executivo
+                Análise de Estoque & E-mail Executivo
               </h3>
               <p className="text-[11px] text-[#71717a]">
-                Worker Autônomo com Relatório HTML & Deep Link
+                Pacote factual reproduzível, executado sob demanda
               </p>
             </div>
           </div>
@@ -82,7 +90,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
           {!result ? (
             <>
               <p className="text-xs text-[#a1a1aa] leading-relaxed">
-                O agente executará o ciclo de auditoria de estoque, validação pelos guardrails do nó de reflexão, registro automático no histórico do Copiloto e despacho do parecer executivo via email.
+                O backend resolverá a janela selecionada, reconciliará fatos e cenários e só publicará o relatório se os checks determinísticos forem aprovados.
               </p>
 
               <div className="space-y-3 pt-1">
@@ -91,16 +99,24 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                     Janela Temporal / Período
                   </label>
                   <select
-                    value={periodLabel}
-                    onChange={e => setPeriodLabel(e.target.value)}
+                    value={periodKey}
+                    onChange={e => setPeriodKey(e.target.value as PeriodKey)}
                     disabled={loading}
                     className="w-full text-xs bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
                   >
-                    <option value="Ano Fechado 2023">Ano Fechado 2023</option>
-                    <option value="Snapshot Completo 2023/2024">Snapshot Completo 2023/2024</option>
-                    <option value="Últimos 90 Dias">Últimos 90 Dias</option>
+                    {periods.map(period => (
+                      <option key={period.period_key} value={period.period_key}>
+                        {period.label} · {period.sales_start.split('-').reverse().join('/')}–{period.sales_end.split('-').reverse().join('/')}
+                      </option>
+                    ))}
+                    {periods.length === 0 && <option value="full_history">Histórico completo observado</option>}
                   </select>
                 </div>
+
+                <details className="rounded-lg border border-[#27272a] bg-[#18181b] p-3 text-[11px] text-[#a1a1aa]">
+                  <summary className="cursor-pointer font-medium text-[#d4d4d8]">Metodologia e limitações</summary>
+                  <p className="mt-2 leading-relaxed">Posição de estoque fornecida — data de referência não informada. Vendas representam tendência histórica observada, não previsão. Financeiro vem de Vendas; cenários não são perdas realizadas.</p>
+                </details>
 
                 <div>
                   <label className="block text-xs font-medium text-[#d4d4d8] mb-1">
@@ -143,12 +159,12 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
             </>
           ) : (
             <div className="space-y-3.5 py-1">
-              <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+              <div className={`p-3.5 rounded-lg text-xs flex items-start gap-2.5 ${result.analysis_success ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'}`}>
+                {result.analysis_success ? <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
                 <div className="space-y-1">
-                  <div className="font-semibold text-emerald-300">Auditoria Executada com Sucesso!</div>
+                  <div className="font-semibold">{result.analysis_success ? 'Análise executada' : 'Análise não concluída'}</div>
                   <div className="text-[#a1a1aa] leading-relaxed">
-                    O parecer foi validado e persistido no Copiloto. O e-mail executivo corporativo foi processado.
+                    Consulte abaixo, separadamente, a reconciliação determinística e o processamento do e-mail.
                   </div>
                 </div>
               </div>
@@ -156,14 +172,14 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
               <div className="p-3 bg-[#18181b] rounded-lg border border-[#27272a] text-xs space-y-1.5 font-mono">
                 <div className="flex justify-between text-[#a1a1aa]">
                   <span>Status do Parecer:</span>
-                  <span className="text-emerald-400 font-semibold">Validado (Guardrails OK)</span>
+                  <span className={result.deterministic_approved ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
+                    {result.deterministic_approved ? 'Aprovado' : 'Reprovado'}
+                  </span>
                 </div>
-                {result.email_result && (
-                  <div className="flex justify-between text-[#a1a1aa]">
-                    <span>Status E-mail:</span>
-                    <span className="text-[#38bdf8] font-semibold">{result.email_result.status}</span>
-                  </div>
-                )}
+                <div className="flex justify-between text-[#a1a1aa]">
+                  <span>Status E-mail:</span>
+                  <span className="text-[#38bdf8] font-semibold">{result.email_status}</span>
+                </div>
                 {result.email_result?.to && (
                   <div className="flex justify-between text-[#a1a1aa]">
                     <span>Destinatário:</span>
@@ -216,13 +232,13 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
               >
                 Fechar
               </button>
-              <button
+              {result.audit_thread_id && <button
                 onClick={handleOpenCopilot}
                 className="px-4 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#09090b] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <span>Abrir Conversa no Copiloto</span>
                 <ExternalLink className="w-3.5 h-3.5" />
-              </button>
+              </button>}
             </>
           )}
         </div>

@@ -1,33 +1,32 @@
-"""
-src/agent/state.py
-Definição do estado e estruturas de dados do LangGraph para o Agente de Estoque.
-"""
+"""Estado do fluxo reproduzível de auditoria."""
 
-from typing import List, Dict, Any, Optional, Annotated
-from typing_extensions import TypedDict
 import operator
+from typing import Annotated, Any, Dict, List, Optional
+from typing_extensions import TypedDict
 
 
 class AgentPlanStep(TypedDict):
     step_id: int
     name: str
     description: str
-    status: str  # 'pending', 'in_progress', 'completed'
+    status: str
     result: Optional[str]
 
 
-class InventoryAgentState(TypedDict):
-    mission: str
+class InventoryAgentState(TypedDict, total=False):
+    period_key: str
     plan: List[AgentPlanStep]
     current_step_index: int
     observations: Annotated[List[Dict[str, Any]], operator.add]
+    factual_package: Optional[Dict[str, Any]]
+    structured_data: Optional[Dict[str, Any]]
+    recommendations: List[Dict[str, Any]]
     draft_report: Optional[str]
+    final_report: Optional[str]
+    deterministic_checks: Dict[str, bool]
+    deterministic_approved: bool
     critic_feedback: Optional[str]
     critic_approved: bool
     critic_reviewed: bool
     revision_count: int
-    final_report: Optional[str]
-    structured_data: Optional[Dict[str, Any]]
-    date_filter: Optional[str]
-    days_window: Optional[float]
-    period_label: Optional[str]
+    llm_complement_status: str

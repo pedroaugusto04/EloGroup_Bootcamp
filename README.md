@@ -11,6 +11,16 @@ Plataforma de inteligência analítica, auditoria de dados e copiloto de decisã
 - **Motor de Dados (DuckDB)**: Banco colunar vetorial in-memory que consome diretamente os arquivos `data/processed/*.parquet` e executa consultas SQL em `< 5ms`.
 - **Copiloto ReAct (LangGraph)**: Agente inteligente com memória persistente para diagnósticos e simulações de estoque.
 
+### Contrato do Copiloto de estoque
+
+O módulo é um **copiloto de estoque baseado em tendência histórica de vendas**. A posição de Estoque foi fornecida sem data de snapshot confirmada; Vendas cobre o período observado de 01/01/2023 a 26/01/2024. Nenhum cenário representa previsão ou perda realizada.
+
+- `estoque` fornece somente atributos operacionais e cadastrais.
+- Todo valor financeiro vem de `vendas`; o valuation usa custo médio ponderado do histórico aprovado.
+- As janelas aceitas são `full_history`, `calendar_2023` e `last_90d_observed`.
+- A API rejeita filtros SQL livres. `POST /api/copilot/audit/run` aceita apenas `period_key`, `send_email` e `to_email`.
+- O worker é executado sob demanda. O parecer factual é publicado quando os checks determinísticos passam, mesmo se o complemento do LLM não estiver disponível.
+
 ---
 
 ## 2. Como Executar

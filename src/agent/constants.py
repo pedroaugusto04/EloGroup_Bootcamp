@@ -22,14 +22,14 @@ DEFAULT_PLAN_STEPS: List[Dict[str, Any]] = [
     {
         "step_id": 2,
         "name": "Cruzamento com Demanda e Capital Travado",
-        "description": "Cruzar faturamento real, curva de receita e quantificar capital imobilizado em descontinuados.",
+        "description": "Cruzar demanda histórica, receita e margem efetivas e valorar capital com custo de Vendas.",
         "status": "pending",
         "result": None,
     },
     {
         "step_id": 3,
         "name": "Auditoria de Qualidade e Devoluções",
-        "description": "Mapear motivos de devolução e produtos com alto atrito para evitar recompras erradas.",
+        "description": "Mapear motivos declarados de devolução sem inferir causalidade.",
         "status": "pending",
         "result": None,
     },
@@ -47,10 +47,7 @@ DEFAULT_PLAN_STEPS: List[Dict[str, Any]] = [
 # MENSAGENS DO SISTEMA E AVISOS DE DISPONIBILIDADE
 # ============================================================================
 
-LLM_UNAVAILABLE_MESSAGE = (
-    "**Serviço Temporariamente Indisponível**\n\n"
-    "Tente novamente mais tarde. "
-)
+LLM_UNAVAILABLE_MESSAGE = "Complemento do LLM indisponível; fatos determinísticos preservados."
 
 CRITIC_UNAVAILABLE_FEEDBACK = (
     "[Indisponível] Auditoria de reflexão não executada devido à indisponibilidade do serviço."
@@ -73,7 +70,7 @@ VIOLATION_TEMPORAL_MSG = "Violação Guardrail 4: Faltou estruturação clara de
 # ============================================================================
 
 DEFAULT_INVENTORY_AUDIT_MISSION = (
-    "Executar a rotina programada de auditoria de estoque da Vértice Retail: "
+    "Executar sob demanda a auditoria de estoque da Vértice Retail: "
     "diagnosticar rupturas ativas e iminentes (cobertura vs. lead time), mapear capital "
     "imobilizado em descontinuados a custo real, filtrar riscos de devolução e consolidar "
     "as recomendações de compras e gestão em 30, 60 e 90 dias."
@@ -92,6 +89,6 @@ PRESET_MISSIONS = {
     ),
     "3. Foco em Curva A: Prevenção de Rupturas e Lead Time": (
         "Identificar os top produtos em faturamento que estão com cobertura abaixo do lead time de fornecedores "
-        "e recomendar ordens de compra prioritárias."
+        "e priorizar investigação de reposição, sem emitir ordens ou quantidades."
     )
 }

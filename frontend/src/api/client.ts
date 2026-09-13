@@ -11,7 +11,9 @@ import {
   OutliersData,
   FilterOptions,
   ChatThread,
-  RoadmapInitiative
+  RoadmapInitiative,
+  PeriodKey,
+  PeriodMeta,
 } from '../types/analytics';
 
 const BASE_URL = 'api';
@@ -112,9 +114,14 @@ export const api = {
 
   getLatestAudit: () => fetchJson<{ snapshot: any }>(`${BASE_URL}/copilot/audit/latest`),
 
-  runAudit: (params?: { date_filter?: string; days_window?: number; period_label?: string; send_email?: boolean; to_email?: string }) =>
+  getCopilotPeriods: () => fetchJson<{ periods: PeriodMeta[] }>(`${BASE_URL}/copilot/periods`),
+
+  runAudit: (params?: { period_key?: PeriodKey; send_email?: boolean; to_email?: string }) =>
     fetchJson<{
       success: boolean;
+      analysis_success: boolean;
+      deterministic_approved: boolean;
+      email_status: string;
       timestamp: string;
       audit_thread_id: string;
       email_result?: any;

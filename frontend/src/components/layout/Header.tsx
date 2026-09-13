@@ -29,7 +29,7 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
   },
   inventory: {
     title: 'Estoque, Suprimentos & Ruptura (Hipótese 6)',
-    subtitle: 'Diagnóstico de 99 SKUs zerados, 701 críticos e R$ 14,7M em produtos descontinuados.',
+    subtitle: 'Posição operacional de estoque; valores financeiros são reconciliados exclusivamente com Vendas.',
   },
   audit: {
     title: 'Auditoria Relacional entre Bases',
@@ -44,8 +44,8 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
     subtitle: 'Síntese executiva transversal, matriz de esforço x impacto e cronograma de quick wins.',
   },
   copilot: {
-    title: 'Copiloto Analítico de Estoque IA',
-    subtitle: 'Consultor inteligente em tempo real para simulações de liquidação e reposição.',
+    title: 'Copiloto de estoque baseado em tendência histórica',
+    subtitle: 'Tendência observada, exposição como cenário e análises de liquidação sem execução automática.',
   },
 };
 
@@ -87,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenAuditModal}
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-[#38bdf8]/10 hover:bg-[#38bdf8]/20 border border-[#38bdf8]/40 hover:border-[#38bdf8]/70 text-[#38bdf8] text-xs font-semibold transition-all shadow-sm active:scale-95"
-            title="Disparar auditoria autônoma e enviar e-mail executivo à diretoria"
+            title="Executar análise sob demanda e, se solicitado, enviar e-mail executivo"
           >
             <Mail className="w-3.5 h-3.5 text-[#38bdf8]" />
             <span className="hidden sm:inline">Gerar Auditoria</span>

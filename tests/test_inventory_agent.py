@@ -1,11 +1,22 @@
-"""
-tests/test_inventory_agent.py
-Suíte de testes automatizados para o Agente de Estoque (LangGraph: Planejamento + Reflexão).
-"""
+"""Contrato factual do copiloto de estoque."""
 
 import json
+
 import pytest
-from src.infrastructure.database import DuckDBRepository
+from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
+from langchain_core.messages import AIMessage
+
+from src.agent.inventory_analytics import (
+    DataQualityError,
+    build_audit_package,
+    capital_coverage,
+    inventory_health,
+    liquidation,
+    sku_deep_dive,
+    data_quality,
+)
+from src.agent.periods import resolve_period
+from src.agent.service import InventoryAgentService
 from src.agent.tools import (
     tool_inventory_health_scan,
     tool_sales_demand_matrix,
@@ -14,275 +25,216 @@ from src.agent.tools import (
     tool_sku_deep_dive,
     tool_simulate_inventory_liquidation,
 )
-from src.agent.graph import (
-    _extract_json,
-    _validate_critic_payload,
-    build_inventory_agent_graph,
-    critic_node,
-    InventoryAgentState,
-)
-from src.agent.service import InventoryAgentService
+from src.infrastructure.database import DuckDBRepository
 
 
-def test_tool_inventory_health_scan():
-    raw = tool_inventory_health_scan.invoke({"limit": 10})
-    data = json.loads(raw)
-    assert isinstance(data, list)
-    assert len(data) > 0
-    first = data[0]
-    assert "sku_id" in first
-    assert "estoque_disponivel" in first
-    assert "dias_cobertura" in first
-    assert "diagnostico_operacional" in first
+@pytest.fixture
+def repo():
+    return DuckDBRepository()
 
 
-def test_tool_sales_demand_matrix():
-    raw = tool_sales_demand_matrix.invoke({"top_n": 5})
-    data = json.loads(raw)
-    assert isinstance(data, list)
-    assert len(data) > 0
-    first = data[0]
-    assert "receita_liquida_total" in first
-    assert "margem_unit_media" in first
-    assert "unidades_vendidas" in first
+@pytest.mark.parametrize("tool,args", [
+    (tool_inventory_health_scan, {"period_key": "full_history", "limit": 3}),
+    (tool_sales_demand_matrix, {"period_key": "calendar_2023", "top_n": 3}),
+    (tool_returns_and_quality_risk, {"period_key": "last_90d_observed", "limit": 3}),
+    (tool_discontinued_stranded_capital, {"period_key": "full_history", "limit": 3}),
+    (tool_sku_deep_dive, {"period_key": "full_history", "sku_id": "SKU-00185"}),
+    (tool_simulate_inventory_liquidation, {"period_key": "full_history", "desconto_pct": 30}),
+])
+def test_all_tools_return_evidence_envelope(tool, args):
+    payload = json.loads(tool.invoke(args))
+    assert set(("meta", "summary", "items")) <= payload.keys()
+    assert payload["meta"]["financial_source"] == "vendas"
+    assert payload["meta"]["operational_source"] == "estoque"
+    assert payload["meta"]["stock_as_of"] is None
+    assert isinstance(payload["items"], list)
 
 
-def test_tool_returns_and_quality_risk():
-    raw = tool_returns_and_quality_risk.invoke({"min_orders": 5, "min_returns": 1})
-    data = json.loads(raw)
-    assert isinstance(data, list)
-    assert len(data) > 0
-    first = data[0]
-    assert "taxa_devolucao_pct" in first
-    assert "principal_motivo_devolucao" in first
+def test_periods_are_resolved_by_backend(repo):
+    full = resolve_period(repo, "full_history")
+    calendar = resolve_period(repo, "calendar_2023")
+    last90 = resolve_period(repo, "last_90d_observed")
+    assert (full.start.isoformat(), full.end.isoformat(), full.days) == ("2023-01-01", "2024-01-26", 391)
+    assert (calendar.start.isoformat(), calendar.end.isoformat(), calendar.days) == ("2023-01-01", "2023-12-31", 365)
+    assert last90.days == 90 and last90.end == full.end
+    with pytest.raises(ValueError):
+        resolve_period(repo, "full_history; DROP TABLE estoque")
 
 
-def test_tool_discontinued_stranded_capital():
-    raw = tool_discontinued_stranded_capital.invoke({"limit": 5})
-    data = json.loads(raw)
-    assert isinstance(data, list)
-    assert len(data) > 0
-    first = data[0]
-    assert "capital_travado_real" in first
-    assert "custo_unitario_avaliado" in first
+def test_calendar_2023_excludes_all_january_2024_sales(repo):
+    package = build_audit_package(repo, "calendar_2023")
+    expected = repo.execute_sql("""
+        SELECT SUM(quantidade) AS units FROM vendas
+        WHERE status_pagamento = 'Aprovado'
+          AND CAST(data_pedido AS DATE) BETWEEN ? AND ?
+    """, ["2023-01-01", "2023-12-31"])["units"].iloc[0]
+    january = repo.execute_sql("""
+        SELECT SUM(quantidade) AS units FROM vendas
+        WHERE status_pagamento = 'Aprovado' AND CAST(data_pedido AS DATE) >= ?
+    """, ["2024-01-01"])["units"].iloc[0]
+    assert package["summary"]["demand"]["unidades_aprovadas"] == expected
+    assert package["summary"]["demand"]["unidades_aprovadas"] + january == pytest.approx(
+        build_audit_package(repo, "full_history")["summary"]["demand"]["unidades_aprovadas"]
+    )
 
 
-def test_tool_sku_deep_dive():
-    raw_ok = tool_sku_deep_dive.invoke({"sku_id": "SKU-00185"})
-    data_ok = json.loads(raw_ok)
-    assert data_ok["sku_id"] == "SKU-00185"
-    assert "estoque_disponivel" in data_ok
-
-    raw_err = tool_sku_deep_dive.invoke({"sku_id": "SKU-INEXISTENTE-999"})
-    data_err = json.loads(raw_err)
-    assert "error" in data_err
-
-
-def test_inventory_agent_graph_execution():
-    graph = build_inventory_agent_graph()
-    initial_state: InventoryAgentState = {
-        "mission": "Auditar a saúde de estoque da Vértice Retail e gerar recomendações 30/60/90 dias.",
-        "plan": [],
-        "current_step_index": 0,
-        "observations": [],
-        "draft_report": None,
-        "critic_feedback": None,
-        "critic_approved": False,
-        "critic_reviewed": False,
-        "revision_count": 0,
-        "final_report": None,
-        "structured_data": None,
-    }
-    result = graph.invoke(initial_state)
-    assert len(result["plan"]) == 4
-    assert all(step["status"] == "completed" for step in result["plan"])
-    assert result["final_report"] is not None
-    assert len(result["final_report"]) > 20
+def test_weighted_sales_cost_and_financial_coverage(repo):
+    payload = capital_coverage(repo)
+    capital = payload["summary"]
+    assert capital["skus_com_custo_vendas"] == 4883
+    assert capital["skus_sem_custo_vendas"] == 117
+    assert capital["capital_fisico"] == pytest.approx(146_964_262.92, abs=0.02)
+    assert capital["capital_reservado"] == pytest.approx(22_017_675.68, abs=0.02)
+    assert capital["capital_disponivel"] == pytest.approx(124_946_587.24, abs=0.02)
+    assert capital["capital_fisico"] == pytest.approx(
+        capital["capital_reservado"] + capital["capital_disponivel"], abs=0.02
+    )
+    assert capital["descontinuados_valorados"] == 206
+    assert capital["descontinuados_excluidos"] == 1
+    assert capital["capital_disponivel_descontinuado"] == pytest.approx(6_059_540.14, abs=0.02)
 
 
-
-def test_critic_payload_requires_complete_schema():
-    valid = {
-        "approved": True,
-        "score": 9,
-        "feedback": "Relatório consistente.",
-        "corrections_needed": [],
-    }
-    assert _validate_critic_payload(valid) == valid
-    assert _validate_critic_payload({"approved": True, "score": 9}) is None
-    assert _validate_critic_payload({**valid, "approved": "true"}) is None
-    assert _extract_json("Resposta: {\"approved\": true}") == {"approved": True}
+def test_operational_queues_use_distinct_definitions(repo):
+    package = build_audit_package(repo)
+    op = package["summary"]["operational"]
+    assert op["ruptura_atual"] == 99
+    assert op["ponto_pedido"] == 701  # inclui igualdade e exige saldo positivo
+    assert op["investigacao_reposicao"] == 101
+    assert op["sem_venda_observada"] == 117
+    assert all(not item["is_descontinuado"] for item in package["queues"]["investigacao_reposicao"])
 
 
-def test_critic_repairs_invalid_json_once(monkeypatch):
-    class FakeResponse:
-        def __init__(self, content):
-            self.content = content
+def test_exposure_is_small_historical_scenario_not_realized_loss(repo):
+    exposure = build_audit_package(repo)["summary"]["lead_time_exposure"]
+    assert exposure["skus"] == 101
+    assert exposure["receita_antes_devolucao"] == pytest.approx(44_892.90, abs=1)
+    assert exposure["receita_ajustada_devolucao"] == pytest.approx(38_215.14, abs=1)
+    assert exposure["margem_potencialmente_exposta"] == pytest.approx(20_833.65, abs=1)
+    assert "não é perda realizada" in exposure["interpretation"]
 
-    class FakeLLM:
-        def __init__(self):
-            self.responses = [
-                FakeResponse("Aprovo a minuta."),
-                FakeResponse("{\"approved\": true, \"score\": 9, \"feedback\": \"Guardrails atendidos.\", \"corrections_needed\": []}"),
-            ]
-            self.calls = 0
 
+def test_liquidation_has_four_reconciled_scenarios(repo):
+    payload = liquidation(repo, discount_pct=30)
+    scenarios = payload["summary"]["scenarios"]
+    assert [row["sell_through_pct"] for row in scenarios] == [25, 50, 75, 100]
+    assert payload["summary"]["central_scenario"] == scenarios[1]
+    assert scenarios[1]["unidades_cenario"] == 2 * scenarios[0]["unidades_cenario"]
+    assert scenarios[1]["receita_ajustada_devolucoes"] < scenarios[1]["receita_antes_devolucoes"]
+    assert scenarios[1]["capital_historico_envolvido"] == pytest.approx(3_029_770.07, abs=0.02)
+    assert payload["summary"]["skus_excluidos_sem_custo_ou_preco"] == 1
+    with pytest.raises(ValueError):
+        liquidation(repo, discount_pct=90.01)
+
+
+def test_bound_category_and_sku_parameters_reject_sql(repo):
+    with pytest.raises(ValueError):
+        inventory_health(repo, category="Beleza'; DROP TABLE estoque; --")
+    with pytest.raises(ValueError):
+        sku_deep_dive(repo, "SKU-00185' OR 1=1 --")
+    assert repo.execute_sql("SELECT COUNT(*) AS n FROM estoque")["n"].iloc[0] == 5000
+
+
+def test_deep_dive_distinguishes_sources(repo):
+    payload = sku_deep_dive(repo, "SKU-00185", "calendar_2023")
+    item = payload["items"][0]
+    assert item["fornecedor_id"]
+    assert item["estoque_fisico"] == item["estoque_reservado"] + item["estoque_disponivel"]
+    assert "lead_time_cadastral_dias" in item
+    assert "custo_unitario_vendas" in item
+    assert "custo_unitario_estoque_auditoria" in item
+
+
+def test_service_publishes_facts_when_llm_contract_is_invalid(monkeypatch):
+    class Response:
+        content = "texto livre fora do contrato"
+    class InvalidLLM:
         def invoke(self, _messages):
-            self.calls += 1
-            return self.responses.pop(0)
-
-    llm = FakeLLM()
-    monkeypatch.setattr("src.agent.graph.get_llm", lambda: llm)
-    monkeypatch.setattr("src.agent.nodes.get_llm", lambda: llm)
-    monkeypatch.setattr("src.infrastructure.llm.get_llm", lambda: llm)
-    state = {
-        "draft_report": "## Quick Wins\nAção em 30 dias.",
-        "structured_data": {"ruptura_count": 1},
-        "revision_count": 0,
-    }
-
-    result = critic_node(state)
-
-    assert llm.calls == 2
-    assert result["critic_reviewed"] is True
-    assert result["critic_approved"] is True
-    assert result["final_report"] == state["draft_report"]
+            return Response()
+    monkeypatch.setattr("src.agent.nodes.get_llm", lambda: InvalidLLM())
+    result = InventoryAgentService().run_diagnostic("full_history")
+    assert result["deterministic_approved"] is True
+    assert result["llm_complement_status"] == "omitted_invalid_contract"
+    assert result["final_report"].startswith("# Copiloto de estoque baseado em tendência histórica")
+    assert result["recommendations"] == []
 
 
-def test_critic_guardrail_rejection():
-    # Minuta simulada com violação de guardrail (sugerindo compra de descontinuado)
-    state: InventoryAgentState = {
-        "mission": "Teste de Guardrails",
-        "plan": [],
-        "current_step_index": 4,
-        "observations": [],
-        "draft_report": "Recomendamos comprar descontinuado SKU-00185 imediatamente.",
-        "critic_feedback": None,
-        "critic_approved": False,
-        "critic_reviewed": False,
-        "revision_count": 0,
-        "final_report": None,
-        "structured_data": {},
-    }
-    critic_res = critic_node(state)
-    assert critic_res["critic_approved"] is False
-    assert "Violação Guardrail 1" in critic_res["critic_feedback"]
+def test_data_quality_registers_malformed_raw_sale(repo):
+    quality = build_audit_package(repo)["summary"]["data_quality"]
+    assert quality["malformed_raw_sales_rows_excluded"] == 1
+    assert quality["blocking_errors"] == 0
 
 
-
-def test_inventory_agent_service():
-    service = InventoryAgentService()
-    result = service.run_diagnostic()
-    assert "structured_data" in result
-    assert result["structured_data"]["total_stranded_cash"] > 0
-    assert result["final_report"] is not None
-
-
-def test_tool_simulate_inventory_liquidation():
-    raw_all = tool_simulate_inventory_liquidation.invoke({"desconto_pct": 30.0})
-    data_all = json.loads(raw_all)
-    assert "total_skus_descontinuados" in data_all
-    assert data_all["total_skus_descontinuados"] > 0
-    assert data_all["capital_imobilizado_custo_total"] > 0
-    assert data_all["caixa_destravado_projetado_total"] > 0
-
-    raw_moda = tool_simulate_inventory_liquidation.invoke({"categoria": "Moda", "desconto_pct": 40.0})
-    data_moda = json.loads(raw_moda)
-    assert data_moda["categoria"] == "Moda"
-    assert data_moda["desconto_aplicado_pct"] == 40.0
+@pytest.mark.parametrize("mutation", ["duplicate", "missing_balance", "inconsistent_balance"])
+def test_inventory_quality_errors_block_publication(repo, mutation):
+    stock = repo.execute_sql("SELECT * FROM estoque")
+    if mutation == "duplicate":
+        stock.loc[1, "sku_id"] = stock.loc[0, "sku_id"]
+    elif mutation == "missing_balance":
+        stock.loc[0, "estoque_disponivel"] = None
+    else:
+        stock.loc[0, "estoque_disponivel"] += 1
+    repo.conn.register("invalid_stock", stock)
+    repo.conn.execute("CREATE OR REPLACE VIEW estoque AS SELECT * FROM invalid_stock")
+    with pytest.raises(DataQualityError):
+        data_quality(repo)
 
 
-def test_inventory_copilot_queries():
+def test_empty_typed_period_returns_friendly_warning(repo):
+    repo.conn.execute("CREATE TEMP TABLE january_sales AS SELECT * FROM vendas WHERE data_pedido >= TIMESTAMP '2024-01-01'")
+    repo.conn.execute("CREATE OR REPLACE VIEW vendas AS SELECT * FROM january_sales")
+    payload = build_audit_package(repo, "calendar_2023")
+    assert payload["summary"]["demand"]["skus"] == 0
+    assert payload["summary"]["operational"]["sem_venda_observada"] == 5000
+    assert any("Nenhuma venda" in warning for warning in payload["meta"]["warnings"])
+
+
+def test_react_executes_a_real_simulated_tool_call(monkeypatch, repo):
+    class ToolCallingModel(FakeMessagesListChatModel):
+        def bind_tools(self, _tools, **_kwargs):
+            return self
+
+    calls = {"repo": 0}
+    def tracked_repo():
+        calls["repo"] += 1
+        return repo
+
+    model = ToolCallingModel(responses=[
+        AIMessage(content="", tool_calls=[{
+            "name": "tool_sku_deep_dive",
+            "args": {"sku_id": "SKU-00185", "period_key": "full_history"},
+            "id": "call-deep-dive-1",
+            "type": "tool_call",
+        }]),
+        AIMessage(content="O SKU foi consultado na ferramenta determinística."),
+    ])
+    monkeypatch.setattr("src.agent.copilot.get_llm", lambda: model)
+    monkeypatch.setattr("src.agent.tools._get_repo", tracked_repo)
     from src.agent.copilot import InventoryCopilot
-    copilot = InventoryCopilot()
+    answer = InventoryCopilot().ask("Investigue o SKU-00185", thread_id="react-tool-test")
+    assert calls["repo"] == 1
+    assert "consultado" in answer
 
-    ans = copilot.ask("Quais categorias possuem maior taxa de ruptura de estoque?", thread_id="t_query_1")
-    assert len(ans) > 20
 
-
-def test_inventory_copilot_react_multiturn_memory():
+def test_checkpoint_memory_receives_only_new_message():
     from src.agent.copilot import InventoryCopilot
-    copilot = InventoryCopilot()
-    thread_id = "test_memory_session_123"
 
-    # Turno 1
-    r1 = copilot.ask("Quais são os 3 SKUs com maior capital travado em descontinuados?", thread_id=thread_id)
-    assert len(r1) > 20
+    class ExistingMemory:
+        def get_tuple(self, _config):
+            return object()
+    class CapturingAgent:
+        def __init__(self):
+            self.messages = None
+        def invoke(self, payload, config):
+            self.messages = payload["messages"]
+            return {"messages": [AIMessage(content="ok")]}
 
-    # Turno 2 (Follow-up contextual utilizando memória do Turno 1)
-    r2 = copilot.ask("Qual o custo unitário do primeiro deles?", thread_id=thread_id)
-    assert len(r2) > 10
-
-
-def test_service_ask_copilot_integration():
-    service = InventoryAgentService()
-    resp = service.ask_copilot("Qual o capital travado em descontinuados?", thread_id="t_integration_1")
-    assert len(resp) > 20
-
-
-def test_copilot_seed_conversation_memory():
-    service = InventoryAgentService()
-    thread_id = "test_seeded_thread_999"
-    email_context = "Auditoria Semanal: O capital travado em descontinuados é de R$ 38.640,00 e o potencial de caixa é de R$ 52.450,00."
-    service.seed_copilot(thread_id=thread_id, initial_message=email_context)
-
-    # Pergunta de follow-up que depende diretamente do e-mail inicial semeado
-    followup_resp = service.ask_copilot("Qual foi o capital travado citado no relatório?", thread_id=thread_id)
-    assert len(followup_resp) > 10
-
-
-def test_copilot_with_explicit_history_window():
-    from src.agent.copilot import InventoryCopilot
-    copilot = InventoryCopilot()
-    thread_id = "test_explicit_history_session"
-
-    history = [
-        {"role": "user", "content": "Quais são os produtos mais críticos em ruptura na categoria Eletrônicos?"},
-        {"role": "assistant", "content": "Na categoria Eletrônicos, o produto SKU-00185 é o mais crítico com 0 unidades em estoque."},
-        {"role": "user", "content": "Qual a margem dele?"},
-        {"role": "assistant", "content": "A margem unitária do SKU-00185 é de R$ 45,20 com 120 pedidos no histórico."},
-    ]
-
-    # Nova pergunta no mesmo chat referenciando o produto mencionado no histórico
-    resp = copilot.ask(
-        query="E quantas unidades foram vendidas desse mesmo produto no total?",
-        thread_id=thread_id,
-        history=history,
+    copilot = InventoryCopilot.__new__(InventoryCopilot)
+    copilot.memory = ExistingMemory()
+    copilot.agent = CapturingAgent()
+    answer = copilot.ask(
+        "nova pergunta", thread_id="checkpoint-existing",
+        history=[{"role": "user", "content": "mensagem já persistida"}],
     )
-    assert len(resp) > 10
-    assert "erro" not in resp.lower() or "não" in resp.lower()
-
-
-def test_service_ask_copilot_with_history_propagation():
-    service = InventoryAgentService()
-    thread_id = "test_service_history_propagation"
-
-    history = [
-        {"role": "user", "content": "Qual o SKU de maior capital travado em descontinuados?"},
-        {"role": "assistant", "content": "O produto com maior capital travado é o SKU-00185 com R$ 12.500 imobilizados."},
-    ]
-
-    resp = service.ask_copilot(
-        query="Qual o status desse produto?",
-        thread_id=thread_id,
-        history=history,
-    )
-    assert len(resp) > 10
-
-
-def test_inventory_agent_with_custom_period():
-    service = InventoryAgentService()
-    result = service.run_diagnostic(
-        date_filter="AND data_pedido >= '2023-10-01' AND data_pedido <= '2023-12-31'",
-        days_window=92.0,
-        period_label="Últimos 90 Dias (Q4 2023)",
-    )
-    assert "structured_data" in result
-    structured = result["structured_data"]
-    assert structured["period_label"] == "Últimos 90 Dias (Q4 2023)"
-    assert structured["total_stranded_cash"] > 0
-    assert structured["ruptura_count"] > 0
-
-
-
-
+    assert answer == "ok"
+    assert len(copilot.agent.messages) == 1
+    assert copilot.agent.messages[0].content == "nova pergunta"

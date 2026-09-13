@@ -5,10 +5,11 @@ Carrega os CSVs brutos de data/raw/, aplica transformações e salva em data/pro
 """
 
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Any
 from datetime import datetime
 import pandas as pd
 import numpy as np
+import json
 
 from src.config import (
     RAW_DATA_DIR,
@@ -23,6 +24,12 @@ class DataPreprocessor:
         self.raw_dir = raw_dir
         self.processed_dir = processed_dir
         self.processed_dir.mkdir(parents=True, exist_ok=True)
+        self.quality_report: Dict[str, Any] = {}
+
+    def _save_quality_report(self) -> None:
+        path = self.processed_dir / "data_quality_report.json"
+        with open(path, "w", encoding="utf-8") as target:
+            json.dump(self.quality_report, target, ensure_ascii=False, indent=2)
 
     def _resolve_raw_path(self, key: str) -> Path:
         filename = RAW_FILES[key]
@@ -38,22 +45,30 @@ class DataPreprocessor:
         """Remove espaços sobressalentes nas extremidades de todas as colunas de texto (strip)."""
         str_cols = df.select_dtypes(include=["object", "string"]).columns
         for col in str_cols:
-            df[col] = df[col].astype(str).str.strip()
+            df[col] = df[col].astype("string").str.strip()
         return df
 
     def process_vendas(self) -> pd.DataFrame:
         raw_path = self._resolve_raw_path("vendas")
         df = pd.read_csv(raw_path)
 
-        # Descarta linhas sem campos transacionais (ex: linha ORD-072219)
-        df = df.dropna(subset=["preco_unitario", "status_pagamento"]).copy()
+        # Quarentena explícita: a linha curta não participa de nenhuma métrica.
+        malformed = df["preco_unitario"].isna() | df["status_pagamento"].isna()
+        self.quality_report["vendas"] = {
+            "raw_rows": int(len(df)),
+            "malformed_rows_excluded": int(malformed.sum()),
+            "malformed_order_ids": df.loc[malformed, "order_id"].dropna().astype(str).tolist(),
+        }
+        df = df.loc[~malformed].copy()
 
         # Padronização de strings (remoção de espaços nas extremidades)
         df = self._strip_strings(df)
 
         # Padroniza tipos de dados
         df["data_pedido"] = pd.to_datetime(df["data_pedido"], errors="coerce")
-        df["devolvido"] = df["devolvido"].astype(str).str.strip().str.upper() == "TRUE"
+        df["devolvido"] = df["devolvido"].map(
+            lambda value: pd.NA if pd.isna(value) else str(value).strip().upper() == "TRUE"
+        ).astype("boolean")
 
         # Padroniza colunas numéricas
         numeric_cols = [
@@ -62,7 +77,7 @@ class DataPreprocessor:
             "custo_frete", "margem_contribuicao", "tempo_entrega_real"
         ]
         for col in numeric_cols:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
         # Métricas calculadas padrão
         df["margem_calculada"] = df["receita_liquida"] - df["custo_produto"] - df["custo_frete"]
@@ -73,19 +88,26 @@ class DataPreprocessor:
 
         # Flags e Métricas de Efetividade e Impacto Financeiro de Devoluções/Cancelamentos
         df["is_aprovado"] = df["status_pagamento"] == "Aprovado"
-        df["is_venda_efetiva"] = (df["status_pagamento"] == "Aprovado") & (~df["devolvido"])
-        df["receita_liquida_efetiva"] = np.where(df["is_venda_efetiva"], df["receita_liquida"], 0.0)
+        df["is_venda_efetiva"] = (df["status_pagamento"] == "Aprovado") & df["devolvido"].eq(False)
+        unknown_return = df["is_aprovado"] & df["devolvido"].isna()
+        df["receita_liquida_efetiva"] = 0.0
+        df.loc[df["is_venda_efetiva"].fillna(False), "receita_liquida_efetiva"] = df["receita_liquida"]
+        df.loc[unknown_return, "receita_liquida_efetiva"] = np.nan
         # Margem efetiva: se devolvido, a receita é estornada e o frete de envio é prejuízo
-        df["margem_efetiva"] = np.where(
-            df["status_pagamento"] == "Aprovado",
-            np.where(df["devolvido"], -df["custo_frete"], df["margem_calculada"]),
-            0.0
-        )
-        df["receita_devolvida"] = np.where((df["status_pagamento"] == "Aprovado") & (df["devolvido"]), df["receita_liquida"], 0.0)
-        df["custo_frete_perdido"] = np.where((df["status_pagamento"] == "Aprovado") & (df["devolvido"]), df["custo_frete"], 0.0)
+        df["margem_efetiva"] = 0.0
+        df.loc[df["is_venda_efetiva"].fillna(False), "margem_efetiva"] = df["margem_calculada"]
+        returned = df["is_aprovado"] & df["devolvido"].eq(True)
+        df.loc[returned.fillna(False), "margem_efetiva"] = -df["custo_frete"]
+        df.loc[unknown_return, "margem_efetiva"] = np.nan
+        df["receita_devolvida"] = 0.0
+        df["custo_frete_perdido"] = 0.0
+        df.loc[returned.fillna(False), "receita_devolvida"] = df["receita_liquida"]
+        df.loc[returned.fillna(False), "custo_frete_perdido"] = df["custo_frete"]
+        df.loc[unknown_return, ["receita_devolvida", "custo_frete_perdido"]] = np.nan
 
         parquet_path = self.processed_dir / "vendas.parquet"
         df.to_parquet(parquet_path, index=False)
+        self._save_quality_report()
         return df
 
     def process_marketing(self) -> pd.DataFrame:
@@ -102,7 +124,7 @@ class DataPreprocessor:
         # Padroniza colunas numéricas
         num_cols = ["investimento_reais", "impressoes", "cliques", "conversoes", "roas", "receita_gerada", "cac"]
         for col in num_cols:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
         # Calcula métricas adicionais
         df["ctr_pct"] = np.where(df["impressoes"] > 0, (df["cliques"] / df["impressoes"]) * 100.0, 0.0)
@@ -134,7 +156,7 @@ class DataPreprocessor:
             "ponto_pedido", "shelf_life_dias", "volume_m3"
         ]
         for col in num_cols:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
         # Calcula métricas adicionais
         df["is_ruptura_real"] = df["estoque_disponivel"] == 0
@@ -150,6 +172,15 @@ class DataPreprocessor:
 
         parquet_path = self.processed_dir / "estoque.parquet"
         df.to_parquet(parquet_path, index=False)
+        self.quality_report["estoque"] = {
+            "rows": int(len(df)),
+            "missing_sku": int(df["sku_id"].isna().sum()),
+            "duplicate_sku": int(df["sku_id"].duplicated(keep=False).sum()),
+            "missing_operational_balance": int(
+                df[["estoque_fisico", "estoque_reservado", "estoque_disponivel"]].isna().any(axis=1).sum()
+            ),
+        }
+        self._save_quality_report()
         return df
 
     def process_clientes(self) -> pd.DataFrame:

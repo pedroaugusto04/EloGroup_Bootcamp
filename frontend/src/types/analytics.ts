@@ -9,6 +9,18 @@ export type ViewTab =
   | 'roadmap'
   | 'copilot';
 
+export type PeriodKey = 'full_history' | 'calendar_2023' | 'last_90d_observed';
+
+export interface PeriodMeta {
+  period_key: PeriodKey;
+  sales_start: string;
+  sales_end: string;
+  days: number;
+  label: string;
+  stock_as_of: null;
+  sales_role: 'historical_trend';
+}
+
 export interface FilterOptions {
   categories: string[];
   sales_channels: string[];
@@ -104,6 +116,7 @@ export interface MarketingAnalyticsData {
 }
 
 export interface InventoryAnalyticsData {
+  methodology_banner?: string;
   kpis: {
     total_skus: number;
     skus_ruptura: number;
@@ -112,6 +125,7 @@ export interface InventoryAnalyticsData {
     taxa_ruptura: number;
     capital_parado: number;
     lead_time_medio: number;
+    descontinuados_valorados?: number;
   };
   categories_rupture: Array<{
     categoria: string;
@@ -133,6 +147,11 @@ export interface InventoryAnalyticsData {
     lead_time_dias: number;
     custo_unitario: number;
     preco_venda_sugerido: number;
+    estoque_fisico?: number;
+    estoque_reservado?: number;
+    deficit_potencial_unidades?: number;
+    lead_time_cadastral_dias?: number;
+    margem_potencialmente_exposta?: number;
   }>;
   status_breakdown: Array<{
     status_disponibilidade: string;

@@ -45,19 +45,18 @@ export const RoadmapView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
         <MetricCard
           label="Total de Iniciativas Mapeadas"
-          value={`${roadmapSummary?.total_initiatives || 7} Iniciativas`}
+          value={roadmapSummary ? `${roadmapSummary.total_initiatives} Iniciativas` : '—'}
           subtitle="Plano estruturado de 90 dias"
         />
         <MetricCard
           label="Quick Wins Imediatos (30 Dias)"
-          value={`${roadmapSummary?.quick_wins_count || 2} Ações`}
-          trend={{ value: 'R$ 14,9M Potencial', isPositive: true }}
+          value={roadmapSummary ? `${roadmapSummary.quick_wins_count} Ações` : '—'}
           subtitle="WhatsApp + Liquidação"
           highlight
         />
         <MetricCard
           label="Valor Financeiro Mapeado"
-          value={`R$ ${(((roadmapSummary?.total_potential_value || 24000000)) / 1e6).toFixed(1)}M`}
+          value={roadmapSummary ? `R$ ${(roadmapSummary.total_potential_value / 1e6).toFixed(1)}M` : '—'}
           subtitle="Redução de custos e caixa"
         />
       </div>

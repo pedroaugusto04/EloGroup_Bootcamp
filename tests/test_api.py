@@ -5,6 +5,7 @@ Testes unitários e de integração para a camada de API FastAPI do Vértice Ana
 
 from fastapi.testclient import TestClient
 from src.api.main import app
+from unittest.mock import patch
 
 client = TestClient(app)
 
@@ -130,3 +131,23 @@ def test_api_copilot_threads_lifecycle():
     # 4. Delete thread
     res_del = client.delete(f"/api/copilot/threads/{tid}")
     assert res_del.status_code == 200
+
+
+def test_copilot_period_contract_and_clean_break():
+    periods = client.get("/api/copilot/periods")
+    assert periods.status_code == 200
+    assert [p["period_key"] for p in periods.json()["periods"]] == [
+        "full_history", "calendar_2023", "last_90d_observed"
+    ]
+    assert periods.json()["periods"][0]["sales_start"] == "2023-01-01"
+
+    legacy = client.post("/api/copilot/audit/run", json={"date_filter": "DROP TABLE vendas"})
+    assert legacy.status_code == 422
+    injected = client.post("/api/copilot/audit/run", json={"period_key": "full_history; DROP TABLE vendas"})
+    assert injected.status_code == 422
+
+    with patch("src.api.routes.copilot.run_autonomous_inventory_audit") as run:
+        run.return_value = {"success": True}
+        response = client.post("/api/copilot/audit/run", json={"period_key": "calendar_2023", "send_email": False})
+        assert response.status_code == 200
+        run.assert_called_once_with(period_key="calendar_2023", send_email=False, to_email=None)

@@ -10,7 +10,7 @@ class IInventoryAgentService(Protocol):
 
     def run_diagnostic(
         self,
-        mission: str = "Auditar a saúde de estoque da Vértice Retail, diagnosticar rupturas e descompasso com marketing, e estruturar plano de ação 30/60/90 dias com Quick Wins.",
+        period_key: str = "full_history",
         on_step: Optional[Any] = None
     ) -> Dict[str, Any]:
         ...
@@ -29,6 +29,5 @@ class IInventoryAgentService(Protocol):
         initial_message: str
     ) -> None:
         ...
-
 
 

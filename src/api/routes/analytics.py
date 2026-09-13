@@ -5,12 +5,13 @@ Reutiliza 100% das queries SQL em src/queries e o DuckDBRepository.
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 import numpy as np
 import pandas as pd
 
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.query_loader import load_query
+from src.agent.inventory_analytics import build_audit_package
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
@@ -146,29 +147,53 @@ def get_inventory_analytics(
     categoria: Optional[List[str]] = Query(None)
 ):
     repo = get_repo()
-    if categoria:
-        cat_str = "', '".join(categoria)
-        where_sql = f"WHERE categoria IN ('{cat_str}')"
-        crit_where = f"WHERE (em_ruptura = true OR is_estoque_critico = true) AND categoria IN ('{cat_str}')"
-    else:
-        where_sql = ""
-        crit_where = "WHERE em_ruptura = true OR is_estoque_critico = true"
-
-    q_kpi = load_query("estoque/kpis_estoque.sql", where_sql=where_sql)
-    df_kpi = repo.execute_sql(q_kpi)
-    kpis = _clean_df(df_kpi)[0] if not df_kpi.empty else {}
-
-    q_cat = load_query("estoque/ruptura_por_categoria.sql", where_sql=where_sql)
-    categories = _clean_df(repo.execute_sql(q_cat))
-
-    q_crit = load_query("estoque/skus_criticos.sql", crit_where=crit_where, limit=50)
-    critical_skus = _clean_df(repo.execute_sql(q_crit))
-
-    # Hipótese 6: Descompasso de Estoque
-    q_desc = load_query("hipotese_6_decisao_gestao/descompasso_estoque_ruptura.sql", where_sql="")
-    discontinued_breakdown = _clean_df(repo.execute_sql(q_desc))
+    package = build_audit_package(repo, "full_history")
+    summary = package["summary"]
+    categories = summary["category_summary"]
+    selected = set(categoria or [])
+    valid = {row["categoria"] for row in categories}
+    if selected - valid:
+        raise HTTPException(status_code=422, detail="Categoria inválida; filtros SQL não são aceitos.")
+    if selected:
+        categories = [row for row in categories if row["categoria"] in selected]
+    rupture = sum(row["ruptura_atual"] for row in categories)
+    reorder = sum(row["ponto_pedido"] for row in categories)
+    exposure = sum(row["exposicao_lead_time"] for row in categories)
+    total_skus = int(repo.execute_sql(
+        "SELECT COUNT(*) AS n FROM estoque" + (
+            f" WHERE categoria IN ({','.join('?' for _ in selected)})" if selected else ""
+        ), list(selected)
+    )["n"].iloc[0])
+    capital = summary["capital"]
+    kpis = {
+        "total_skus": total_skus,
+        "skus_ruptura": rupture,
+        "skus_criticos": reorder,
+        "skus_precisa_reposicao": exposure,
+        "taxa_ruptura": rupture * 100.0 / total_skus if total_skus else None,
+        "capital_parado": capital["capital_disponivel_descontinuado"] if not selected else None,
+        "descontinuados_valorados": capital["descontinuados_valorados"] if not selected else None,
+        "lead_time_medio": None,
+    }
+    critical_skus = [
+        item for item in package["items"] if not selected or item.get("categoria") in selected
+    ]
+    categories = [{
+        **row,
+        "skus_ruptura": row["ruptura_atual"],
+        "skus_estoque_critico": row["ponto_pedido"],
+        "skus_precisa_reposicao": row["exposicao_lead_time"],
+    } for row in categories]
+    discontinued_breakdown = [{
+        "status_disponibilidade": "Descontinuado valorado em Vendas",
+        "capital_total_estoque": capital["capital_fisico_descontinuado"],
+        "capital_travado_descontinuado": capital["capital_disponivel_descontinuado"],
+        "capital_em_risco_ruptura": None,
+    }] if not selected else []
 
     return {
+        "meta": package["meta"],
+        "methodology_banner": summary["methodology_banner"],
         "kpis": kpis,
         "categories_rupture": categories,
         "critical_skus": critical_skus,

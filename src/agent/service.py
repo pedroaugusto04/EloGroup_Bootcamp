@@ -13,7 +13,7 @@ from src.agent.copilot import InventoryCopilot
 
 
 class InventoryAgentService(IInventoryAgentService):
-    """Serviço de orquestração do Agente de Estoque (Worker Autônomo + Copiloto Interativo)."""
+    """Serviço de orquestração da análise sob demanda e do Copiloto interativo."""
 
     def __init__(self, graph=None, copilot: Optional[InventoryCopilot] = None):
         self.graph = graph or build_inventory_agent_graph()
@@ -21,15 +21,12 @@ class InventoryAgentService(IInventoryAgentService):
 
     def run_diagnostic(
         self,
-        mission: str = "Auditar a saúde de estoque da Vértice Retail, diagnosticar rupturas e capital travado em descontinuados, e estruturar plano de ação 30/60/90 dias com Quick Wins.",
-        date_filter: str = "",
-        days_window: float = 365.0,
-        period_label: str = "Ano Fechado 2023",
-        on_step: Optional[Any] = None
+        period_key: str = "full_history",
+        on_step: Optional[Any] = None,
     ) -> Dict[str, Any]:
-        """Executa a auditoria completa e retorna o estado consolidado com suporte a filtros temporais e callbacks."""
+        """Executa a auditoria factual para uma das três janelas tipadas."""
         initial_state: InventoryAgentState = {
-            "mission": mission,
+            "period_key": period_key,
             "plan": [],
             "current_step_index": 0,
             "observations": [],
@@ -40,9 +37,11 @@ class InventoryAgentService(IInventoryAgentService):
             "revision_count": 0,
             "final_report": None,
             "structured_data": None,
-            "date_filter": date_filter,
-            "days_window": days_window,
-            "period_label": period_label,
+            "factual_package": None,
+            "recommendations": [],
+            "deterministic_checks": {},
+            "deterministic_approved": False,
+            "llm_complement_status": "not_run",
         }
         
         audit_recursion_limit = int(os.environ.get("AUDIT_RECURSION_LIMIT", "25"))
@@ -54,7 +53,6 @@ class InventoryAgentService(IInventoryAgentService):
                 for node_name, state_update in chunk.items():
                     accumulated_state.update(state_update)
                     if "observations" in state_update and state_update["observations"]:
-                        # Redutor de observações
                         accumulated_state["observations"] = (
                             accumulated_state.get("observations", []) + state_update["observations"]
                         )
@@ -80,5 +78,3 @@ class InventoryAgentService(IInventoryAgentService):
     def seed_copilot(self, thread_id: str, initial_message: str) -> None:
         """Inicializa a memória do Copiloto ReAct com uma mensagem prévia (ex: e-mail de auditoria)."""
         self.copilot.seed_conversation(thread_id, initial_message)
-
-

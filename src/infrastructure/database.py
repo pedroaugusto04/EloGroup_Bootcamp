@@ -43,9 +43,14 @@ class DuckDBRepository:
                     SELECT * FROM read_parquet('{parquet_file.as_posix()}');
                 """)
 
-    def execute_sql(self, query: str) -> pd.DataFrame:
-        """Executa qualquer consulta SQL ANSI diretamente no DuckDB e retorna um DataFrame."""
-        return self.conn.execute(query).df()
+    def execute_sql(self, query: str, parameters: Optional[List[Any]] = None) -> pd.DataFrame:
+        """Executa SQL com parâmetros vinculados e retorna um DataFrame.
+
+        As consultas analíticas expostas à API ou ao agente devem usar ``?`` e
+        fornecer ``parameters``. Isso impede que valores vindos da interface ou
+        do LLM sejam interpretados como trechos de SQL.
+        """
+        return self.conn.execute(query, parameters or []).df()
 
     def get_executive_kpis(self) -> ExecutiveKPIs:
         """Calcula os KPIs executivos consolidados utilizando queries desacopladas."""

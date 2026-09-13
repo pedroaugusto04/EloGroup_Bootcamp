@@ -5,6 +5,9 @@ Rotas do Plano Estratégico 30/60/90 Dias e Matriz de Priorização Executiva.
 
 from fastapi import APIRouter
 
+from src.agent.inventory_analytics import build_audit_package
+from src.infrastructure.database import DuckDBRepository
+
 router = APIRouter(prefix="/roadmap", tags=["roadmap"])
 
 # Matriz estritamente alinhada às conclusões de DEVELOPMENT.md
@@ -21,19 +24,6 @@ STRATEGIC_INITIATIVES = [
         "category": "Suporte & IA",
         "description": "Uma única mensagem proativa de WhatsApp após a compra com link de rastreamento direto para sanar a ansiedade do cliente e evitar chamadas de 'Onde está meu pedido' (30% dos chamados).",
         "metrics_to_watch": ["Volume de chamados 'Onde está meu pedido'", "Custo operacional de suporte", "CSAT inicial"]
-    },
-    {
-        "id": "init-02",
-        "title": "Liquidação para Queima de Estoque Descontinuado",
-        "hypothesis": "Hipótese 6 (Decisão & Estoque)",
-        "type": "Quick Win (Curto Prazo)",
-        "horizon": "30 Dias",
-        "financial_impact_label": "R$ 14.775.347,64 (Capital Parado)",
-        "financial_impact_value": 14775347,
-        "effort_days": 20,
-        "category": "Estoque",
-        "description": "Campanha promocional de liquidação para liberar o capital travado em 207 SKUs descontinuados e convertê-los em liquidez imediata para o fluxo de caixa.",
-        "metrics_to_watch": ["Capital liberado (R$)", "Giro de estoque descontinuado", "Espaço em armazém WMS"]
     },
     {
         "id": "init-03",
@@ -62,19 +52,6 @@ STRATEGIC_INITIATIVES = [
         "metrics_to_watch": ["Volume de chamados técnicos", "Taxa de resolução no primeiro contato (FCR)", "CSAT de suporte"]
     },
     {
-        "id": "init-05",
-        "title": "Ajuste no Mecanismo de Compras e Alertas de Ruptura",
-        "hypothesis": "Hipótese 6 (Decisão & Estoque)",
-        "type": "Médio / Longo Prazo",
-        "horizon": "90 Dias",
-        "financial_impact_label": "R$ 7.250.310,60 (Risco de Ruptura)",
-        "financial_impact_value": 7250310,
-        "effort_days": 70,
-        "category": "Estoque",
-        "description": "Revisão dos parâmetros de ponto de pedido e lead time para os 701 SKUs que operam em nível crítico (especialmente na categoria Beleza), evitando faltas de produtos de alto giro.",
-        "metrics_to_watch": ["Taxa de ruptura (%)", "SKUs abaixo do ponto de pedido", "Perdas de vendas por indisponibilidade"]
-    },
-    {
         "id": "init-06",
         "title": "Governança & Unificação das 5 Bases de Dados (MDM / Lakehouse)",
         "hypothesis": "Integridade das Bases",
@@ -96,11 +73,53 @@ STRATEGIC_INITIATIVES = [
 
 @router.get("/initiatives")
 def get_roadmap_initiatives():
+    package = build_audit_package(DuckDBRepository(), "full_history")
+    summary = package["summary"]
+    capital = summary["capital"]
+    exposure = summary["lead_time_exposure"]
+    liquidation = summary["liquidation"]["central_scenario"]
+    dynamic_inventory = [
+        {
+            "id": "init-02",
+            "title": "Análise de Liquidação de Estoque Descontinuado",
+            "hypothesis": "Hipótese 6 (Decisão & Estoque)",
+            "type": "Quick Win (Curto Prazo)",
+            "horizon": "30 Dias",
+            "financial_impact_label": f"R$ {liquidation['receita_ajustada_devolucoes']:,.2f} (Receita no cenário central)",
+            "financial_impact_value": liquidation["receita_ajustada_devolucoes"],
+            "effort_days": 20,
+            "category": "Estoque",
+            "description": (
+                f"Avaliar liquidação dos {capital['descontinuados_valorados']} SKUs descontinuados valorados. "
+                "O cenário central usa 30% de desconto e 50% de sell-through; não representa caixa realizado."
+            ),
+            "metrics_to_watch": ["Receita estimada no cenário", "Capital disponível envolvido", "Sell-through"],
+        },
+        {
+            "id": "init-05",
+            "title": "Revisão de Parâmetros e Exposição no Lead Time",
+            "hypothesis": "Hipótese 6 (Decisão & Estoque)",
+            "type": "Médio / Longo Prazo",
+            "horizon": "90 Dias",
+            "financial_impact_label": f"R$ {exposure['margem_potencialmente_exposta']:,.2f} (Cenário de margem exposta)",
+            "financial_impact_value": exposure["margem_potencialmente_exposta"],
+            "effort_days": 70,
+            "category": "Estoque",
+            "description": (
+                f"Revisar pontos de pedido e lead times cadastrais dos {exposure['skus']} SKUs ativos expostos. "
+                "A métrica usa tendência histórica e prioriza investigação, sem emitir ordens de compra."
+            ),
+            "metrics_to_watch": ["Ruptura atual", "SKUs no/abaixo do ponto", "Margem potencialmente exposta"],
+        },
+    ]
+    initiatives = [*STRATEGIC_INITIATIVES, *dynamic_inventory]
     return {
-        "initiatives": STRATEGIC_INITIATIVES,
+        "meta": package["meta"],
+        "initiatives": initiatives,
         "summary": {
-            "total_initiatives": len(STRATEGIC_INITIATIVES),
-            "quick_wins_count": len([i for i in STRATEGIC_INITIATIVES if "Quick Win" in i["type"]]),
-            "total_potential_value": sum(i["financial_impact_value"] for i in STRATEGIC_INITIATIVES)
+            "total_initiatives": len(initiatives),
+            "quick_wins_count": len([i for i in initiatives if "Quick Win" in i["type"]]),
+            "total_potential_value": sum(i["financial_impact_value"] for i in initiatives),
+            "inventory_scenario_value": liquidation["receita_ajustada_devolucoes"] + exposure["margem_potencialmente_exposta"],
         }
     }

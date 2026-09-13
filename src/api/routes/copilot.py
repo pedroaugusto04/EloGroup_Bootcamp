@@ -1,17 +1,19 @@
 """
 src/api/routes/copilot.py
-Rotas do Copiloto de Estoque Inteligente e Worker Autônomo.
+Rotas do Copiloto de estoque baseado em tendência histórica.
 Permite criação de conversas, envio de mensagens analíticas, gerenciamento de sessões e execução de diagnósticos.
 """
 
 import uuid
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel
+from typing import Literal, Optional
+from pydantic import BaseModel, ConfigDict
 from fastapi import APIRouter, HTTPException
 
 from src.infrastructure.chat_store import CopilotChatStore
 from src.agent.service import InventoryAgentService
 from src.agent.worker import load_latest_audit_snapshot, run_autonomous_inventory_audit
+from src.agent.periods import VALID_PERIOD_KEYS, build_meta, resolve_period
+from src.infrastructure.database import DuckDBRepository
 
 router = APIRouter(prefix="/copilot", tags=["copilot"])
 
@@ -36,11 +38,10 @@ class ChatMessageRequest(BaseModel):
 
 
 class AuditRunRequest(BaseModel):
-    mission: Optional[str] = "Auditar a saúde de estoque da Vértice Retail, diagnosticar rupturas e capital travado em descontinuados, e estruturar plano de ação 30/60/90 dias com Quick Wins."
-    date_filter: Optional[str] = ""
-    days_window: Optional[float] = 365.0
-    period_label: Optional[str] = "Ano Fechado 2023"
-    send_email: Optional[bool] = True
+    model_config = ConfigDict(extra="forbid")
+
+    period_key: Literal["full_history", "calendar_2023", "last_90d_observed"] = "full_history"
+    send_email: bool = True
     to_email: Optional[str] = None
 
 
@@ -131,6 +132,16 @@ def send_chat_message(req: ChatMessageRequest):
 # 3. WORKER DE AUDITORIA & SNAPSHOTS
 # =========================================================================
 
+@router.get("/periods")
+def list_audit_periods():
+    repo = DuckDBRepository()
+    return {
+        "periods": [
+            {**build_meta(resolve_period(repo, key)), "label": resolve_period(repo, key).label}
+            for key in VALID_PERIOD_KEYS
+        ]
+    }
+
 @router.get("/audit/latest")
 def get_latest_audit():
     snapshot = load_latest_audit_snapshot()
@@ -140,10 +151,8 @@ def get_latest_audit():
 @router.post("/audit/run")
 def run_audit(req: AuditRunRequest):
     result = run_autonomous_inventory_audit(
-        send_email=req.send_email if req.send_email is not None else True,
+        period_key=req.period_key,
+        send_email=req.send_email,
         to_email=req.to_email,
-        date_filter=req.date_filter or "",
-        days_window=req.days_window if req.days_window is not None else 365.0,
-        period_label=req.period_label or "Ano Fechado 2023",
     )
     return result

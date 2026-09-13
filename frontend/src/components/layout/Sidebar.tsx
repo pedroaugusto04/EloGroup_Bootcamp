@@ -102,7 +102,7 @@ const navSections: NavSection[] = [
       },
       {
         id: 'copilot',
-        label: 'Copiloto de Estoque IA',
+        label: 'Copiloto de Estoque',
         tag: '09',
         icon: Bot,
         description: '',

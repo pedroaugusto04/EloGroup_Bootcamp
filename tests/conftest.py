@@ -28,12 +28,15 @@ class FakeConsultingLLM(FakeListChatModel):
 
 
 @pytest.fixture(autouse=True)
-def mock_llm_for_tests(monkeypatch):
+def mock_llm_for_tests(monkeypatch, tmp_path):
     """Garante que nenhum teste faça chamadas remotas reais para LLMs, e-mail ou gaste tokens."""
     monkeypatch.setenv("OPENAI_API_KEY", "mock-test-key")
     monkeypatch.setenv("GEMINI_API_KEY", "mock-test-key")
     
     fake_model = FakeConsultingLLM()
     monkeypatch.setattr("src.agent.graph.get_llm", lambda: fake_model)
+    monkeypatch.setattr("src.agent.nodes.get_llm", lambda: fake_model)
     monkeypatch.setattr("src.agent.copilot.get_llm", lambda: fake_model)
     monkeypatch.setattr("src.agent.service.get_llm", lambda: fake_model, raising=False)
+    # Workers e chats de teste jamais alteram o histórico real.
+    monkeypatch.setattr("src.infrastructure.chat_store.DEFAULT_CHAT_STORE_PATH", tmp_path / "chats.json")

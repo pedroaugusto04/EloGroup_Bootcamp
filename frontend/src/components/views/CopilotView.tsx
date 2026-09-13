@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../api/client';
-import { ChatThread, ChatMessage } from '../../types/analytics';
+import { ChatThread, ChatMessage, PeriodMeta } from '../../types/analytics';
 import { MermaidDiagram } from '../common/MermaidDiagram';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -18,7 +18,7 @@ const SUGGESTED_PROMPTS = [
   'Qual o impacto financeiro de liquidar a categoria Beleza com 40% de desconto?',
   'Quais são os SKUs com maior capital imobilizado em produtos descontinuados?',
   'Quantos SKUs zerados temos e qual a concentração por categoria?',
-  'Simule a queima de todo o estoque descontinuado com 30% de margem líquida.',
+  'Simule a liquidação do estoque descontinuado com 30% de desconto.',
 ];
 
 const isMermaidContent = (content: string, className?: string) => {
@@ -49,12 +49,14 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [periods, setPeriods] = useState<PeriodMeta[]>([]);
   const [showThreadsMobile, setShowThreadsMobile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load threads and automatically resolve thread from URL or Email Deep Link
   useEffect(() => {
     loadThreads();
+    api.getCopilotPeriods().then(res => setPeriods(res.periods || [])).catch(() => setPeriods([]));
   }, [initialThreadId]);
 
   const loadThreads = async () => {
@@ -264,6 +266,12 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
 
       {/* Chat Area */}
       <div className="flex-1 min-w-0 flex flex-col h-full bg-[#09090b]">
+        <div className="px-3 sm:px-6 py-2 border-b border-[#27272a] bg-[#38bdf8]/5 text-[10px] sm:text-[11px] text-[#a1a1aa] leading-relaxed">
+          <strong className="text-[#d4d4d8]">Posição de estoque fornecida — data de referência não informada.</strong>{' '}
+          {periods[0]
+            ? `Tendência de vendas observada entre ${periods[0].sales_start.split('-').reverse().join('/')} e ${periods[0].sales_end.split('-').reverse().join('/')}.`
+            : 'As datas da tendência de vendas serão resolvidas pelo backend.'}
+        </div>
         {/* Mobile Top Sub-Header */}
         <div className="md:hidden flex items-center justify-between px-3 py-2 border-b border-[#27272a] bg-[#0d0d10]/80 text-xs">
           <button
@@ -286,9 +294,9 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
                   <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#f4f4f5] font-sans tracking-tight">Copiloto de Estoque Vértice Retail</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-[#f4f4f5] font-sans tracking-tight">Copiloto de estoque baseado em tendência histórica</h3>
                   <p className="text-xs sm:text-sm text-[#71717a] max-w-xl mt-1.5 sm:mt-2 font-sans leading-relaxed">
-                    Assistente analítico conectado diretamente ao DuckDB para diagnósticos, simulações de liquidação, análise de SKUs e cronogramas.
+                    Assistente conectado ao DuckDB para posição operacional, evidências históricas e cenários de liquidação — sem previsão ou compra automática.
                   </p>
                 </div>
 

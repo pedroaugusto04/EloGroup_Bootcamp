@@ -53,15 +53,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
     fetchData();
   }, [selectedCats]);
 
-  const kpis = data?.kpis || {
-    total_skus: 5000,
-    skus_ruptura: 99,
-    skus_criticos: 701,
-    skus_precisa_reposicao: 800,
-    taxa_ruptura: 2.0,
-    capital_parado: 14775347,
-    lead_time_medio: 20,
-  };
+  const kpis = data?.kpis;
 
   const criticalColumns: Column<any>[] = [
     {
@@ -89,36 +81,40 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
       render: r => `${r.ponto_pedido} un`,
     },
     {
-      key: 'deficit_unidades',
-      header: 'Déficit (Reposição)',
+      key: 'deficit_potencial_unidades',
+      header: 'Déficit potencial',
       align: 'right',
       render: r => (
         <span className="font-mono text-rose-400 font-semibold">
-          +{r.deficit_unidades} un
+          {Number(r.deficit_potencial_unidades).toFixed(1)} un
         </span>
       ),
     },
     {
-      key: 'lead_time_dias',
-      header: 'Lead Time',
+      key: 'lead_time_cadastral_dias',
+      header: 'Lead time cadastral',
       align: 'right',
-      render: r => `${r.lead_time_dias} dias`,
+      render: r => `${r.lead_time_cadastral_dias} dias`,
     },
     {
-      key: 'preco_venda_sugerido',
-      header: 'Preço Venda',
+      key: 'margem_potencialmente_exposta',
+      header: 'Margem potencialmente exposta',
       align: 'right',
-      render: r => `R$ ${Number(r.preco_venda_sugerido).toFixed(2)}`,
+      render: r => `R$ ${Number(r.margem_potencialmente_exposta).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
     },
   ];
 
   return (
     <div className="space-y-6 view-enter">
       <ScopeBadge
-        tables={['estoque']}
-        scope="5.000 SKUs (WMS) • Snapshot Jan/2026"
+        tables={['estoque', 'vendas']}
+        scope="Posição operacional fornecida • Tendência histórica de Vendas"
         devSection="Seção 3 & Seção 5: Hipótese 6 (Descompasso de Estoque & Ruptura)"
       />
+
+      <div className="p-3 rounded-lg border border-[#38bdf8]/30 bg-[#38bdf8]/5 text-xs text-[#a1a1aa]">
+        {data?.methodology_banner || 'Carregando escopo temporal e metodologia…'}
+      </div>
 
       {/* Autonomous Inventory Audit & Email Dispatch Banner */}
       {onOpenAuditModal && (
@@ -128,9 +124,9 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-semibold text-[#f4f4f5]">Auditoria Autônoma de Estoque</h4>
+              <h4 className="text-xs sm:text-sm font-semibold text-[#f4f4f5]">Análise de estoque sob demanda</h4>
               <p className="text-[11px] sm:text-xs text-[#a1a1aa]">
-                Execute o parecer executivo via IA com diagnóstico de ruptura, liquidação e envio por e-mail.
+                Gere fatos reconciliados, cenários de liquidação e, se solicitado, envie o parecer por e-mail.
               </p>
             </div>
           </div>
@@ -184,33 +180,33 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
         <MetricCard
           label="Total de SKUs"
-          value={Number(kpis.total_skus || 5000).toLocaleString('pt-BR')}
+          value={kpis ? Number(kpis.total_skus).toLocaleString('pt-BR') : '—'}
           subtitle="Catálogo WMS"
         />
         <MetricCard
           label="SKUs em Ruptura"
-          value={`${kpis.skus_ruptura || 99} SKUs`}
+          value={kpis ? `${kpis.skus_ruptura} SKUs` : '—'}
           trend={{ value: 'Sem Estoque', isPositive: false }}
-          subtitle="96 em Beleza"
+          subtitle="Saldo disponível igual a zero"
           highlight
         />
         <MetricCard
-          label="Estoque Crítico"
-          value={`${kpis.skus_criticos || 701} SKUs`}
+          label="No/abaixo do ponto"
+          value={kpis ? `${kpis.skus_criticos} SKUs` : '—'}
           trend={{ value: '<= Ponto Pedido', isPositive: false }}
-          subtitle="Risco de falta"
+          subtitle="Saldo positivo; sinal operacional"
         />
         <MetricCard
           label="Descontinuados"
-          value={`R$ ${((kpis.capital_parado || 14775347) / 1e6).toFixed(1)}M`}
-          trend={{ value: '207 SKUs', isPositive: false }}
-          subtitle="Capital parado"
+          value={kpis?.capital_parado != null ? `R$ ${(kpis.capital_parado / 1e6).toFixed(1)}M` : '—'}
+          trend={kpis?.descontinuados_valorados != null ? { value: `${kpis.descontinuados_valorados} valorados`, isPositive: false } : undefined}
+          subtitle="Capital disponível coberto em Vendas"
         />
         <div className="col-span-2 sm:col-span-1 lg:col-span-1">
           <MetricCard
-            label="Lead Time Médio"
-            value={`${Math.round(kpis.lead_time_medio || 20)} dias`}
-            subtitle="Reposição fabril"
+            label="Exposição no lead time"
+            value={kpis ? `${kpis.skus_precisa_reposicao} SKUs` : '—'}
+            subtitle="Cenário baseado em tendência histórica"
           />
         </div>
       </div>
@@ -219,8 +215,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
       <div className="p-3 sm:p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
         <div className="w-2 h-2 rounded-full bg-[#38bdf8] mt-1.5 shrink-0" />
         <div className="leading-relaxed">
-          <span className="font-semibold text-[#f4f4f5]">Diagnóstico Executivo de Estoque (Hipótese 6):</span>{' '}
-          Existe um descompasso estrutural entre excesso e falta. Mais de <span className="font-mono text-[#38bdf8]">R$ 14,7M</span> estão imobilizados em 207 produtos fora de linha (descontinuados), enquanto <span className="font-mono text-rose-400">96 dos 99 SKUs zerados</span> pertencem exclusivamente à categoria <span className="font-semibold text-[#f4f4f5]">Beleza</span>.
+          <span className="font-semibold text-[#f4f4f5]">Leitura metodológica:</span>{' '}
+          Ruptura, ponto de pedido e exposição no lead time são sinais distintos. Alta cobertura requer revisão e não comprova excesso; valores de exposição são cenários, não perdas realizadas.
         </div>
       </div>
 
@@ -229,7 +225,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
         {/* Rupture by Category Stacked */}
         <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-            <span className="truncate">Necessidade de Reposição por Categoria</span>
+            <span className="truncate">Sinais operacionais por categoria</span>
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -251,7 +247,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
         {/* Capital Breakdown by Status */}
         <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-            <span className="truncate">Capital em Estoque por Status</span>
+            <span className="truncate">Capital coberto em Vendas por status</span>
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -285,7 +281,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
       {/* Critical SKUs Table */}
       <div className="flex flex-col">
         <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-          <span>Tabela de SKUs Críticos & em Ruptura (Reposição Urgente)</span>
+          <span>Prioridades para investigação de exposição no lead time cadastral</span>
         </div>
         <DataTable
           columns={criticalColumns}

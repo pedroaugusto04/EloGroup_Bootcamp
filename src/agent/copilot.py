@@ -1,6 +1,6 @@
 """
 src/agent/copilot.py
-Copiloto Interativo de Estoque & Estratégia Comercial (Vértice Retail).
+Copiloto de estoque baseado em tendência histórica de vendas.
 Implementado com a estratégia ReAct (Reasoning + Acting) e Memória Conversacional Persistente (LangGraph MemorySaver).
 Permite aos tomadores de decisão (C-Level e Gerentes de Categoria) realizar
 perguntas ad-hoc, investigações de SKU e simulações financeiras em tempo real com raciocínio multi-hop.
@@ -25,16 +25,16 @@ from src.agent.tools import (
 
 logger = logging.getLogger("vertice.inventory_copilot")
 
-COPILOT_SYSTEM_PROMPT = """Você é o **Copiloto Estratégico de Estoque & Rentabilidade da Vértice Retail** (Bootcamp EloGroup 2026).
+COPILOT_SYSTEM_PROMPT = """Você é o **Copiloto de estoque baseado em tendência histórica de vendas da Vértice Retail** (Bootcamp EloGroup 2026).
 Seu papel é atuar como um consultor analítico sênior no diagnóstico de estoque, rentabilidade e estratégia comercial para o C-Level e Gerentes de Categoria.
 
 Ano Base de Referência: 2026.
 
 Diretrizes de Raciocínio (ReAct):
 1. **Rigor e Factualidade**: Sempre que o usuário fizer uma pergunta sobre estoque, vendas, produtos, SKUs, categorias, fornecedores ou devoluções, utilize suas ferramentas determinísticas do DuckDB para buscar os dados reais. NUNCA invente números, SKUs ou estatísticas.
-2. **Impacto em R$ e Visão Executiva**: Sempre quantifique o impacto financeiro (R$), o capital de giro imobilizado (baseado no custo contábil oficial de estoque, R$ 14,77M em descontinuados), a margem de contribuição e o risco operacional.
+2. **Contrato metodológico**: Estoque é uma posição operacional fornecida sem data de snapshot informada. Vendas são tendência histórica observada, não previsão atual. Financeiro vem exclusivamente de Vendas. Exposição não é perda realizada.
 3. **Guardrail de Descontinuados**: NUNCA sugira comprar ou repor itens marcados como 'descontinuados'. Para estes itens, recomende queima controlada/liquidação ou renegociação.
-4. **Itens sem Giro / Obsolescência**: Produtos com estoque disponível positivo mas com zero vendas registradas no período anualizado são diagnosticados como 'SEM_GIRO_OBSOLETO'. Recomende auditoria de catálogo e desova antes de novas compras.
+4. **Ações compatíveis**: Descontinuado permite somente análise de liquidação. Ativo exposto permite priorizar investigação/reposição, nunca criar ordem ou quantidade. Alta cobertura pede revisão, não prova excesso. Devolução permite investigar o motivo declarado, não inferir causa-raiz.
 5. **Memória de Contexto**: Mantenha a continuidade da conversa. Se o usuário fizer uma pergunta de follow-up (ex: 'E qual o lead time do primeiro produto citado?'), utilize o contexto das mensagens e ferramentas anteriores para responder com precisão.
 6. **Apresentação Executiva**: Estruture dados quantitativos em tabelas Markdown claras, destaque métricas e valores em negrito e apresente planos de ação (30/60/90 dias) de forma cronológica e objetiva.
 """
@@ -105,7 +105,14 @@ class InventoryCopilot:
             }
 
             input_messages = []
-            if history:
+            # Quando o checkpoint já existe, ele contém o histórico canônico;
+            # reenviar o JSON duplicaria mensagens e chamadas de ferramenta.
+            checkpoint_exists = False
+            try:
+                checkpoint_exists = self.memory.get_tuple(config) is not None
+            except Exception:
+                checkpoint_exists = False
+            if history and not checkpoint_exists:
                 # Recorta as últimas N mensagens
                 recent_history = history[-history_window:]
                 for msg in recent_history:
@@ -144,4 +151,3 @@ class InventoryCopilot:
                 logger.info("Memória ReAct da thread '%s' inicializada com contexto de e-mail/auditoria.", thread_id)
             except Exception as e:
                 logger.warning("Falha ao semear memória do agente: %s", e)
-
