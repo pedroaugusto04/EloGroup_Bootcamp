@@ -14,7 +14,7 @@ def repo():
 
 
 def test_preprocessing_duckdb_views(repo):
-    """Garante que as 5 views do DuckDB estão criadas e respondendo com dados."""
+    """Garante que as 5 views estão criadas e respondendo com dados."""
     tables = ["vendas", "marketing", "estoque", "clientes", "atendimento"]
     for table in tables:
         df = repo.execute_sql(f"SELECT * FROM {table} LIMIT 5;")

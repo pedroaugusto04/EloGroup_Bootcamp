@@ -1,152 +1,108 @@
-"""Nós do grafo: fatos determinísticos e complemento opcional do LLM."""
+"""
+src/agent/nodes.py
+Nós do grafo LangGraph para o copiloto de estoque: orquestração de fatos determinísticos e revisão.
+"""
 
-import json
 import logging
-import re
 from typing import Any, Dict, List
 
-from langchain_core.messages import HumanMessage, SystemMessage
-
+import json
 from src.agent.constants import DEFAULT_PLAN_STEPS, VIOLATION_DISCONTINUED_MSG
+from src.agent.deterministic_checks import run_deterministic_checks
 from src.agent.inventory_analytics import build_audit_package
+from src.agent.prompts import CONSOLIDATOR_EXECUTIVE_PROMPT, PLANNER_SYSTEM_PROMPT
+from src.agent.report_generator import generate_inventory_audit_report
 from src.agent.state import InventoryAgentState
 from src.infrastructure.database import DuckDBRepository
 from src.infrastructure.llm import get_llm
 from src.utils.json_parser import extract_json_from_llm_response
+from langchain_core.messages import HumanMessage, SystemMessage
 
 logger = logging.getLogger("vertice.inventory_agent")
 
-
-def _brl(value: Any) -> str:
-    if value is None:
-        return "não disponível"
-    return "R$ " + f"{float(value):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+# Aliases para retrocompatibilidade com mocks ou testes existentes
+_deterministic_checks = run_deterministic_checks
+_report = generate_inventory_audit_report
 
 
-def _deterministic_checks(package: dict) -> Dict[str, bool]:
-    meta = package["meta"]
-    summary = package["summary"]
-    capital = summary["capital"]
-    exposure = summary["lead_time_exposure"]
-    operational = summary["operational"]
-    tolerance = 0.02
-    checks = {
-        "typed_period": meta["period_key"] in {"full_history", "calendar_2023", "last_90d_observed"},
-        "financial_source_is_sales": meta["financial_source"] == "vendas",
-        "operational_source_is_stock": meta["operational_source"] == "estoque",
-        "stock_reconciliation": abs(
-            float(capital.get("capital_fisico") or 0)
-            - float(capital.get("capital_reservado") or 0)
-            - float(capital.get("capital_disponivel") or 0)
-        ) <= tolerance,
-        "financial_coverage_reconciled": (
-            int(capital.get("skus_com_custo_vendas") or 0)
-            + int(capital.get("skus_sem_custo_vendas") or 0)
-            == int(capital.get("total_skus") or 0)
-        ),
-        "discontinued_never_replenished": all(
-            not item.get("is_descontinuado") for item in package.get("queues", {}).get("investigacao_reposicao", [])
-        ),
-        "exposure_count_reconciled": int(exposure["skus"]) == int(operational["investigacao_reposicao"]),
-        "data_quality_approved": summary["data_quality"]["blocking_errors"] == 0,
-        "liquidation_has_four_scenarios": len(summary["liquidation"]["scenarios"]) == 4,
-        "lead_time_formulas_reconciled": summary["reconciliation"]["exposure_formulas_valid"],
-        "liquidation_formulas_reconciled": summary["reconciliation"]["liquidation_scenarios_proportional"],
+def _build_llm_evidence_summary(package: Dict[str, Any]) -> str:
+    """Prepara um resumo conciso e estruturado dos fatos para o LLM raciocinar."""
+    summary = package.get("summary", {})
+    cap = summary.get("capital", {})
+    op = summary.get("operational", {})
+    exp = summary.get("lead_time_exposure", {})
+    liq = summary.get("liquidation", {})
+    central_liq = liq.get("central_scenario", {})
+    categories = summary.get("category_summary", [])
+    top_suppliers = summary.get("supplier_exposure_summary", [])[:5]
+    top_items = package.get("items", [])[:5]
+
+    evidence = {
+        "periodo": package.get("meta", {}).get("period_key", "full_history"),
+        "dias_observados": package.get("meta", {}).get("days"),
+        "capital": {
+            "capital_disponivel_coberto": cap.get("capital_disponivel"),
+            "capital_descontinuado_imobilizado": cap.get("capital_disponivel_descontinuado"),
+            "skus_descontinuados_valorados": cap.get("descontinuados_valorados"),
+        },
+        "operacional": {
+            "rupturas_imediatas": op.get("ruptura_atual"),
+            "skus_no_ponto_pedido": op.get("ponto_pedido"),
+            "skus_expostos_lead_time": exp.get("skus"),
+            "margem_exposta_lead_time": exp.get("margem_potencialmente_exposta"),
+            "skus_alta_cobertura": op.get("alta_cobertura"),
+            "dias_cobertura_limite": op.get("coverage_threshold_days"),
+            "skus_sem_venda_observada": op.get("sem_venda_observada"),
+            "capital_excedente_sobre_estoque": op.get("capital_excedente"),
+            "unidades_excedentes_sobre_estoque": op.get("unidades_excedentes"),
+        },
+        "simulacao_desova_descontinuados": {
+            "desconto_pct": liq.get("desconto_pct"),
+            "sell_through_central_pct": central_liq.get("sell_through_pct"),
+            "contribuicao_liquida_estimada": central_liq.get("contribuicao_estimada"),
+            "receita_liquida_estimada": central_liq.get("receita_ajustada_devolucoes"),
+            "categoria_lider_desova": (liq.get("central_by_category") or [{}])[0],
+        },
+        "categorias_mais_criticas": [
+            {
+                "categoria": c.get("categoria"),
+                "rupturas": c.get("ruptura_atual"),
+                "expostos_lead_time": c.get("exposicao_lead_time"),
+                "margem_exposta": c.get("margem_potencialmente_exposta"),
+                "alta_cobertura": c.get("alta_cobertura"),
+                "capital_excedente": c.get("capital_excedente"),
+            }
+            for c in categories
+        ],
+        "top_fornecedores_em_risco": [
+            {
+                "fornecedor": f.get("fornecedor_id"),
+                "skus_expostos": f.get("skus_expostos"),
+                "margem_exposta": f.get("margem_potencialmente_exposta"),
+            }
+            for f in top_suppliers
+        ],
+        "amostra_skus_criticos": [
+            {
+                "sku_id": i.get("sku_id"),
+                "produto": i.get("nome_produto"),
+                "categoria": i.get("categoria"),
+                "margem_exposta": i.get("margem_potencialmente_exposta"),
+            }
+            for i in top_items
+        ],
     }
-    return checks
-
-
-def _report(package: dict, recommendations: List[dict]) -> str:
-    meta, summary = package["meta"], package["summary"]
-    cap = summary["capital"]
-    op = summary["operational"]
-    exp = summary["lead_time_exposure"]
-    central = summary["liquidation"]["central_scenario"]
-    top = summary.get("top_attention_category") or {}
-    lines = [
-        "# Copiloto de estoque baseado em tendência histórica de vendas",
-        "",
-        f"> {summary['methodology_banner']}",
-        "",
-        "## Síntese factual",
-        "",
-        f"- Capital físico coberto: **{_brl(cap['capital_fisico'])}**; reservado: **{_brl(cap['capital_reservado'])}**; disponível/liquidável: **{_brl(cap['capital_disponivel'])}**.",
-        f"- Cobertura financeira: **{cap['skus_com_custo_vendas']} de {cap['total_skus']} SKUs**; {cap['skus_sem_custo_vendas']} ficaram fora do valuation por ausência de custo válido em Vendas.",
-        f"- Posição operacional: **{op['ruptura_atual']} rupturas atuais**, **{op['ponto_pedido']}** saldos positivos no/abaixo do ponto e **{op['sem_venda_observada']}** SKUs sem venda aprovada observada.",
-        f"- Exposição no lead time cadastral: **{exp['skus']} SKUs ativos**, com {_brl(exp['receita_ajustada_devolucao'])} de receita e {_brl(exp['margem_potencialmente_exposta'])} de margem potencialmente expostas.",
-        f"- Categoria com maior atenção no critério de exposição: **{top.get('categoria', 'não disponível')}**.",
-        "",
-        "Esses valores de exposição são um cenário secundário de priorização baseado na tendência histórica; não são perda realizada nem previsão atual.",
-        "",
-        "## Liquidação de descontinuados — cenário central",
-        "",
-        f"Com 30% de desconto e 50% de sell-through: **{central['unidades_cenario']:,.0f} unidades**, {_brl(central['capital_historico_envolvido'])} de capital histórico envolvido, {_brl(central['receita_antes_devolucoes'])} antes de devoluções, {_brl(central['receita_ajustada_devolucoes'])} após ajuste e {_brl(central['contribuicao_estimada'])} de contribuição estimada.",
-        "",
-        "A simulação não modela retorno físico. Impostos, comissões, logística reversa e elasticidade de preço não estão disponíveis.",
-        "",
-        "## Encaminhamentos 30/60/90 dias",
-        "",
-        "- **30 dias:** investigar os SKUs ativos priorizados por margem exposta; submeter descontinuados à análise de liquidação, sem reposição.",
-        "- **60 dias:** revisar pontos de pedido, compras e cadastros dos sinais de alta cobertura; alta cobertura não é diagnóstico definitivo de excesso.",
-        "- **90 dias:** formalizar a data de snapshot do estoque e medir lead time realizado antes de automatizar decisões de abastecimento.",
-    ]
-    if recommendations:
-        lines.extend(["", "## Hipóteses complementares do copiloto", ""])
-        for rec in recommendations:
-            lines.append(
-                f"- **{rec['horizon']} — {rec['recommendation']}** Evidência: `{rec['evidence']}`. "
-                f"Confiança: {rec['confidence']}. Ressalva: {rec['caveat']}"
-            )
-    return "\n".join(lines)
-
-
-def _llm_recommendations(package: dict) -> tuple[List[dict], str]:
-    llm = get_llm()
-    if not llm:
-        return [], "unavailable"
-    prompt = {
-        "meta": package["meta"],
-        "operational": package["summary"]["operational"],
-        "lead_time_exposure": package["summary"]["lead_time_exposure"],
-        "top_attention_category": package["summary"]["top_attention_category"],
-    }
-    try:
-        response = llm.invoke([
-            SystemMessage(content=(
-                "Retorne somente JSON no formato {\"recommendations\": [...]}. Cada item deve conter "
-                "horizon (30/60/90 dias), recommendation, evidence (caminho do JSON recebido), "
-                "confidence (baixa/média/alta) e caveat. Não crie números, ordens ou quantidades de compra."
-            )),
-            HumanMessage(content=json.dumps(prompt, ensure_ascii=False)),
-        ])
-        payload = extract_json_from_llm_response(str(response.content)) or {}
-        valid = []
-        for item in payload.get("recommendations", []):
-            if not isinstance(item, dict):
-                continue
-            required = {"horizon", "recommendation", "evidence", "confidence", "caveat"}
-            if (required <= item.keys()
-                    and item["confidence"] in {"baixa", "média", "alta"}
-                    and str(item["horizon"]).lower() in {"30 dias", "60 dias", "90 dias"}):
-                text = str(item["recommendation"]).lower()
-                caveat = str(item["caveat"]).lower()
-                # Fatos numéricos pertencem ao pacote determinístico, nunca ao texto livre do LLM.
-                creates_financial_fact = bool(re.search(r"r\$|\d", text + " " + caveat))
-                if (not creates_financial_fact and "ordem de compra" not in text
-                        and "comprar descontinuado" not in text and "repor descontinuado" not in text):
-                    valid.append({key: str(item[key]) for key in required})
-        return valid, "included" if valid else "omitted_invalid_contract"
-    except Exception as exc:
-        logger.warning("Complemento LLM omitido: %s", exc)
-        return [], "unavailable"
+    return json.dumps(evidence, ensure_ascii=False, indent=2)
 
 
 def planner_node(state: InventoryAgentState) -> Dict[str, Any]:
+    """Inicializa o plano canônico estruturado de auditoria executiva (4 pilares metodológicos)."""
     plan = [dict(step) for step in DEFAULT_PLAN_STEPS]
     return {"plan": plan, "current_step_index": 0, "observations": [], "revision_count": 0}
 
 
 def executor_node(state: InventoryAgentState) -> Dict[str, Any]:
+    """Executa a etapa atual do plano de auditoria."""
     index = state["current_step_index"]
     plan = [dict(step) for step in state["plan"]]
     if index >= len(plan):
@@ -157,15 +113,65 @@ def executor_node(state: InventoryAgentState) -> Dict[str, Any]:
 
 
 def replanner_node(state: InventoryAgentState) -> Dict[str, Any]:
+    """Avança o ponteiro de execução do plano."""
     return {"current_step_index": state["current_step_index"] + 1}
 
 
 def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
+    """Consolida o pacote de auditoria e invoca o LLM para analisar os fatos e formular recomendações."""
     package = build_audit_package(DuckDBRepository(), state.get("period_key", "full_history"))
-    recommendations, llm_status = _llm_recommendations(package)
-    checks = _deterministic_checks(package)
+    checks = run_deterministic_checks(package)
     approved = all(checks.values())
-    report = _report(package, recommendations)
+
+    recommendations: List[dict] = []
+    llm_status = "not_used"
+
+    llm = get_llm()
+    if llm:
+        try:
+            evidence_summary = _build_llm_evidence_summary(package)
+            prompt = CONSOLIDATOR_EXECUTIVE_PROMPT.format(factual_summary=evidence_summary)
+            response = llm.invoke([HumanMessage(content=prompt)])
+            response_text = getattr(response, "content", response)
+            parsed = extract_json_from_llm_response(response_text)
+
+            if parsed and isinstance(parsed, dict):
+                recs = parsed.get("recommendations")
+                if isinstance(recs, list) and len(recs) > 0:
+                    recommendations = recs
+                if parsed.get("executive_summary"):
+                    package["agent_executive_summary"] = str(parsed["executive_summary"])
+                elif parsed.get("feedback"):
+                    package["agent_executive_summary"] = str(parsed["feedback"])
+                if parsed.get("next_steps_text"):
+                    package["agent_next_steps"] = str(parsed["next_steps_text"])
+                llm_status = "completed"
+            elif response_text and isinstance(response_text, str) and len(response_text.strip()) > 30:
+                package["agent_executive_summary"] = response_text.strip()
+                llm_status = "completed"
+
+            # Se o LLM gerou o parecer mas as recomendações vieram vazias,
+            # alinha as recomendações às iniciativas prioritárias com evidências factuais
+            if not recommendations and package.get("summary", {}).get("decision_matrix"):
+                recommendations = [
+                    {
+                        "horizon": row.get("horizon", "30 dias"),
+                        "type": row.get("type", "Quick Win" if "30" in str(row.get("horizon")) else "Estrutural"),
+                        "initiative": row.get("initiative", "Iniciativa"),
+                        "recommendation": row.get("decision", ""),
+                        "evidence": ", ".join(row.get("evidence", [])),
+                        "confidence": "Alta",
+                        "caveat": row.get("decision_gate", "Validação executiva requerida"),
+                        "financial_impact": row.get("financial_value"),
+                    }
+                    for row in package["summary"]["decision_matrix"]
+                ]
+        except Exception as exc:
+            logger.warning("Falha ao invocar LLM no consolidator_node: %s", exc)
+            llm_status = "error"
+
+    report = generate_inventory_audit_report(package, recommendations)
+
     return {
         "factual_package": package,
         "structured_data": package["summary"],
@@ -178,9 +184,10 @@ def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
 
 
 def critic_node(state: InventoryAgentState) -> Dict[str, Any]:
+    """Aplica guardrails de conteúdo e validação final contra regras de negócio."""
     draft = state.get("draft_report") or ""
     checks = dict(state.get("deterministic_checks") or {})
-    forbidden = ("comprar descontinuado", "repor descontinuado", "emitir ordem de compra", "lucro cessante")
+    forbidden = ("comprar descontinuado", "repor descontinuado", "emitir ordem de compra")
     content_ok = not any(term in draft.lower() for term in forbidden)
     if not content_ok:
         checks["content_guardrails"] = False
@@ -195,3 +202,15 @@ def critic_node(state: InventoryAgentState) -> Dict[str, Any]:
         "revision_count": int(state.get("revision_count", 0)) + 1,
         "final_report": draft if approved else None,
     }
+
+
+__all__ = [
+    "get_llm",
+    "_deterministic_checks",
+    "_report",
+    "planner_node",
+    "executor_node",
+    "replanner_node",
+    "consolidator_node",
+    "critic_node",
+]

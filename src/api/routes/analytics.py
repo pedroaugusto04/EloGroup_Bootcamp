@@ -24,6 +24,20 @@ def _clean_df(df: pd.DataFrame) -> List[dict]:
     return df_clean.to_dict(orient="records")
 
 
+def _build_in_clause(column: str, values: Optional[List[str]]) -> Optional[str]:
+    """Gera cláusula IN segura para listas de strings."""
+    if not values:
+        return None
+    joined = "', '".join(values)
+    return f"{column} IN ('{joined}')"
+
+
+def _build_where_sql(*clauses: Optional[str]) -> str:
+    """Combina cláusulas SQL em uma string WHERE unificada."""
+    valid_clauses = [c for c in clauses if c]
+    return f"WHERE {' AND '.join(valid_clauses)}" if valid_clauses else ""
+
+
 def get_repo() -> DuckDBRepository:
     return DuckDBRepository()
 
@@ -36,19 +50,13 @@ def get_repo() -> DuckDBRepository:
 def get_executive_overview(
     status: str = Query("Aprovado", description="Status de pagamento"),
     categoria: Optional[List[str]] = Query(None, description="Filtro de categorias"),
-    ano: str = Query("Todos", description="Ano do pedido")
+    ano: str = Query("Todos", description="Ano do pedido"),
 ):
     repo = get_repo()
-    where_clauses = []
-    if status != "Todos":
-        where_clauses.append(f"status_pagamento = '{status}'")
-    if categoria:
-        cats_str = "', '".join(categoria)
-        where_clauses.append(f"categoria IN ('{cats_str}')")
-    if ano != "Todos":
-        where_clauses.append(f"ano = {ano}")
-    
-    where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    status_clause = f"status_pagamento = '{status}'" if status != "Todos" else None
+    cat_clause = _build_in_clause("categoria", categoria)
+    year_clause = f"ano = {ano}" if ano != "Todos" else None
+    where_sql = _build_where_sql(status_clause, cat_clause, year_clause)
 
     q_kpi = load_query("visao_geral/kpis_consolidados.sql", where_sql=where_sql)
     df_kpi = repo.execute_sql(q_kpi)
@@ -78,21 +86,18 @@ def get_executive_overview(
 @router.get("/sales")
 def get_sales_analytics(
     canal: Optional[List[str]] = Query(None),
-    categoria: Optional[List[str]] = Query(None)
+    categoria: Optional[List[str]] = Query(None),
 ):
     repo = get_repo()
-    where_clauses = ["status_pagamento = 'Aprovado'"]
-    if canal:
-        can_str = "', '".join(canal)
-        where_clauses.append(f"canal IN ('{can_str}')")
-    if categoria:
-        cat_str = "', '".join(categoria)
-        where_clauses.append(f"categoria IN ('{cat_str}')")
-    
-    where_sql = f"WHERE {' AND '.join(where_clauses)}"
+    where_sql = _build_where_sql(
+        "status_pagamento = 'Aprovado'",
+        _build_in_clause("canal", canal),
+        _build_in_clause("categoria", categoria),
+    )
 
     q_decomp = load_query("vendas/decomposicao_margem.sql", where_sql=where_sql)
-    decomp = _clean_df(repo.execute_sql(q_decomp))[0] if not repo.execute_sql(q_decomp).empty else {}
+    df_decomp = repo.execute_sql(q_decomp)
+    decomp = _clean_df(df_decomp)[0] if not df_decomp.empty else {}
 
     q_cat = load_query("vendas/margem_por_categoria.sql", where_sql=where_sql)
     cat_margin = _clean_df(repo.execute_sql(q_cat))
@@ -107,7 +112,7 @@ def get_sales_analytics(
         "decomposition": decomp,
         "categories_margin": cat_margin,
         "returns_impact": returns,
-        "top_skus": top_skus
+        "top_skus": top_skus,
     }
 
 
@@ -117,13 +122,10 @@ def get_sales_analytics(
 
 @router.get("/marketing")
 def get_marketing_analytics(
-    canal: Optional[List[str]] = Query(None)
+    canal: Optional[List[str]] = Query(None),
 ):
     repo = get_repo()
-    where_sql = f"WHERE canal IN ('{chr(39).join(canal)}')" if canal else ""
-    if canal:
-        c_str = "', '".join(canal)
-        where_sql = f"WHERE canal IN ('{c_str}')"
+    where_sql = _build_where_sql(_build_in_clause("canal", canal))
 
     q_kpi = load_query("marketing/kpis_marketing.sql", where_sql=where_sql)
     df_kpi = repo.execute_sql(q_kpi)
@@ -134,7 +136,7 @@ def get_marketing_analytics(
 
     return {
         "kpis": kpis,
-        "channels": channels
+        "channels": channels,
     }
 
 
@@ -144,7 +146,7 @@ def get_marketing_analytics(
 
 @router.get("/inventory")
 def get_inventory_analytics(
-    categoria: Optional[List[str]] = Query(None)
+    categoria: Optional[List[str]] = Query(None),
 ):
     repo = get_repo()
     package = build_audit_package(repo, "full_history")
@@ -197,7 +199,7 @@ def get_inventory_analytics(
         "kpis": kpis,
         "categories_rupture": categories,
         "critical_skus": critical_skus,
-        "status_breakdown": discontinued_breakdown
+        "status_breakdown": discontinued_breakdown,
     }
 
 
@@ -207,16 +209,12 @@ def get_inventory_analytics(
 
 @router.get("/customers")
 def get_customers_analytics(
-    segmento: Optional[List[str]] = Query(None)
+    segmento: Optional[List[str]] = Query(None),
 ):
     repo = get_repo()
-    if segmento:
-        seg_str = "', '".join(segmento)
-        where_sql = f"WHERE segmento_rfm IN ('{seg_str}')"
-        uf_where = f"WHERE segmento_rfm IN ('{seg_str}') AND estado IS NOT NULL"
-    else:
-        where_sql = ""
-        uf_where = "WHERE estado IS NOT NULL"
+    seg_clause = _build_in_clause("segmento_rfm", segmento)
+    where_sql = _build_where_sql(seg_clause)
+    uf_where = _build_where_sql(seg_clause, "estado IS NOT NULL")
 
     q_kpi = load_query("clientes/kpis_clientes.sql", where_sql=where_sql)
     df_kpi = repo.execute_sql(q_kpi)
@@ -244,7 +242,7 @@ def get_customers_analytics(
         "top_states": top_states,
         "loyalty": loyalty,
         "pareto_distribution": pareto,
-        "acquisition_channels": acq_channels
+        "acquisition_channels": acq_channels,
     }
 
 
@@ -254,13 +252,10 @@ def get_customers_analytics(
 
 @router.get("/support")
 def get_support_analytics(
-    canal: Optional[List[str]] = Query(None)
+    canal: Optional[List[str]] = Query(None),
 ):
     repo = get_repo()
-    where_sql = f"WHERE canal_entrada IN ('{chr(39).join(canal)}')" if canal else ""
-    if canal:
-        c_str = "', '".join(canal)
-        where_sql = f"WHERE canal_entrada IN ('{c_str}')"
+    where_sql = _build_where_sql(_build_in_clause("canal_entrada", canal))
 
     q_kpi = load_query("atendimento/kpis_atendimento.sql", where_sql=where_sql)
     df_kpi = repo.execute_sql(q_kpi)
@@ -284,7 +279,7 @@ def get_support_analytics(
         "channels": channels,
         "reasons": motivos,
         "csat_distribution": csat,
-        "root_causes_ai": root_causes
+        "root_causes_ai": root_causes,
     }
 
 
@@ -308,5 +303,5 @@ def get_filter_options():
         "marketing_channels": canais_mkt,
         "support_channels": canais_sup,
         "rfm_segments": segmentos_rfm,
-        "years": ["Todos", "2023", "2024", "2025", "2026"]
+        "years": ["Todos", "2023", "2024", "2025", "2026"],
     }

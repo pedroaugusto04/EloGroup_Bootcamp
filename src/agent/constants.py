@@ -14,8 +14,8 @@ from typing import List, Dict, Any
 DEFAULT_PLAN_STEPS: List[Dict[str, Any]] = [
     {
         "step_id": 1,
-        "name": "Diagnóstico de Ruptura & Cobertura Física",
-        "description": "Scan completo de SKUs em ruptura, abaixo do ponto de pedido e cálculo de dias de cobertura.",
+        "name": "Diagnóstico de Ruptura, Cobertura Física & Sobre-estoque",
+        "description": "Scan de SKUs em ruptura, abaixo do ponto de pedido, dias de cobertura e capital excedente imobilizado.",
         "status": "pending",
         "result": None,
     },
@@ -71,9 +71,9 @@ VIOLATION_TEMPORAL_MSG = "Violação Guardrail 4: Faltou estruturação clara de
 
 DEFAULT_INVENTORY_AUDIT_MISSION = (
     "Executar sob demanda a auditoria de estoque da Vértice Retail: "
-    "diagnosticar rupturas ativas e iminentes (cobertura vs. lead time), mapear capital "
-    "imobilizado em descontinuados a custo real, filtrar riscos de devolução e consolidar "
-    "as recomendações de compras e gestão em 30, 60 e 90 dias."
+    "diagnosticar rupturas e déficit no lead time (sob-estoque), quantificar sobre-estoque ativo e "
+    "capital excedente imobilizado, simular desova de descontinuados a custo real, filtrar riscos "
+    "de devolução e consolidar as prioridades de investigação e gestão em 30, 60 e 90 dias."
 )
 
 

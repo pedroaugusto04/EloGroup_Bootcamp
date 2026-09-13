@@ -1,3 +1,4 @@
+-- Lista itens descontinuados e valora seus saldos físico e disponível com custo histórico de Vendas.
 WITH weighted_cost AS (
     SELECT sku_id, SUM(custo_produto) / NULLIF(SUM(quantidade), 0) AS custo_unitario_vendas
     FROM vendas
@@ -14,4 +15,3 @@ FROM estoque e
 LEFT JOIN weighted_cost c USING (sku_id)
 WHERE e.is_descontinuado AND (? IS NULL OR e.categoria = ?)
 ORDER BY capital_disponivel DESC NULLS LAST, e.sku_id
-LIMIT ?;

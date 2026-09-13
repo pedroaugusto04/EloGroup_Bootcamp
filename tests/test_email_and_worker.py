@@ -27,8 +27,21 @@ def test_render_executive_email_template():
                 "capital": {"capital_disponivel": 42500, "skus_com_custo_vendas": 10, "total_skus": 11},
                 "operational": {"ruptura_atual": 5, "ponto_pedido": 3},
                 "lead_time_exposure": {"skus": 1, "margem_potencialmente_exposta": 123.45},
-                "liquidation": {"central_scenario": {"receita_ajustada_devolucoes": 1000, "capital_historico_envolvido": 800}},
+                "liquidation": {
+                    "desconto_pct": 20,
+                    "central_scenario": {
+                        "sell_through_pct": 75,
+                        "receita_ajustada_devolucoes": 1000,
+                        "capital_historico_envolvido": 800,
+                        "frete_historico_estimado": 50,
+                        "contribuicao_estimada": 150,
+                    },
+                },
                 "top_attention_category": {"categoria": "Moda"},
+                "decision_matrix": [{
+                    "horizon": "30 dias", "initiative": "Piloto controlado",
+                    "decision": "Validar antes de ampliar.", "decision_gate": "Medir resultado realizado.",
+                }],
             },
             "items": [{"sku_id": "SKU-00185", "nome_produto": "Camisa Social", "categoria": "Moda", "margem_potencialmente_exposta": 123.45}],
         },
@@ -39,9 +52,21 @@ def test_render_executive_email_template():
     assert "<!DOCTYPE html>" in html
     assert "Vértice Retail" in html or "VÉRTICE" in html
     assert "R$ 42.500,00" in html
+    assert "R$ 150,00" in html
+    assert "Margem de contribuição simulada" in html
+    assert "20,0% DESC. · 75,0% SELL-THROUGH" in html
+    assert "RELATÓRIO EXECUTIVO" in html
+    assert "class=\"metric-grid\"" in html
+    assert "card card-capital" in html
+    assert "card card-liquidation" in html
+    assert "background-color:#2e0854" in html
+    assert "cta-btn" in html
+    assert "Plano de Ação · Quick Wins e Recomendações" in html
+    assert "30 dias · Piloto controlado" in html
+    assert "Gate: Medir resultado realizado." in html
+    assert "#ffffff" in html
     assert "SKU-00185" in html
-    assert deep_link in html
-    assert "Acessar Copiloto de Estoque no App" in html
+    assert "Ver Relatório Completo na Plataforma" in html
 
 
 def test_resend_email_service_simulation_mode():

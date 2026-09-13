@@ -98,7 +98,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
     },
     {
       key: 'margem_potencialmente_exposta',
-      header: 'Margem potencialmente exposta',
+      header: 'Margem em Risco',
       align: 'right',
       render: r => `R$ ${Number(r.margem_potencialmente_exposta).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
     },
@@ -204,9 +204,9 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
         />
         <div className="col-span-2 sm:col-span-1 lg:col-span-1">
           <MetricCard
-            label="Exposição no lead time"
+            label="Margem em Risco (Lead Time)"
             value={kpis ? `${kpis.skus_precisa_reposicao} SKUs` : '—'}
-            subtitle="Cenário baseado em tendência histórica"
+            subtitle="SKUs em risco no lead time"
           />
         </div>
       </div>
@@ -215,8 +215,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
       <div className="p-3 sm:p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
         <div className="w-2 h-2 rounded-full bg-[#38bdf8] mt-1.5 shrink-0" />
         <div className="leading-relaxed">
-          <span className="font-semibold text-[#f4f4f5]">Leitura metodológica:</span>{' '}
-          Ruptura, ponto de pedido e exposição no lead time são sinais distintos. Alta cobertura requer revisão e não comprova excesso; valores de exposição são cenários, não perdas realizadas.
+          <span className="font-semibold text-[#f4f4f5]">Diretriz de análise:</span>{' '}
+          Ruptura imediata, ponto de pedido e margem em risco no lead time representam diferentes níveis de urgência operacional. Itens descontinuados devem ser priorizados para liquidação e liberação de capital.
         </div>
       </div>
 
@@ -281,7 +281,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
       {/* Critical SKUs Table */}
       <div className="flex flex-col">
         <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
-          <span>Prioridades para investigação de exposição no lead time cadastral</span>
+          <span>SKUs Críticos com Margem em Risco (Lead Time)</span>
         </div>
         <DataTable
           columns={criticalColumns}

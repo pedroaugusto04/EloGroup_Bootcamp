@@ -1,4 +1,4 @@
--- Saúde operacional. Datas, categoria, limite de cobertura e limite de linhas são vinculados.
+-- Classifica a posição operacional por SKU com estoque atual e demanda histórica da janela selecionada.
 WITH period_sales AS (
     SELECT
         sku_id,
@@ -6,8 +6,9 @@ WITH period_sales AS (
         SUM(receita_liquida) AS historical_net_revenue,
         SUM(receita_liquida_efetiva) AS effective_revenue,
         SUM(margem_efetiva) AS effective_margin,
-        AVG(receita_liquida / NULLIF(quantidade, 0)) AS average_net_unit_price,
-        AVG(margem_efetiva / NULLIF(quantidade, 0)) AS average_effective_unit_margin,
+        SUM(receita_liquida) / NULLIF(SUM(quantidade), 0) AS average_net_unit_price,
+        SUM(margem_efetiva) / NULLIF(SUM(quantidade), 0) AS average_effective_unit_margin,
+        SUM(custo_produto) / NULLIF(SUM(quantidade), 0) AS average_unit_cost,
         SUM(custo_frete) AS shipping_cost,
         SUM(CASE WHEN devolvido THEN quantidade ELSE 0 END) AS returned_units
     FROM vendas
@@ -49,6 +50,7 @@ health AS (
         END AS deficit_potencial_unidades,
         s.average_net_unit_price AS preco_liquido_unitario_historico,
         s.average_effective_unit_margin AS margem_efetiva_unitaria_historica,
+        s.average_unit_cost AS custo_unitario_historico,
         COALESCE(cr.return_rate, 0) AS taxa_devolucao_categoria,
         e.estoque_disponivel = 0 AS ruptura_atual,
         e.estoque_disponivel > 0 AND e.estoque_disponivel <= e.ponto_pedido AS abaixo_ou_no_ponto_pedido,
@@ -76,4 +78,3 @@ health AS (
 )
 SELECT * FROM health
 ORDER BY margem_potencialmente_exposta DESC NULLS LAST, demanda_diaria_historica DESC NULLS LAST, sku_id
-LIMIT ?;

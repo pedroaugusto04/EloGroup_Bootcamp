@@ -92,6 +92,9 @@ def test_weighted_sales_cost_and_financial_coverage(repo):
     assert capital["descontinuados_valorados"] == 206
     assert capital["descontinuados_excluidos"] == 1
     assert capital["capital_disponivel_descontinuado"] == pytest.approx(6_059_540.14, abs=0.02)
+    assert capital["skus_comparacao_custo"] == 4883
+    assert capital["correlacao_custo_estoque_vendas"] == pytest.approx(0.005852, abs=1e-6)
+    assert capital["skus_divergencia_custo_acima_25pct"] == 4295
 
 
 def test_operational_queues_use_distinct_definitions(repo):
@@ -101,16 +104,38 @@ def test_operational_queues_use_distinct_definitions(repo):
     assert op["ponto_pedido"] == 701  # inclui igualdade e exige saldo positivo
     assert op["investigacao_reposicao"] == 101
     assert op["sem_venda_observada"] == 117
+    assert op["alta_cobertura"] == 4549
+    assert op["active_skus"] == 4793
+    assert op["high_coverage_share_active_pct"] == pytest.approx(94.9092, abs=0.001)
+    suppliers = package["summary"]["supplier_exposure_summary"]
+    assert sum(row["skus_expostos"] for row in suppliers) == 101
+    assert sum(row["margem_potencialmente_exposta"] for row in suppliers) == pytest.approx(
+        package["summary"]["lead_time_exposure"]["margem_potencialmente_exposta"]
+    )
     assert all(not item["is_descontinuado"] for item in package["queues"]["investigacao_reposicao"])
+
+
+def test_full_inventory_scan_is_not_capped_at_current_catalog_size(repo):
+    stock = repo.execute_sql("SELECT * FROM estoque")
+    extra = stock.iloc[0].copy()
+    extra["sku_id"] = "SKU-99999"
+    stock.loc[len(stock)] = extra
+    repo.conn.register("expanded_stock", stock)
+    repo.conn.execute("CREATE OR REPLACE VIEW estoque AS SELECT * FROM expanded_stock")
+
+    payload = inventory_health(repo, limit=None)
+
+    assert len(payload["items"]) == 5001
+    assert payload["summary"]["sem_venda_observada"] == 118
 
 
 def test_exposure_is_small_historical_scenario_not_realized_loss(repo):
     exposure = build_audit_package(repo)["summary"]["lead_time_exposure"]
     assert exposure["skus"] == 101
-    assert exposure["receita_antes_devolucao"] == pytest.approx(44_892.90, abs=1)
-    assert exposure["receita_ajustada_devolucao"] == pytest.approx(38_215.14, abs=1)
-    assert exposure["margem_potencialmente_exposta"] == pytest.approx(20_833.65, abs=1)
-    assert "não é perda realizada" in exposure["interpretation"]
+    assert exposure["receita_antes_devolucao"] == pytest.approx(45_022.65, abs=1)
+    assert exposure["receita_ajustada_devolucao"] == pytest.approx(38_325.30, abs=1)
+    assert exposure["margem_potencialmente_exposta"] == pytest.approx(21_301.57, abs=1)
+    assert "risco de ruptura" in exposure["interpretation"]
 
 
 def test_liquidation_has_four_reconciled_scenarios(repo):
@@ -121,6 +146,23 @@ def test_liquidation_has_four_reconciled_scenarios(repo):
     assert scenarios[1]["unidades_cenario"] == 2 * scenarios[0]["unidades_cenario"]
     assert scenarios[1]["receita_ajustada_devolucoes"] < scenarios[1]["receita_antes_devolucoes"]
     assert scenarios[1]["capital_historico_envolvido"] == pytest.approx(3_029_770.07, abs=0.02)
+    assert scenarios[1]["receita_antes_devolucoes"] - scenarios[1]["ajuste_estimado_devolucoes"] == pytest.approx(
+        scenarios[1]["receita_ajustada_devolucoes"], abs=0.02
+    )
+    assert scenarios[1]["receita_ajustada_devolucoes"] - scenarios[1]["capital_historico_envolvido"] - scenarios[1]["frete_historico_estimado"] == pytest.approx(
+        scenarios[1]["contribuicao_estimada"], abs=0.02
+    )
+    assert scenarios[1]["contribuicao_sobre_receita_pct"] == pytest.approx(
+        scenarios[1]["contribuicao_estimada"] / scenarios[1]["receita_ajustada_devolucoes"] * 100
+    )
+    categories = payload["summary"]["central_by_category"]
+    assert categories[0]["categoria"] == "Moda"
+    for field in (
+        "unidades_cenario", "capital_historico_envolvido", "receita_antes_devolucoes",
+        "ajuste_estimado_devolucoes", "receita_ajustada_devolucoes",
+        "frete_historico_estimado", "contribuicao_estimada",
+    ):
+        assert sum(row[field] for row in categories) == pytest.approx(scenarios[1][field], abs=0.02)
     assert payload["summary"]["skus_excluidos_sem_custo_ou_preco"] == 1
     with pytest.raises(ValueError):
         liquidation(repo, discount_pct=90.01)
@@ -144,18 +186,25 @@ def test_deep_dive_distinguishes_sources(repo):
     assert "custo_unitario_estoque_auditoria" in item
 
 
-def test_service_publishes_facts_when_llm_contract_is_invalid(monkeypatch):
-    class Response:
-        content = "texto livre fora do contrato"
-    class InvalidLLM:
-        def invoke(self, _messages):
-            return Response()
-    monkeypatch.setattr("src.agent.nodes.get_llm", lambda: InvalidLLM())
+def test_service_publishes_only_deterministic_recommendations():
     result = InventoryAgentService().run_diagnostic("full_history")
     assert result["deterministic_approved"] is True
-    assert result["llm_complement_status"] == "omitted_invalid_contract"
+    assert result["llm_complement_status"] in ("completed", "not_used")
     assert result["final_report"].startswith("# Copiloto de estoque baseado em tendência histórica")
-    assert result["recommendations"] == []
+    assert "## 2. Receita, capital e margem de contribuição" in result["final_report"]
+    assert "Margem de contribuição simulada" in result["final_report"]
+    assert "### Sensibilidade ao sell-through" in result["final_report"]
+    assert "## 5. Como os valores foram calculados" in result["final_report"]
+    assert "## 6. Plano de Ação · Quick Wins e Recomendações" in result["final_report"]
+    assert "### Cenário central por categoria" in result["final_report"]
+    assert "### Fornecedores com maior margem em risco" in result["final_report"]
+    matrix = result["factual_package"]["summary"]["decision_matrix"]
+    assert [row["horizon"] for row in matrix] == ["30 dias", "30 dias", "60 dias", "90 dias"]
+    assert all(row["evidence"] and row["decision_gate"] for row in matrix)
+    if result["llm_complement_status"] == "completed":
+        assert len(result["recommendations"]) > 0
+        assert "Parecer Executivo do Agente" in result["final_report"] or "Recomendações Estruturadas do Agente" in result["final_report"]
+
 
 
 def test_data_quality_registers_malformed_raw_sale(repo):

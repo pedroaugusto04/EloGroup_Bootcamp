@@ -6,6 +6,8 @@ from typing import Optional
 from langchain_core.tools import tool
 
 from src.agent.inventory_analytics import (
+    DEFAULT_COVERAGE_DAYS,
+    DEFAULT_LIQUIDATION_DISCOUNT_PCT,
     demand_matrix,
     discontinued_capital,
     inventory_health,
@@ -29,7 +31,7 @@ def _json(payload: dict) -> str:
 def tool_inventory_health_scan(
     period_key: PeriodKey = "full_history",
     categoria: Optional[str] = None,
-    coverage_days: float = 120.0,
+    coverage_days: float = DEFAULT_COVERAGE_DAYS,
     limit: int = 25,
 ) -> str:
     """Separa ruptura atual, ponto de pedido, exposição no lead time cadastral,
@@ -79,7 +81,7 @@ def tool_sku_deep_dive(sku_id: str, period_key: PeriodKey = "full_history") -> s
 def tool_simulate_inventory_liquidation(
     period_key: PeriodKey = "full_history",
     categoria: Optional[str] = None,
-    desconto_pct: float = 30.0,
+    desconto_pct: float = DEFAULT_LIQUIDATION_DISCOUNT_PCT,
 ) -> str:
     """Simula 25/50/75/100% de sell-through sobre preço líquido histórico, com ajuste de devolução."""
     return _json(liquidation(_get_repo(), period_key, categoria, desconto_pct))

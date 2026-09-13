@@ -1,3 +1,4 @@
+-- Resume demanda, receita efetiva e margem efetiva por SKU na janela selecionada.
 SELECT sku_id, ANY_VALUE(produto) AS produto, ANY_VALUE(categoria) AS categoria,
        COUNT(*) AS pedidos_aprovados, SUM(quantidade) AS unidades_aprovadas,
        SUM(receita_liquida_efetiva) AS receita_efetiva,
@@ -11,4 +12,3 @@ WHERE status_pagamento = 'Aprovado'
   AND (? IS NULL OR categoria = ?)
 GROUP BY sku_id
 ORDER BY margem_efetiva DESC, unidades_aprovadas DESC, sku_id
-LIMIT ?;

@@ -1,3 +1,4 @@
+-- Detalha um SKU, separando a posição de Estoque das métricas históricas de Vendas.
 WITH period_sales AS (
     SELECT sku_id, COUNT(*) AS pedidos_aprovados, SUM(quantidade) AS unidades_aprovadas,
            SUM(receita_liquida_efetiva) AS receita_efetiva,

@@ -1,3 +1,4 @@
+-- Resume devoluções aprovadas por SKU e o motivo declarado na janela selecionada.
 SELECT sku_id, ANY_VALUE(produto) AS produto, ANY_VALUE(categoria) AS categoria,
        COUNT(*) AS pedidos_aprovados,
        SUM(CASE WHEN devolvido THEN 1 ELSE 0 END) AS pedidos_devolvidos,
@@ -12,4 +13,3 @@ WHERE status_pagamento = 'Aprovado'
 GROUP BY sku_id
 HAVING COUNT(*) >= ? AND SUM(CASE WHEN devolvido THEN 1 ELSE 0 END) >= ?
 ORDER BY taxa_devolucao DESC, pedidos_devolvidos DESC, sku_id
-LIMIT ?;

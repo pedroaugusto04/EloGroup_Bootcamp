@@ -1,3 +1,4 @@
+-- Reúne preço, frete, devoluções e custo de Vendas para simular a liquidação de itens descontinuados.
 WITH weighted_cost AS (
     SELECT sku_id, SUM(custo_produto) / NULLIF(SUM(quantidade), 0) AS custo_unitario_vendas
     FROM vendas

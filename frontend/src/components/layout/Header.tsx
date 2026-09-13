@@ -98,7 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={onRefresh}
           disabled={loading}
           className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-[#18181b] border border-[#27272a] hover:border-[#3f3f46] text-[#d4d4d8] text-xs font-medium transition-colors disabled:opacity-50 active:scale-95"
-          title="Recarregar dados do DuckDB"
+          title="Recarregar dados"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#38bdf8]' : 'text-[#a1a1aa]'}`} />
           <span className="hidden sm:inline">Atualizar</span>

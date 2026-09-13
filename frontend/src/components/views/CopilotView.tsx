@@ -15,10 +15,10 @@ import {
 } from 'lucide-react';
 
 const SUGGESTED_PROMPTS = [
-  'Qual o impacto financeiro de liquidar a categoria Beleza com 40% de desconto?',
-  'Quais são os SKUs com maior capital imobilizado em produtos descontinuados?',
+  'Quais são os SKUs ativos com maior capital imobilizado em sobre-estoque?',
+  'Qual o impacto financeiro de liquidar a categoria Moda com 30% de desconto?',
+  'Quais categorias e SKUs apresentam maior margem exposta a risco de ruptura?',
   'Quantos SKUs zerados temos e qual a concentração por categoria?',
-  'Simule a liquidação do estoque descontinuado com 30% de desconto.',
 ];
 
 const isMermaidContent = (content: string, className?: string) => {
@@ -243,8 +243,8 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
               key={thread.id}
               onClick={() => selectThread(thread.id)}
               className={`group flex items-center justify-between p-2.5 sm:p-3 rounded-lg cursor-pointer text-xs transition-colors ${activeThreadId === thread.id
-                  ? 'bg-[#18181b] border border-[#38bdf8]/40 text-[#f4f4f5] shadow-sm'
-                  : 'hover:bg-[#18181b]/60 text-[#a1a1aa] border border-transparent'
+                ? 'bg-[#18181b] border border-[#38bdf8]/40 text-[#f4f4f5] shadow-sm'
+                : 'hover:bg-[#18181b]/60 text-[#a1a1aa] border border-transparent'
                 }`}
             >
               <span className="truncate flex-1 font-medium">{thread.title || 'Conversa'}</span>
@@ -410,7 +410,7 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
                 </div>
                 <div className="py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-xl bg-[#121215] border border-[#27272a] text-xs sm:text-[13px] text-[#a1a1aa] flex items-center gap-2.5 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-[#38bdf8] animate-ping" />
-                  <span>Consultando DuckDB e gerando raciocínio...</span>
+                  <span>Consultando as bases e gerando raciocínio...</span>
                 </div>
               </div>
             )}

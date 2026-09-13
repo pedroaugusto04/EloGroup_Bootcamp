@@ -25,6 +25,8 @@ data/audit_log.json
 AGENTS.md
 .env
 agent-reference/
+.agents/
+.agent/
 
 # Node / Frontend
 node_modules/
@@ -35,5 +37,6 @@ dist/
 logs/
 *.tsbuildinfo
 .DS_Store
+
 
 

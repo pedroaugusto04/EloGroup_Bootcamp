@@ -18,7 +18,7 @@ class FakeConsultingLLM(FakeListChatModel):
             'O capital total travado em descontinuados é de R$ 38.640,00, com potencial de liberação de caixa de R$ 52.450,00 com 30% de desconto.',
             'O primeiro produto listado possui custo unitário de R$ 45,00 e estoque físico no galpão.',
             'As categorias Moda e Lifestyle apresentam as maiores taxas de ruptura.',
-            'Auditoria executada com sucesso no DuckDB.',
+            'Auditoria executada com sucesso.',
         ] * 20
         super().__init__(responses=default_responses)
 
