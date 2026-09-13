@@ -25,8 +25,18 @@ def test_render_executive_email_template():
             "summary": {
                 "methodology_banner": "Posição de estoque fornecida — data de referência não informada. Tendência de vendas observada entre 01/01/2023 e 26/01/2024.",
                 "capital": {"capital_disponivel": 42500, "skus_com_custo_vendas": 10, "total_skus": 11},
-                "operational": {"ruptura_atual": 5, "ponto_pedido": 3},
+                "operational": {"ruptura_atual": 5, "ponto_pedido": 3, "alta_cobertura": 8, "capital_excedente": 32000.0},
                 "lead_time_exposure": {"skus": 1, "margem_potencialmente_exposta": 123.45},
+                "overstock_exposure": {"skus": 8, "capital_excedente": 32000.0, "unidades_excedentes": 400.0},
+                "top_overstock_skus": [
+                    {
+                        "sku_id": "SKU-09999",
+                        "nome_produto": "Calça Jeans Premium",
+                        "categoria": "Moda",
+                        "cobertura_dias_historica": 340.0,
+                        "capital_excedente": 15000.0,
+                    }
+                ],
                 "liquidation": {
                     "desconto_pct": 20,
                     "central_scenario": {
@@ -52,12 +62,18 @@ def test_render_executive_email_template():
     assert "<!DOCTYPE html>" in html
     assert "Vértice Retail" in html or "VÉRTICE" in html
     assert "R$ 42.500,00" in html
+    assert "R$ 32.000,00" in html
+    assert "SOBRE-ESTOQUE ATIVO (ALTA COBERTURA)" in html
+    assert "Top SKUs em Sobre-estoque (Capital Imobilizado)" in html
+    assert "SKU-09999" in html
+    assert "340 dias" in html
     assert "R$ 150,00" in html
     assert "Margem de contribuição simulada" in html
     assert "20,0% DESC. · 75,0% SELL-THROUGH" in html
     assert "RELATÓRIO EXECUTIVO" in html
     assert "class=\"metric-grid\"" in html
     assert "card card-capital" in html
+    assert "card card-overstock" in html
     assert "card card-liquidation" in html
     assert "background-color:#2e0854" in html
     assert "cta-btn" in html

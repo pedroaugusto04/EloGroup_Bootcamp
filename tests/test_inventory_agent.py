@@ -191,11 +191,11 @@ def test_service_publishes_only_deterministic_recommendations():
     assert result["deterministic_approved"] is True
     assert result["llm_complement_status"] in ("completed", "not_used")
     assert result["final_report"].startswith("# Copiloto de estoque baseado em tendência histórica")
-    assert "## 2. Receita, capital e margem de contribuição" in result["final_report"]
+    assert "## 2. Liquidação de descontinuados e liberação de caixa" in result["final_report"]
     assert "Margem de contribuição simulada" in result["final_report"]
     assert "### Sensibilidade ao sell-through" in result["final_report"]
     assert "## 5. Como os valores foram calculados" in result["final_report"]
-    assert "## 6. Plano de Ação · Quick Wins e Recomendações" in result["final_report"]
+    assert "## 4. Plano de Ação · Quick Wins e Recomendações Estruturadas" in result["final_report"]
     assert "### Cenário central por categoria" in result["final_report"]
     assert "### Fornecedores com maior margem em risco" in result["final_report"]
     matrix = result["factual_package"]["summary"]["decision_matrix"]

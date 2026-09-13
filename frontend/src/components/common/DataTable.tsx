@@ -53,11 +53,11 @@ export function DataTable<T extends Record<string, any>>({
   }, [filteredData, currentPage, pageSize]);
 
   return (
-    <div className="w-full rounded-lg border border-[#262046] bg-[#131126] overflow-hidden">
+    <div className="w-full rounded-lg border border-[#e6e5f0] dark:border-[#262046] bg-[#ffffff] dark:bg-[#131126] overflow-hidden shadow-sm">
       {/* Search Header */}
-      <div className="p-2.5 sm:p-3 border-b border-[#262046] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 bg-[#121024]">
+      <div className="p-2.5 sm:p-3 border-b border-[#e6e5f0] dark:border-[#262046] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 bg-[#f8f7fc] dark:bg-[#121024]">
         <div className="relative flex-1 w-full sm:max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8e92a0] dark:text-[#71717a]" />
           <input
             type="text"
             value={searchTerm}
@@ -66,11 +66,11 @@ export function DataTable<T extends Record<string, any>>({
               setCurrentPage(1);
             }}
             placeholder={searchPlaceholder}
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#181530] border border-[#262046] rounded-md text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#8575ff]/60 transition-colors"
+            className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#ffffff] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] rounded-md text-[#131920] dark:text-[#f4f4f5] placeholder-[#8e92a0] dark:placeholder-[#71717a] focus:outline-none focus:border-[#4200db] dark:focus:border-[#8575ff]/60 transition-colors shadow-inner"
           />
         </div>
 
-        <div className="text-[11px] font-mono text-[#71717a] text-right sm:text-left self-end sm:self-center">
+        <div className="text-[11px] font-mono text-[#5e6270] dark:text-[#71717a] text-right sm:text-left self-end sm:self-center">
           {filteredData.length} registros
         </div>
       </div>
@@ -78,7 +78,7 @@ export function DataTable<T extends Record<string, any>>({
       {/* Table Content */}
       <div className="overflow-x-auto touch-pan-x">
         <table className="w-full text-xs text-left min-w-[500px] sm:min-w-full">
-          <thead className="bg-[#181530] text-[#a1a1aa] font-medium border-b border-[#262046]">
+          <thead className="bg-[#f3f2f8] dark:bg-[#181530] text-[#5e6270] dark:text-[#a1a1aa] font-medium border-b border-[#e6e5f0] dark:border-[#262046]">
             <tr>
               {columns.map(col => (
                 <th
@@ -96,12 +96,12 @@ export function DataTable<T extends Record<string, any>>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#262046]/60 font-sans">
+          <tbody className="divide-y divide-[#e6e5f0] dark:divide-[#262046]/60 font-sans">
             {paginatedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="py-8 text-center text-[#71717a] font-mono text-xs"
+                  className="py-8 text-center text-[#8e92a0] dark:text-[#71717a] font-mono text-xs"
                 >
                   {emptyMessage}
                 </td>
@@ -110,7 +110,7 @@ export function DataTable<T extends Record<string, any>>({
               paginatedData.map((row, idx) => (
                 <tr
                   key={idx}
-                  className="hover:bg-[#181530]/50 transition-colors duration-100"
+                  className="hover:bg-[#f8f7fc] dark:hover:bg-[#181530]/50 transition-colors duration-100"
                 >
                   {columns.map(col => (
                     <td
@@ -135,17 +135,17 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="p-2.5 sm:p-3 border-t border-[#262046] bg-[#121024] flex items-center justify-between text-xs text-[#a1a1aa]">
+        <div className="p-2.5 sm:p-3 border-t border-[#e6e5f0] dark:border-[#262046] bg-[#f8f7fc] dark:bg-[#121024] flex items-center justify-between text-xs text-[#5e6270] dark:text-[#a1a1aa]">
           <div>
-            Pág. <span className="font-mono text-[#f4f4f5]">{currentPage}</span> de{' '}
-            <span className="font-mono text-[#f4f4f5]">{totalPages}</span>
+            Pág. <span className="font-mono text-[#131920] dark:text-[#f4f4f5]">{currentPage}</span> de{' '}
+            <span className="font-mono text-[#131920] dark:text-[#f4f4f5]">{totalPages}</span>
           </div>
 
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded bg-[#181530] border border-[#262046] text-[#a1a1aa] hover:text-[#f4f4f5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-95"
+              className="p-1.5 rounded bg-[#ffffff] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] text-[#5e6270] dark:text-[#a1a1aa] hover:text-[#131920] dark:hover:text-[#f4f4f5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-95"
               aria-label="Página anterior"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -153,7 +153,7 @@ export function DataTable<T extends Record<string, any>>({
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded bg-[#181530] border border-[#262046] text-[#a1a1aa] hover:text-[#f4f4f5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-95"
+              className="p-1.5 rounded bg-[#ffffff] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] text-[#5e6270] dark:text-[#a1a1aa] hover:text-[#131920] dark:hover:text-[#f4f4f5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-95"
               aria-label="Próxima página"
             >
               <ChevronRight className="w-4 h-4" />

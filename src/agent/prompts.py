@@ -37,8 +37,7 @@ Framework de Análise e Raciocínio:
 Retorne OBRIGATORIAMENTE um objeto JSON válido no seguinte formato:
 ```json
 {{
-  "executive_summary": "Parecer executivo detalhado e opinativo sobre os principais gargalos e oportunidades financeiras identificados na base.",
-  "next_steps_text": "- **Quick Wins (30 dias):** ...\\n- **Médio Prazo (60 dias):** ...\\n- **Governança (90 dias):** ...",
+  "executive_summary": "Parecer executivo detalhado e opinativo sobre os principais gargalos, trade-offs e oportunidades financeiras identificados na base.",
   "recommendations": [
     {{
       "horizon": "30 dias",

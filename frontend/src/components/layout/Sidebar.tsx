@@ -128,24 +128,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-200"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-200"
           aria-hidden="true"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 sm:w-80 lg:w-64 xl:w-72 bg-[#121024] border-r border-[#262046] flex flex-col h-full shrink-0 select-none transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 sm:w-80 lg:w-64 xl:w-72 bg-[#ffffff] dark:bg-[#121024] border-r border-[#e6e5f0] dark:border-[#262046] flex flex-col h-full shrink-0 select-none transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
           }`}
       >
         {/* Brand Header */}
-        <div className="p-4 border-b border-[#262046] bg-[#0d0b1a] flex items-center justify-between">
+        <div className="p-4 border-b border-[#e6e5f0] dark:border-[#262046] bg-[#ffffff] dark:bg-[#0d0b1a] flex items-center justify-between transition-colors">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md bg-[#4200db]/25 border border-[#8575ff]/40 flex items-center justify-center text-[#8575ff] shadow-sm shadow-[#4200db]/30">
-              <VerticeLogo className="w-4 h-4 text-[#8575ff]" size={16} />
+            <div className="w-8 h-8 rounded-md bg-[#e8e6ff] dark:bg-[#4200db]/25 border border-[#c4b8ff] dark:border-[#8575ff]/40 flex items-center justify-center text-[#4200db] dark:text-[#8575ff] shadow-sm shadow-[#4200db]/10 dark:shadow-[#4200db]/30">
+              <VerticeLogo className="w-4 h-4 text-[#4200db] dark:text-[#8575ff]" size={16} />
             </div>
             <div>
-              <div className="text-sm font-bold tracking-tight text-[#f4f4f5] flex items-center gap-1.5">
+              <div className="text-sm font-bold tracking-tight text-[#131920] dark:text-[#f4f4f5] flex items-center gap-1.5">
                 <span>VÉRTICE</span>
               </div>
             </div>
@@ -154,7 +154,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Close button on Mobile */}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#181530] lg:hidden transition-colors"
+            className="p-1.5 rounded-lg text-[#5e6270] dark:text-[#a1a1aa] hover:text-[#131920] dark:hover:text-[#f4f4f5] hover:bg-[#f3f2f8] dark:hover:bg-[#181530] lg:hidden transition-colors"
             title="Fechar menu"
           >
             <X className="w-5 h-5" />
@@ -165,9 +165,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
           {navSections.map((section, sIdx) => (
             <div key={sIdx} className="space-y-1">
-              <div className="px-2 py-1 text-[10px] font-mono font-bold tracking-wider text-[#71717a] uppercase">
-                {section.title}
-              </div>
+              {section.title && (
+                <div className="px-2 py-1 text-[10px] font-mono font-bold tracking-wider text-[#8e92a0] dark:text-[#71717a] uppercase">
+                  {section.title}
+                </div>
+              )}
               <div className="space-y-1">
                 {section.items.map(item => {
                   const Icon = item.icon;
@@ -178,14 +180,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       key={item.id}
                       onClick={() => handleItemClick(item.id)}
                       className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${isActive
-                        ? 'bg-[#181530] border-[#8575ff]/50 shadow-[0_0_12px_rgba(133,117,255,0.12)]'
-                        : 'bg-transparent border-transparent hover:bg-[#181530]/60 hover:border-[#262046]'
+                        ? 'bg-[#e8e6ff]/70 dark:bg-[#181530] border-[#c4b8ff] dark:border-[#8575ff]/50 shadow-sm dark:shadow-[0_0_12px_rgba(133,117,255,0.12)]'
+                        : 'bg-transparent border-transparent hover:bg-[#f3f2f8] dark:hover:bg-[#181530]/60 hover:border-[#e6e5f0] dark:hover:border-[#262046]'
                         }`}
                     >
                       <div
                         className={`mt-0.5 p-1.5 rounded-md transition-colors shrink-0 ${isActive
-                          ? 'bg-[#4200db]/30 text-[#8575ff] border border-[#8575ff]/30'
-                          : 'bg-[#181530] text-[#71717a] group-hover:text-[#a1a1aa]'
+                          ? 'bg-[#4200db] text-[#ffffff] dark:bg-[#4200db]/30 dark:text-[#8575ff] dark:border dark:border-[#8575ff]/30 shadow-sm'
+                          : 'bg-[#f3f2f8] dark:bg-[#181530] text-[#5e6270] dark:text-[#71717a] group-hover:text-[#131920] dark:group-hover:text-[#a1a1aa]'
                           }`}
                       >
                         <Icon className="w-4 h-4" />
@@ -194,22 +196,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <span
-                            className={`text-xs font-semibold truncate ${isActive ? 'text-[#f4f4f5]' : 'text-[#d4d4d8] group-hover:text-[#f4f4f5]'
+                            className={`text-xs font-semibold truncate ${isActive ? 'text-[#4200db] dark:text-[#f4f4f5]' : 'text-[#334155] dark:text-[#d4d4d8] group-hover:text-[#131920] dark:group-hover:text-[#f4f4f5]'
                               }`}
                           >
                             {item.label}
                           </span>
-                          <span className="text-[10px] font-mono text-[#71717a] ml-1">
+                          <span className={`text-[10px] font-mono ml-1 ${isActive ? 'text-[#4200db] dark:text-[#8575ff]' : 'text-[#8e92a0] dark:text-[#71717a]'}`}>
                             {item.tag}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#71717a] truncate mt-0.5 font-sans leading-tight">
+                        <p className="text-[11px] text-[#5e6270] dark:text-[#71717a] truncate mt-0.5 font-sans leading-tight">
                           {item.description}
                         </p>
                       </div>
 
                       {isActive && (
-                        <ChevronRight className="w-3.5 h-3.5 text-[#8575ff] self-center shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-[#4200db] dark:text-[#8575ff] self-center shrink-0" />
                       )}
                     </button>
                   );
@@ -220,11 +222,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Footer Info */}
-        <div className="p-3 border-t border-[#262046] bg-[#0d0b1a] text-[11px] font-mono text-[#71717a]">
+        <div className="p-3 border-t border-[#e6e5f0] dark:border-[#262046] bg-[#f8f7fc] dark:bg-[#0d0b1a] text-[11px] font-mono text-[#5e6270] dark:text-[#71717a] transition-colors">
           <div className="flex items-center justify-between">
-            <span>v2.0.0</span>
+            <span className="font-semibold text-[#4200db] dark:text-[#8575ff]">v2.0.0</span>
           </div>
-          <div className="mt-1 text-[10px] text-[#52525b]">
+          <div className="mt-1 text-[10px] text-[#8e92a0] dark:text-[#52525b]">
             Bootcamp EloGroup 2026
           </div>
         </div>

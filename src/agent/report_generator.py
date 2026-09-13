@@ -36,12 +36,6 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
     quality = summary["data_quality"]
     liquidation_leader = (liquidation.get("central_by_category") or [{}])[0]
     supplier_leader = (summary.get("supplier_exposure_summary") or [{}])[0]
-    liquidation_leader_note = (
-        "{} lidera a contribuição modelada do cenário central. Isso define o primeiro recorte para avaliação comercial, não comprova que o desconto de {} seja ótimo.".format(
-            liquidation_leader["categoria"], discount_label
-        )
-        if liquidation_leader else "Nenhuma categoria tem dados financeiros válidos para o cenário selecionado."
-    )
 
     scenario_rows = [
         "| Sell-through | Unidades | Capital envolvido | Receita ajustada | Contribuição estimada | Contrib./receita |",
@@ -137,7 +131,7 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
     ]
     decision_details = []
     for row in summary.get("decision_matrix", []):
-        financial = _brl(row["financial_value"]) if row.get("financial_value") is not None else "Não estimada com segurança"
+        financial = _brl(row["financial_value"]) if row.get("financial_value") is not None else "Impacto estrutural (Governança/Processos)"
         decision_rows.append(
             "| {priority} | {horizon} | {initiative} | {scope} | {financial} |".format(
                 priority=row["priority"], horizon=row["horizon"], initiative=row["initiative"],
@@ -153,6 +147,9 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
             "",
         ])
 
+    agent_next_steps = package.get("agent_next_steps")
+    agent_exec_summary = package.get("agent_executive_summary")
+
     lines = [
         "# Copiloto de estoque baseado em tendência histórica de vendas",
         "",
@@ -160,6 +157,15 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
         "",
         "## 1. Resumo executivo",
         "",
+    ]
+
+    if agent_exec_summary:
+        lines.extend([
+            f"> **Parecer Executivo do Agente:** {agent_exec_summary}",
+            "",
+        ])
+
+    lines.extend([
         f"- Capital físico coberto: **{_brl(cap['capital_fisico'])}**; reservado: **{_brl(cap['capital_reservado'])}**; disponível/liquidável: **{_brl(cap['capital_disponivel'])}**.",
         f"- Cobertura financeira: **{cap['skus_com_custo_vendas']} de {cap['total_skus']} SKUs**; {cap['skus_sem_custo_vendas']} ficaram fora do valuation por ausência de custo válido em Vendas.",
         "- Quantidades fora da cobertura financeira: **{} físicas**, **{} reservadas** e **{} disponíveis**.".format(
@@ -177,19 +183,9 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
         f"- Margem em risco (lead time): **{exp['skus']} SKUs ativos**, totalizando {_brl(exp['receita_ajustada_devolucao'])} de faturamento e {_brl(exp['margem_potencialmente_exposta'])} de margem sob risco de ruptura durante o lead time.",
         f"- Categoria com maior margem em risco: **{top.get('categoria', 'não disponível')}**.",
         "",
-        "## 2. Receita, capital e margem de contribuição",
+        "## 2. Liquidação de descontinuados e liberação de caixa",
         "",
-        "No cenário central de liquidação, a **receita líquida estimada** é de {}. O **custo histórico dos produtos envolvidos** é de {} e o frete estimado é de {}.".format(
-            _brl(central["receita_ajustada_devolucoes"]), _brl(central["capital_historico_envolvido"]), _brl(central["frete_historico_estimado"])
-        ),
-        "A **margem de contribuição simulada** é de {}, correspondendo a {} da receita líquida e {} do capital recuperado.".format(
-            _brl(central["contribuicao_estimada"]), _pct(central["contribuicao_sobre_receita_pct"]),
-            _pct(central["contribuicao_sobre_capital_pct"]),
-        ),
-        "",
-        "## 3. Simulação de liquidação de descontinuados",
-        "",
-        "Com **{} de desconto** e **{} de sell-through**:".format(discount_label, sell_through_label),
+        "No **cenário central de liquidação** (com **{} de desconto** e **{} de sell-through**):".format(discount_label, sell_through_label),
         "",
         "- Unidades no cenário: **{}**.".format(_number(central["unidades_cenario"])),
         "- Capital histórico envolvido: **{}**.".format(_brl(central["capital_historico_envolvido"])),
@@ -197,7 +193,11 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
         "- Ajuste estimado por devoluções: **-{}**.".format(_brl(central["ajuste_estimado_devolucoes"])),
         "- Receita líquida estimada: **{}**.".format(_brl(central["receita_ajustada_devolucoes"])),
         "- Frete histórico estimado: **-{}**.".format(_brl(central["frete_historico_estimado"])),
-        "- Margem de contribuição simulada: **{}**.".format(_brl(central["contribuicao_estimada"])),
+        "- Margem de contribuição simulada: **{}** (correspondendo a **{}** da receita líquida e **{}** do capital recuperado).".format(
+            _brl(central["contribuicao_estimada"]),
+            _pct(central["contribuicao_sobre_receita_pct"]),
+            _pct(central["contribuicao_sobre_capital_pct"]),
+        ),
         "",
         "### Sensibilidade ao sell-through",
         "",
@@ -207,9 +207,7 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
         "",
         *liquidation_category_rows,
         "",
-        liquidation_leader_note,
-        "",
-        "## 4. Onde está a atenção operacional",
+        "## 3. Onde está a atenção operacional",
         "",
         "### Resumo por categoria",
         "",
@@ -227,63 +225,16 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
         "",
         *supplier_rows,
         "",
-        f"A visão conjunta contrapõe o risco imediato de perda de margem por sob-estoque ({_brl(exp['margem_potencialmente_exposta'])}) ao custo de carregamento do sobre-estoque ativo ({_brl(op.get('capital_excedente'))}), orientando o autofinanciamento de reposição via congelamento de compras OTB.",
-        "",
-        "## 5. Como os valores foram calculados",
-        "",
-        "- **Custo unitário de valuation:** custo ponderado de aquisição apurado no histórico de Vendas.",
-        "- **Demanda diária:** média de unidades diárias observadas na janela ({meta_days} dias).".format(meta_days=meta["days"]),
-        "- **Déficit potencial:** necessidade estimada no lead time cadastral deduzida do saldo disponível.",
-        "- **Liquidação:** preço histórico com desconto, ajustado pela devolução da categoria e deduzido de custos/frete.",
-        "- **Auditoria cadastral:** {coverage_skus} SKUs descontinuados elegíveis para o modelo de liquidação.".format(
-            coverage_skus=liquidation["skus_elegiveis"],
-        ),
-        "",
-        "## 6. Plano de Ação · Quick Wins e Recomendações",
+        "## 4. Plano de Ação · Quick Wins e Recomendações Estruturadas",
         "",
         "Ações priorizadas com base nos itens críticos identificados no diagnóstico de estoque:",
         "",
         *decision_rows,
         "",
-        *decision_details,
-        "## 7. Próximos Passos (Quick Wins & Estrutural)",
-        "",
-    ]
-
-    agent_next_steps = package.get("agent_next_steps")
-    agent_exec_summary = package.get("agent_executive_summary")
-
-    if agent_exec_summary:
-        lines.extend([
-            f"> **Parecer Executivo do Agente:** {agent_exec_summary}",
-            "",
-        ])
-
-    if agent_next_steps:
-        lines.extend([agent_next_steps.strip(), ""])
-    elif recommendations:
-        for rec in recommendations:
-            horizon = rec.get("horizon", "30 dias")
-            init = rec.get("initiative", "Ação Prioritária")
-            rec_text = rec.get("recommendation", "")
-            lines.append(f"- **{horizon} ({init}):** {rec_text}")
-        lines.append("")
-    else:
-        lines.extend([
-            "- **Quick Wins (30 dias):** Iniciar liquidação focada na categoria **{}** ({}) e reposição emergencial dos **{} SKUs ativos em risco** (foco em **{}** e fornecedor **{}**).".format(
-                liquidation_leader.get("categoria", "categoria líder"),
-                _brl(liquidation_leader.get("contribuicao_estimada")), exp["skus"],
-                top.get("categoria", "categoria líder"), supplier_leader.get("fornecedor_id", "líder"),
-            ),
-            "- **Médio Prazo (60 dias):** Recalibrar regras de ponto de pedido e suspender compras OTB para os {} SKUs ativos com cobertura excessiva (>{} dias), visando liberar até {} em capital imobilizado.".format(
-                op["alta_cobertura"], _number(op["coverage_threshold_days"]), _brl(op.get("capital_excedente")),
-            ),
-            "- **Governança (90 dias):** Implementar snapshots sistemáticos de estoque e rastreamento de lead time real por fornecedor.",
-            "",
-        ])
+    ])
 
     if recommendations:
-        lines.extend(["## Hipóteses e Recomendações Estruturadas do Agente", ""])
+        lines.extend(["### Recomendações Estruturadas do Agente", ""])
         for rec in recommendations:
             horizon = rec.get("horizon", "Horizonte não informado")
             rec_body = rec.get("recommendation") or rec.get("decision", "")
@@ -296,6 +247,27 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
                 f"- **{horizon} — {rec_body}** Evidência: `{evidence}`. "
                 f"Confiança: {confidence}. Ressalva: {caveat}{impact_text}"
             )
+        lines.append("")
+    elif agent_next_steps:
+        lines.extend([agent_next_steps.strip(), ""])
+    else:
+        lines.extend([
+            *decision_details,
+        ])
+
+    lines.extend([
+        "## 5. Como os valores foram calculados",
+        "",
+        "- **Custo unitário de valuation:** custo ponderado de aquisição apurado no histórico de Vendas.",
+        "- **Demanda diária:** média de unidades diárias observadas na janela ({meta_days} dias).".format(meta_days=meta["days"]),
+        "- **Déficit potencial:** necessidade estimada no lead time cadastral deduzida do saldo disponível.",
+        "- **Liquidação:** preço histórico com desconto, ajustado pela devolução da categoria e deduzido de custos/frete.",
+        "- **Auditoria cadastral:** {coverage_skus} SKUs descontinuados elegíveis para o modelo de liquidação.".format(
+            coverage_skus=liquidation["skus_elegiveis"],
+        ),
+        "",
+    ])
+
     return "\n".join(lines)
 
 

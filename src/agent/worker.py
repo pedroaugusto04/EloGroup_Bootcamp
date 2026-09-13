@@ -77,7 +77,7 @@ def run_autonomous_inventory_audit(
     if approved and report and publish_chat:
         audit_thread_id = str(uuid.uuid4())
         deep_link = get_deep_link_url(audit_thread_id)
-        context = report + "\n\n---\nPergunte por uma fila, categoria, SKU ou cenário de desconto."
+        context = report + "\n\n---\nAlguma dúvida? Pergunte ao agente."
         messages = [{"role": "assistant", "content": context}]
         try:
             CopilotChatStore().save_thread(

@@ -62,8 +62,8 @@ export const RoadmapView: React.FC = () => {
       </div>
 
       {/* Horizon Filters */}
-      <div className="flex items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-xl bg-[#131126] border border-[#262046] overflow-x-auto no-scrollbar touch-pan-x shadow-sm">
-        <span className="text-xs text-[#a1a1aa] font-medium mr-1 whitespace-nowrap">Filtrar Horizonte:</span>
+      <div className="flex items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-xl bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] overflow-x-auto no-scrollbar touch-pan-x shadow-sm">
+        <span className="text-xs text-[#5e6270] dark:text-[#a1a1aa] font-medium mr-1 whitespace-nowrap">Filtrar Horizonte:</span>
         {['Todos', 'Quick Wins', '30 Dias', '60 Dias', '90 Dias'].map(horizon => {
           const active = selectedHorizon === horizon;
           return (
@@ -72,8 +72,8 @@ export const RoadmapView: React.FC = () => {
               onClick={() => setSelectedHorizon(horizon)}
               className={`text-xs px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg border whitespace-nowrap transition-all ${
                 active
-                  ? 'bg-[#8575ff]/20 border-[#8575ff]/60 text-[#8575ff] font-semibold shadow-sm'
-                  : 'bg-[#181530] border-[#262046] text-[#a1a1aa] hover:border-[#4a3f85] hover:text-[#f4f4f5]'
+                  ? 'bg-[#e8e6ff] dark:bg-[#8575ff]/20 border-[#c4b8ff] dark:border-[#8575ff]/60 text-[#4200db] dark:text-[#8575ff] font-semibold shadow-sm'
+                  : 'bg-[#f8f7fc] dark:bg-[#181530] border-[#e6e5f0] dark:border-[#262046] text-[#5e6270] dark:text-[#a1a1aa] hover:border-[#4200db]/40 dark:hover:border-[#4a3f85] hover:text-[#131920] dark:hover:text-[#f4f4f5]'
               }`}
             >
               {horizon}
@@ -87,47 +87,47 @@ export const RoadmapView: React.FC = () => {
         {filteredInitiatives.map(init => (
           <div
             key={init.id}
-            className="p-4 sm:p-5 rounded-xl bg-[#131126] border border-[#262046] hover:border-[#8575ff]/50 transition-all flex flex-col justify-between space-y-3 sm:space-y-4 shadow-sm"
+            className="p-4 sm:p-5 rounded-xl bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] hover:border-[#4200db]/40 dark:hover:border-[#8575ff]/50 transition-all flex flex-col justify-between space-y-3 sm:space-y-4 shadow-sm"
           >
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-xs font-mono font-semibold px-2 sm:px-2.5 py-0.5 rounded-md bg-[#181530] border border-[#262046] text-[#8575ff]">
+                <span className="text-xs font-mono font-semibold px-2 sm:px-2.5 py-0.5 rounded-md bg-[#f8f7fc] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] text-[#4200db] dark:text-[#8575ff]">
                   {init.horizon}
                 </span>
                 <span
                   className={`text-xs font-mono px-2 sm:px-2.5 py-0.5 rounded-md font-semibold ${
                     init.type.includes('Quick Win')
-                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-[#181530] text-[#a1a1aa] border border-[#262046]'
+                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                      : 'bg-[#f8f7fc] dark:bg-[#181530] text-[#5e6270] dark:text-[#a1a1aa] border border-[#e6e5f0] dark:border-[#262046]'
                   }`}
                 >
                   {init.type}
                 </span>
               </div>
 
-              <h4 className="text-sm sm:text-base font-bold text-[#f4f4f5] tracking-tight mb-1">
+              <h4 className="text-sm sm:text-base font-bold text-[#131920] dark:text-[#f4f4f5] tracking-tight mb-1">
                 {init.title}
               </h4>
-              <div className="text-[11px] sm:text-xs text-[#71717a] font-mono mb-2">
+              <div className="text-[11px] sm:text-xs text-[#5e6270] dark:text-[#71717a] font-mono mb-2">
                 {init.hypothesis} • {init.category}
               </div>
 
-              <p className="text-xs text-[#d4d4d8] leading-relaxed">
+              <p className="text-xs text-[#40434f] dark:text-[#d4d4d8] leading-relaxed">
                 {init.description}
               </p>
             </div>
 
-            <div className="pt-3 border-t border-[#262046] flex items-center justify-between text-xs">
+            <div className="pt-3 border-t border-[#e6e5f0] dark:border-[#262046] flex items-center justify-between text-xs">
               <div>
-                <span className="text-[10px] sm:text-[11px] text-[#71717a] block">Impacto Estimado:</span>
-                <span className="font-mono font-bold text-[#8575ff] text-xs sm:text-sm">
+                <span className="text-[10px] sm:text-[11px] text-[#5e6270] dark:text-[#71717a] block">Impacto Estimado:</span>
+                <span className="font-mono font-bold text-[#4200db] dark:text-[#8575ff] text-xs sm:text-sm">
                   {init.financial_impact_label}
                 </span>
               </div>
 
               <div className="text-right">
-                <span className="text-[10px] sm:text-[11px] text-[#71717a] block">Prazo:</span>
-                <span className="font-mono text-[#f4f4f5] text-xs sm:text-sm">
+                <span className="text-[10px] sm:text-[11px] text-[#5e6270] dark:text-[#71717a] block">Prazo:</span>
+                <span className="font-mono text-[#131920] dark:text-[#f4f4f5] text-xs sm:text-sm">
                   {init.effort_days} dias
                 </span>
               </div>

@@ -4,6 +4,7 @@ import { MarketingAnalyticsData, FilterOptions } from '../../types/analytics';
 import { MetricCard } from '../common/MetricCard';
 import { ScopeBadge } from '../common/ScopeBadge';
 import { DataTable, Column } from '../common/DataTable';
+import { useTheme } from '../../context/ThemeContext';
 import {
   ResponsiveContainer,
   BarChart,
@@ -20,6 +21,7 @@ interface MarketingViewProps {
 }
 
 export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) => {
+  const { isDark } = useTheme();
   const [loading, setLoading] = useState(true);
   const [mktData, setMktData] = useState<MarketingAnalyticsData | null>(null);
 
@@ -40,7 +42,7 @@ export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) =
   }, []);
 
   const mktColumns: Column<any>[] = [
-    { key: 'canal', header: 'Canal de Mídia', className: 'font-semibold text-[#f4f4f5]' },
+    { key: 'canal', header: 'Canal de Mídia', className: 'font-semibold text-[#131920] dark:text-[#f4f4f5]' },
     {
       key: 'investimento',
       header: 'Investimento',
@@ -58,7 +60,7 @@ export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) =
       header: 'ROAS',
       align: 'right',
       render: r => (
-        <span className="font-mono text-[#8575ff] font-bold">
+        <span className="font-mono text-[#4200db] dark:text-[#8575ff] font-bold">
           {Number(r.roas).toFixed(2)}x
         </span>
       ),
@@ -84,7 +86,7 @@ export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) =
   ];
 
   if (loading) {
-    return <div className="text-[#71717a] text-sm">Carregando dados de marketing...</div>;
+    return <div className="text-[#5e6270] dark:text-[#71717a] text-sm">Carregando dados de marketing...</div>;
   }
 
   return (
@@ -128,48 +130,62 @@ export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) =
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
-          <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] shadow-sm">
+          <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2 truncate">
             Investimento vs. Receita por Canal de Mídia
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={mktData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
-                <XAxis dataKey="canal" stroke="#71717a" fontSize={10} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#262046' : '#e6e5f0'} opacity={0.7} />
+                <XAxis dataKey="canal" stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
                 <YAxis
-                  stroke="#71717a"
+                  stroke={isDark ? '#71717a' : '#8e92a0'}
                   fontSize={10}
                   tickFormatter={v => `${(v / 1e6).toFixed(0)}M`}
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: isDark ? '#181530' : '#ffffff',
+                    borderColor: isDark ? '#262046' : '#e6e5f0',
+                    color: isDark ? '#f4f4f5' : '#131920',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                <Bar dataKey="investimento" name="Investimento (R$)" fill="#94a3b8" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="receita_gerada" name="Receita Declarada (R$)" fill="#8575ff" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="investimento" name="Investimento (R$)" fill={isDark ? '#94a3b8' : '#cbd5e1'} radius={[3, 3, 0, 0]} />
+                <Bar dataKey="receita_gerada" name="Receita Declarada (R$)" fill={isDark ? '#8575ff' : '#4200db'} radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
-          <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] shadow-sm">
+          <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2 truncate">
             Eficiência Relativa: ROAS vs. CAC por Canal
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={mktData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
-                <XAxis dataKey="canal" stroke="#71717a" fontSize={10} tickLine={false} />
-                <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#262046' : '#e6e5f0'} opacity={0.7} />
+                <XAxis dataKey="canal" stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
+                <YAxis stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: isDark ? '#181530' : '#ffffff',
+                    borderColor: isDark ? '#262046' : '#e6e5f0',
+                    color: isDark ? '#f4f4f5' : '#131920',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                <Bar dataKey="roas" name="ROAS (x)" fill="#8575ff" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="roas" name="ROAS (x)" fill={isDark ? '#8575ff' : '#4200db'} radius={[3, 3, 0, 0]} />
                 <Bar dataKey="cac" name="CAC (R$)" fill="#f59e0b" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -178,7 +194,7 @@ export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) =
       </div>
 
       <div className="flex flex-col">
-        <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+        <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2">
           Matriz Completa de Desempenho de Mídia
         </div>
         <DataTable

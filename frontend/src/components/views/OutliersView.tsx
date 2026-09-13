@@ -31,7 +31,7 @@ export const OutliersView = () => {
   }, [selectedTable, selectedMetric]);
 
   const outlierColumns: Column<any>[] = [
-    { key: 'dimension_value', header: 'Dimensão / Grupo', className: 'font-semibold text-[#f4f4f5]' },
+    { key: 'dimension_value', header: 'Dimensão / Grupo', className: 'font-semibold text-[#131920] dark:text-[#f4f4f5]' },
     { key: 'total_records', header: 'Registros', align: 'right', render: r => Number(r.total_records).toLocaleString('pt-BR') },
     { key: 'q1', header: 'Q1 (25%)', align: 'right', render: r => Number(r.q1).toFixed(2) },
     { key: 'median', header: 'Mediana (50%)', align: 'right', render: r => Number(r.median).toFixed(2) },
@@ -42,7 +42,7 @@ export const OutliersView = () => {
       header: 'Outliers (Tukey)',
       align: 'right',
       render: r => (
-        <span className={`font-mono font-bold ${r.outliers_count > 0 ? 'text-amber-400' : 'text-[#71717a]'}`}>
+        <span className={`font-mono font-bold ${r.outliers_count > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[#5e6270] dark:text-[#71717a]'}`}>
           {r.outliers_count} ({Number(r.outliers_pct).toFixed(1)}%)
         </span>
       ),
@@ -50,7 +50,7 @@ export const OutliersView = () => {
   ];
 
   if (loading) {
-    return <div className="text-[#71717a] text-sm">Carregando dados de outliers...</div>;
+    return <div className="text-[#5e6270] dark:text-[#71717a] text-sm">Carregando dados de outliers...</div>;
   }
 
   return (
@@ -61,16 +61,16 @@ export const OutliersView = () => {
         devSection="Seção 2: Outliers e Anomalias (DEVELOPMENT.md)"
       />
 
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-lg bg-[#131126] border border-[#262046]">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] shadow-sm">
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <span className="text-xs text-[#a1a1aa] font-medium">Tabela:</span>
+          <span className="text-xs text-[#5e6270] dark:text-[#a1a1aa] font-medium">Tabela:</span>
           <select
             value={selectedTable}
             onChange={e => {
               setSelectedTable(e.target.value);
               setSelectedMetric(undefined);
             }}
-            className="text-xs bg-[#181530] border border-[#262046] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#8575ff]"
+            className="text-xs bg-[#f8f7fc] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] rounded px-2 sm:px-2.5 py-1 text-[#131920] dark:text-[#f4f4f5] focus:outline-none focus:border-[#4200db] dark:focus:border-[#8575ff]"
           >
             {(outliersData?.available_tables || ['vendas', 'estoque', 'clientes', 'atendimento', 'marketing']).map(t => (
               <option key={t} value={t}>{t.toUpperCase()}</option>
@@ -79,11 +79,11 @@ export const OutliersView = () => {
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <span className="text-xs text-[#a1a1aa] font-medium">Métrica:</span>
+          <span className="text-xs text-[#5e6270] dark:text-[#a1a1aa] font-medium">Métrica:</span>
           <select
             value={selectedMetric || outliersData?.selected_metric || ''}
             onChange={e => setSelectedMetric(e.target.value)}
-            className="text-xs bg-[#181530] border border-[#262046] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#8575ff]"
+            className="text-xs bg-[#f8f7fc] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] rounded px-2 sm:px-2.5 py-1 text-[#131920] dark:text-[#f4f4f5] focus:outline-none focus:border-[#4200db] dark:focus:border-[#8575ff]"
           >
             {(outliersData?.available_metrics || []).map(m => (
               <option key={m} value={m}>{m}</option>
@@ -130,7 +130,7 @@ export const OutliersView = () => {
       )}
 
       <div className="flex flex-col">
-        <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
+        <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2 flex items-center justify-between">
           <span>Dispersão e Quantis por {outliersData?.group_by_dimension?.toUpperCase()}</span>
         </div>
         <DataTable

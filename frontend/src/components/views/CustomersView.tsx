@@ -4,6 +4,7 @@ import { CustomerAnalyticsData, FilterOptions } from '../../types/analytics';
 import { MetricCard } from '../common/MetricCard';
 import { ScopeBadge } from '../common/ScopeBadge';
 import { DataTable, Column } from '../common/DataTable';
+import { useTheme } from '../../context/ThemeContext';
 import {
   ResponsiveContainer,
   BarChart,
@@ -19,6 +20,7 @@ interface CustomersViewProps {
 }
 
 export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) => {
+  const { isDark } = useTheme();
   const [loading, setLoading] = useState(true);
   const [custData, setCustData] = useState<CustomerAnalyticsData | null>(null);
 
@@ -42,7 +44,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
     {
       key: 'segmento_rfm',
       header: 'Segmento RFM',
-      className: 'font-semibold text-[#f4f4f5]',
+      className: 'font-semibold text-[#131920] dark:text-[#f4f4f5]',
       render: r => r.segmento_rfm || r.segmento || 'Não Definido',
     },
     {
@@ -68,7 +70,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
       header: '% LTV Total',
       align: 'right',
       render: r => (
-        <span className="font-mono font-bold text-emerald-400">
+        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
           {Number(r.pct_ltv_total || 0).toFixed(1)}%
         </span>
       ),
@@ -88,7 +90,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
   ];
 
   if (loading) {
-    return <div className="text-[#71717a] text-sm">Carregando dados de clientes...</div>;
+    return <div className="text-[#5e6270] dark:text-[#71717a] text-sm">Carregando dados de clientes...</div>;
   }
 
   return (
@@ -130,51 +132,65 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
         </div>
       </div>
 
-      <div className="p-3 sm:p-3.5 rounded-lg bg-[#181530] border border-[#262046] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
-        <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+      <div className="p-3 sm:p-3.5 rounded-lg bg-[#ffffff] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] text-xs text-[#5e6270] dark:text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3 shadow-sm">
+        <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
         <div className="leading-relaxed">
-          <span className="font-semibold text-[#f4f4f5]">Diagnóstico de Concentração de Clientes (Hipótese 5):</span>{' '}
-          Clientes dos segmentos <span className="font-semibold text-[#f4f4f5]">Campeões</span> e <span className="font-semibold text-[#f4f4f5]">Fiéis</span> são poucos em volume, mas representam a maior fatia do LTV acumulado. Em contrapartida, <span className="font-mono text-amber-400 font-semibold">46,7% da base</span> está nas faixas de risco.
+          <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Diagnóstico de Concentração de Clientes (Hipótese 5):</span>{' '}
+          Clientes dos segmentos <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Campeões</span> e <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Fiéis</span> são poucos em volume, mas representam a maior fatia do LTV acumulado. Em contrapartida, <span className="font-mono text-amber-600 dark:text-amber-400 font-semibold">46,7% da base</span> está nas faixas de risco.
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
-          <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] shadow-sm">
+          <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2 truncate">
             Distribuição de Clientes por Segmento RFM
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={custData?.segments || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
-                <XAxis dataKey="segmento" stroke="#71717a" fontSize={10} tickLine={false} />
-                <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#262046' : '#e6e5f0'} opacity={0.7} />
+                <XAxis dataKey="segmento" stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
+                <YAxis stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: isDark ? '#181530' : '#ffffff',
+                    borderColor: isDark ? '#262046' : '#e6e5f0',
+                    color: isDark ? '#f4f4f5' : '#131920',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }}
                 />
-                <Bar dataKey="total_clientes" name="Total Clientes" fill="#8575ff" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="total_clientes" name="Total Clientes" fill={isDark ? '#8575ff' : '#4200db'} radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
-          <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] shadow-sm">
+          <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2 truncate">
             LTV Médio por Segmento RFM (R$)
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={custData?.segments || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
-                <XAxis dataKey="segmento" stroke="#71717a" fontSize={10} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#262046' : '#e6e5f0'} opacity={0.7} />
+                <XAxis dataKey="segmento" stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
                 <YAxis
-                  stroke="#71717a"
+                  stroke={isDark ? '#71717a' : '#8e92a0'}
                   fontSize={10}
                   tickFormatter={v => `${(v / 1e3).toFixed(0)}k`}
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: isDark ? '#181530' : '#ffffff',
+                    borderColor: isDark ? '#262046' : '#e6e5f0',
+                    color: isDark ? '#f4f4f5' : '#131920',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
                 <Bar dataKey="ltv_medio" name="LTV Médio (R$)" fill="#10b981" radius={[3, 3, 0, 0]} />
@@ -185,7 +201,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
       </div>
 
       <div className="flex flex-col">
-        <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+        <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2">
           Matriz de Concentração de Pareto & Ticket Médio por Segmento
         </div>
         <DataTable

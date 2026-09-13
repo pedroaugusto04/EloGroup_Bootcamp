@@ -89,7 +89,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#0a0914] text-[#f4f4f5]">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#faf9fc] dark:bg-[#0a0914] text-[#131920] dark:text-[#f4f4f5] transition-colors duration-150">
       {/* Navigation Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -99,7 +99,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0a0914] min-w-0">
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#faf9fc] dark:bg-[#0a0914] min-w-0 transition-colors duration-150">
         <Header
           activeTab={activeTab}
           onRefresh={handleRefresh}

@@ -4,6 +4,7 @@ import { SupportAnalyticsData, FilterOptions } from '../../types/analytics';
 import { MetricCard } from '../common/MetricCard';
 import { ScopeBadge } from '../common/ScopeBadge';
 import { DataTable, Column } from '../common/DataTable';
+import { useTheme } from '../../context/ThemeContext';
 import {
   ResponsiveContainer,
   BarChart,
@@ -19,6 +20,7 @@ interface SupportViewProps {
 }
 
 export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
+  const { isDark } = useTheme();
   const [loading, setLoading] = useState(true);
   const [supData, setSupData] = useState<SupportAnalyticsData | null>(null);
 
@@ -39,13 +41,13 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
   }, []);
 
   const aiColumns: Column<any>[] = [
-    { key: 'categoria_problema', header: 'Motivo do Chamado', className: 'font-semibold text-[#f4f4f5]' },
+    { key: 'categoria_problema', header: 'Motivo do Chamado', className: 'font-semibold text-[#131920] dark:text-[#f4f4f5]' },
     {
       key: 'is_automatizavel',
       header: 'Automação IA',
       align: 'center',
       render: r => (
-        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${r.is_automatizavel ? 'bg-[#8575ff]/20 text-[#8575ff] border border-[#8575ff]/40' : 'bg-[#1f1a3a] text-[#71717a]'}`}>
+        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${r.is_automatizavel ? 'bg-[#e8e6ff] dark:bg-[#8575ff]/20 text-[#4200db] dark:text-[#8575ff] border border-[#c4b8ff] dark:border-[#8575ff]/40' : 'bg-[#f3f2f8] dark:bg-[#1f1a3a] text-[#5e6270] dark:text-[#71717a]'}`}>
           {r.is_automatizavel ? 'Automatizável (IA)' : 'Atendimento Humano'}
         </span>
       ),
@@ -79,7 +81,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
       header: 'Economia Potencial (IA)',
       align: 'right',
       render: r => (
-        <span className={`font-mono font-bold ${r.custo_evitavel_automacao > 0 ? 'text-emerald-400' : 'text-[#71717a]'}`}>
+        <span className={`font-mono font-bold ${r.custo_evitavel_automacao > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#8e92a0] dark:text-[#71717a]'}`}>
           R$ {Number(r.custo_evitavel_automacao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
         </span>
       ),
@@ -87,7 +89,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
   ];
 
   if (loading) {
-    return <div className="text-[#71717a] text-sm">Carregando dados de suporte...</div>;
+    return <div className="text-[#5e6270] dark:text-[#71717a] text-sm">Carregando dados de suporte...</div>;
   }
 
   return (
@@ -132,48 +134,62 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
         </div>
       </div>
 
-      <div className="p-3 sm:p-3.5 rounded-lg bg-[#181530] border border-[#262046] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
-        <div className="w-2 h-2 rounded-full bg-[#8575ff] mt-1.5 shrink-0" />
+      <div className="p-3 sm:p-3.5 rounded-lg bg-[#ffffff] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] text-xs text-[#5e6270] dark:text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3 shadow-sm">
+        <div className="w-2 h-2 rounded-full bg-[#4200db] dark:bg-[#8575ff] mt-1.5 shrink-0" />
         <div className="leading-relaxed">
-          <span className="font-semibold text-[#f4f4f5]">Oportunidade Imediata de IA & Notificação (Hipótese 4):</span>{' '}
-          O motivo <span className="font-semibold text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#8575ff] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), logo o atrito é puramente ansiedade e falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento resolve o problema.
+          <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Oportunidade Imediata de IA & Notificação (Hipótese 4):</span>{' '}
+          O motivo <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#4200db] dark:text-[#8575ff] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), logo o atrito é puramente ansiedade e falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento resolve o problema.
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
-          <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] shadow-sm">
+          <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2 truncate">
             Volume de Chamados por Canal de Entrada
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={supData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
-                <XAxis dataKey="canal_entrada" stroke="#71717a" fontSize={10} tickLine={false} />
-                <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#262046' : '#e6e5f0'} opacity={0.7} />
+                <XAxis dataKey="canal_entrada" stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
+                <YAxis stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: isDark ? '#181530' : '#ffffff',
+                    borderColor: isDark ? '#262046' : '#e6e5f0',
+                    color: isDark ? '#f4f4f5' : '#131920',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }}
                 />
-                <Bar dataKey="total_tickets" name="Total Tickets" fill="#8575ff" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="total_tickets" name="Total Tickets" fill={isDark ? '#8575ff' : '#4200db'} radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
-          <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] shadow-sm">
+          <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2 truncate">
             Distribuição das Notas CSAT (1 a 5)
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={supData?.csat_distribution || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
-                <XAxis dataKey="nota_csat" stroke="#71717a" fontSize={10} tickLine={false} />
-                <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#262046' : '#e6e5f0'} opacity={0.7} />
+                <XAxis dataKey="nota_csat" stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
+                <YAxis stroke={isDark ? '#71717a' : '#8e92a0'} fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: isDark ? '#181530' : '#ffffff',
+                    borderColor: isDark ? '#262046' : '#e6e5f0',
+                    color: isDark ? '#f4f4f5' : '#131920',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }}
                 />
-                <Bar dataKey="total_avaliacoes" name="Avaliações" fill="#6366f1" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="total_avaliacoes" name="Avaliações" fill={isDark ? '#6366f1' : '#6366f1'} radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -181,7 +197,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
       </div>
 
       <div className="flex flex-col">
-        <div className="text-xs font-semibold text-[#f4f4f5] mb-2">
+        <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2">
           Diagnóstico de Causas-Raiz & Custos Evitáveis por Automação IA
         </div>
         <DataTable
