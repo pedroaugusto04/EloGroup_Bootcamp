@@ -45,7 +45,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
       header: 'Automação IA',
       align: 'center',
       render: r => (
-        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${r.is_automatizavel ? 'bg-[#38bdf8]/15 text-[#38bdf8] border border-[#38bdf8]/30' : 'bg-[#27272a] text-[#71717a]'}`}>
+        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${r.is_automatizavel ? 'bg-[#8575ff]/20 text-[#8575ff] border border-[#8575ff]/40' : 'bg-[#1f1a3a] text-[#71717a]'}`}>
           {r.is_automatizavel ? 'Automatizável (IA)' : 'Atendimento Humano'}
         </span>
       ),
@@ -132,48 +132,48 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
         </div>
       </div>
 
-      <div className="p-3 sm:p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
-        <div className="w-2 h-2 rounded-full bg-[#38bdf8] mt-1.5 shrink-0" />
+      <div className="p-3 sm:p-3.5 rounded-lg bg-[#181530] border border-[#262046] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
+        <div className="w-2 h-2 rounded-full bg-[#8575ff] mt-1.5 shrink-0" />
         <div className="leading-relaxed">
           <span className="font-semibold text-[#f4f4f5]">Oportunidade Imediata de IA & Notificação (Hipótese 4):</span>{' '}
-          O motivo <span className="font-semibold text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#38bdf8] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), logo o atrito é puramente ansiedade e falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento resolve o problema.
+          O motivo <span className="font-semibold text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#8575ff] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), logo o atrito é puramente ansiedade e falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento resolve o problema.
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
             Volume de Chamados por Canal de Entrada
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={supData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="canal_entrada" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                 />
-                <Bar dataKey="total_tickets" name="Total Tickets" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="total_tickets" name="Total Tickets" fill="#8575ff" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
             Distribuição das Notas CSAT (1 a 5)
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={supData?.csat_distribution || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="nota_csat" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                 />
-                <Bar dataKey="total_avaliacoes" name="Avaliações" fill="#818cf8" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="total_avaliacoes" name="Avaliações" fill="#6366f1" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -23,10 +23,10 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 }) => {
   return (
     <div
-      className={`relative p-3 sm:p-4 rounded-lg border bg-[#11131a] transition-all duration-150 flex flex-col justify-between ${
+      className={`relative p-3 sm:p-4 rounded-lg border bg-[#131126] transition-all duration-150 flex flex-col justify-between ${
         highlight
-          ? 'border-[#38bdf8]/40 shadow-[0_0_15px_rgba(56,189,248,0.06)]'
-          : 'border-[#27272a] hover:border-[#3f3f46]'
+          ? 'border-[#8575ff]/50 shadow-[0_0_15px_rgba(133,117,255,0.12)]'
+          : 'border-[#262046] hover:border-[#4a3f85]'
       }`}
       title={help}
     >
@@ -36,7 +36,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
           <span
             className={`text-[10px] sm:text-[11px] font-mono font-medium px-1.5 py-0.2 rounded shrink-0 whitespace-nowrap ${
               trend.isNeutral
-                ? 'bg-[#27272a] text-[#a1a1aa]'
+                ? 'bg-[#1f1a3a] text-[#a1a1aa] border border-[#262046]'
                 : trend.isPositive
                 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                 : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'

@@ -204,7 +204,7 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
   const activeThread = threads.find(t => t.id === activeThreadId);
 
   return (
-    <div className="relative flex h-full w-full bg-[#09090b] overflow-hidden">
+    <div className="relative flex h-full w-full bg-[#0a0914] overflow-hidden">
       {/* Mobile Backdrop for Threads Drawer */}
       {showThreadsMobile && (
         <div
@@ -215,21 +215,21 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
 
       {/* Threads Sidebar */}
       <div
-        className={`fixed md:static inset-y-0 left-0 z-40 w-72 sm:w-80 md:w-64 lg:w-72 shrink-0 border-r border-[#27272a] bg-[#11131a] flex flex-col h-full select-none transform transition-transform duration-300 ease-in-out ${showThreadsMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+        className={`fixed md:static inset-y-0 left-0 z-40 w-72 sm:w-80 md:w-64 lg:w-72 shrink-0 border-r border-[#262046] bg-[#121024] flex flex-col h-full select-none transform transition-transform duration-300 ease-in-out ${showThreadsMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
           }`}
       >
-        <div className="p-3 sm:p-3.5 border-b border-[#27272a] bg-[#0d0d10] flex flex-col gap-2">
+        <div className="p-3 sm:p-3.5 border-b border-[#262046] bg-[#0d0b1a] flex flex-col gap-2">
           <button
             onClick={handleNewThread}
-            className="w-full py-2 px-3 rounded-lg bg-[#18181b] border border-[#27272a] hover:border-[#38bdf8]/50 text-[#f4f4f5] text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm hover:bg-[#202025] active:scale-95"
+            className="w-full py-2 px-3 rounded-lg bg-[#181530] border border-[#262046] hover:border-[#8575ff]/50 text-[#f4f4f5] text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm hover:bg-[#201c3e] active:scale-95"
           >
-            <Plus className="w-4 h-4 text-[#38bdf8]" />
+            <Plus className="w-4 h-4 text-[#8575ff]" />
             <span>Nova Conversa</span>
           </button>
           {onOpenAuditModal && (
             <button
               onClick={onOpenAuditModal}
-              className="w-full py-1.5 px-3 rounded-lg bg-[#38bdf8]/10 border border-[#38bdf8]/30 hover:bg-[#38bdf8]/20 text-[#38bdf8] text-xs font-medium flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
+              className="w-full py-1.5 px-3 rounded-lg bg-[#8575ff]/10 border border-[#8575ff]/30 hover:bg-[#8575ff]/20 text-[#8575ff] text-xs font-medium flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
             >
               <Mail className="w-3.5 h-3.5" />
               <span>Gerar Auditoria</span>
@@ -243,8 +243,8 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
               key={thread.id}
               onClick={() => selectThread(thread.id)}
               className={`group flex items-center justify-between p-2.5 sm:p-3 rounded-lg cursor-pointer text-xs transition-colors ${activeThreadId === thread.id
-                ? 'bg-[#18181b] border border-[#38bdf8]/40 text-[#f4f4f5] shadow-sm'
-                : 'hover:bg-[#18181b]/60 text-[#a1a1aa] border border-transparent'
+                ? 'bg-[#181530] border border-[#8575ff]/40 text-[#f4f4f5] shadow-sm'
+                : 'hover:bg-[#181530]/60 text-[#a1a1aa] border border-transparent'
                 }`}
             >
               <span className="truncate flex-1 font-medium">{thread.title || 'Conversa'}</span>
@@ -259,24 +259,24 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
           ))}
         </div>
 
-        <div className="p-3 border-t border-[#27272a] bg-[#0d0d10] text-[11px] font-mono text-[#71717a] flex items-center justify-between">
+        <div className="p-3 border-t border-[#262046] bg-[#0d0b1a] text-[11px] font-mono text-[#71717a] flex items-center justify-between">
           <span className="text-[10px] text-[#52525b]">{threads.length} chats</span>
         </div>
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 min-w-0 flex flex-col h-full bg-[#09090b]">
-        <div className="px-3 sm:px-6 py-2 border-b border-[#27272a] bg-[#38bdf8]/5 text-[10px] sm:text-[11px] text-[#a1a1aa] leading-relaxed">
+      <div className="flex-1 min-w-0 flex flex-col h-full bg-[#0a0914]">
+        <div className="px-3 sm:px-6 py-2 border-b border-[#262046] bg-[#8575ff]/5 text-[10px] sm:text-[11px] text-[#a1a1aa] leading-relaxed">
           <strong className="text-[#d4d4d8]">Posição de estoque fornecida — data de referência não informada.</strong>{' '}
           {periods[0]
             ? `Tendência de vendas observada entre ${periods[0].sales_start.split('-').reverse().join('/')} e ${periods[0].sales_end.split('-').reverse().join('/')}.`
             : 'As datas da tendência de vendas serão resolvidas pelo backend.'}
         </div>
         {/* Mobile Top Sub-Header */}
-        <div className="md:hidden flex items-center justify-between px-3 py-2 border-b border-[#27272a] bg-[#0d0d10]/80 text-xs">
+        <div className="md:hidden flex items-center justify-between px-3 py-2 border-b border-[#262046] bg-[#0d0b1a]/80 text-xs">
           <button
             onClick={() => setShowThreadsMobile(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#18181b] border border-[#27272a] text-[#38bdf8] font-medium"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#181530] border border-[#262046] text-[#8575ff] font-medium"
           >
             <span>Conversas ({threads.length})</span>
           </button>
@@ -290,7 +290,7 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
           <div className="max-w-4xl mx-auto w-full space-y-6 sm:space-y-8">
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-10 sm:py-20 px-2 sm:px-4 space-y-4 sm:space-y-5">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#38bdf8]/20 to-[#818cf8]/20 border border-[#38bdf8]/40 flex items-center justify-center text-[#38bdf8] shadow-[0_0_30px_rgba(56,189,248,0.25)]">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#4200db]/30 to-[#8575ff]/30 border border-[#8575ff]/50 flex items-center justify-center text-[#8575ff] shadow-[0_0_30px_rgba(66,0,219,0.3)]">
                   <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
                 <div>
@@ -306,7 +306,7 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
                     <button
                       key={idx}
                       onClick={() => handleSendMessage(prompt)}
-                      className="p-3 sm:p-4 rounded-xl bg-[#121215] border border-[#27272a] hover:border-[#38bdf8]/50 text-xs text-[#d4d4d8] hover:text-[#f4f4f5] transition-all hover:bg-[#18181b] shadow-sm leading-relaxed text-left active:scale-[0.99]"
+                      className="p-3 sm:p-4 rounded-xl bg-[#131126] border border-[#262046] hover:border-[#8575ff]/50 text-xs text-[#d4d4d8] hover:text-[#f4f4f5] transition-all hover:bg-[#181530] shadow-sm leading-relaxed text-left active:scale-[0.99]"
                     >
                       {prompt}
                     </button>
@@ -319,17 +319,17 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
                   {msg.role === 'user' ? (
                     <div className="flex flex-col items-end gap-1 w-full">
                       <div className="flex items-start gap-2 sm:gap-3 max-w-[92%] sm:max-w-[80%]">
-                        <div className="rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 bg-[#2563eb]/20 border border-[#2563eb]/40 text-[#f4f4f5] text-xs sm:text-[13.5px] leading-relaxed shadow-sm">
+                        <div className="rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 bg-[#4200db]/30 border border-[#8575ff]/40 text-[#f4f4f5] text-xs sm:text-[13.5px] leading-relaxed shadow-sm">
                           <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                         </div>
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#27272a] flex items-center justify-center text-[#a1a1aa] shrink-0 mt-0.5 shadow-sm">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#262046] flex items-center justify-center text-[#a1a1aa] shrink-0 mt-0.5 shadow-sm">
                           <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-start gap-2.5 sm:gap-4 w-full min-w-0">
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#38bdf8]/20 to-[#818cf8]/20 border border-[#38bdf8]/40 flex items-center justify-center text-[#38bdf8] shrink-0 mt-0.5 shadow-[0_0_16px_rgba(56,189,248,0.15)]">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#4200db]/30 to-[#8575ff]/30 border border-[#8575ff]/50 flex items-center justify-center text-[#8575ff] shrink-0 mt-0.5 shadow-[0_0_16px_rgba(133,117,255,0.2)]">
                         <Bot className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
                       </div>
                       <div className="flex-1 min-w-0 text-xs sm:text-[13.5px] text-[#d4d4d8] leading-relaxed overflow-hidden">
@@ -338,13 +338,13 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
                             remarkPlugins={[remarkGfm]}
                             components={{
                               h1: ({ node, ...props }) => (
-                                <h1 className="text-base sm:text-xl font-bold text-[#38bdf8] mt-4 sm:mt-6 mb-2 sm:mb-3 pb-1.5 border-b border-[#27272a] font-sans tracking-tight" {...props} />
+                                <h1 className="text-base sm:text-xl font-bold text-[#8575ff] mt-4 sm:mt-6 mb-2 sm:mb-3 pb-1.5 border-b border-[#262046] font-sans tracking-tight" {...props} />
                               ),
                               h2: ({ node, ...props }) => (
                                 <h2 className="text-sm sm:text-lg font-semibold text-[#f4f4f5] mt-3 sm:mt-5 mb-2 font-sans tracking-tight" {...props} />
                               ),
                               h3: ({ node, ...props }) => (
-                                <h3 className="text-xs sm:text-base font-semibold text-[#38bdf8]/90 mt-3 sm:mt-4 mb-1.5 font-sans tracking-tight" {...props} />
+                                <h3 className="text-xs sm:text-base font-semibold text-[#8575ff]/90 mt-3 sm:mt-4 mb-1.5 font-sans tracking-tight" {...props} />
                               ),
                               h4: ({ node, ...props }) => (
                                 <h4 className="text-xs sm:text-sm font-semibold text-[#e4e4e7] mt-2 sm:mt-3 mb-1 font-sans" {...props} />
@@ -355,18 +355,18 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
                               li: ({ node, ...props }) => <li className="leading-relaxed pl-0.5" {...props} />,
                               strong: ({ node, ...props }) => <strong className="font-semibold text-[#f4f4f5]" {...props} />,
                               table: ({ node, ...props }) => (
-                                <div className="overflow-x-auto my-3 sm:my-4 rounded-xl border border-[#27272a] bg-[#11131a] shadow-md touch-pan-x">
+                                <div className="overflow-x-auto my-3 sm:my-4 rounded-xl border border-[#262046] bg-[#131126] shadow-md touch-pan-x">
                                   <table className="w-full text-left text-[11px] sm:text-xs border-collapse min-w-[300px]" {...props} />
                                 </div>
                               ),
                               thead: ({ node, ...props }) => (
-                                <thead className="bg-[#18181b] text-[#f4f4f5] border-b border-[#27272a]" {...props} />
+                                <thead className="bg-[#181530] text-[#f4f4f5] border-b border-[#262046]" {...props} />
                               ),
                               th: ({ node, ...props }) => (
-                                <th className="px-2.5 sm:px-3.5 py-2 sm:py-2.5 font-semibold text-[#f4f4f5] border-b border-[#27272a]" {...props} />
+                                <th className="px-2.5 sm:px-3.5 py-2 sm:py-2.5 font-semibold text-[#f4f4f5] border-b border-[#262046]" {...props} />
                               ),
                               td: ({ node, ...props }) => (
-                                <td className="px-2.5 sm:px-3.5 py-2 sm:py-2.5 border-b border-[#27272a]/40 text-[#d4d4d8] font-mono text-[11px] sm:text-[12px]" {...props} />
+                                <td className="px-2.5 sm:px-3.5 py-2 sm:py-2.5 border-b border-[#262046]/40 text-[#d4d4d8] font-mono text-[11px] sm:text-[12px]" {...props} />
                               ),
                               code: ({ node, inline, className, children, ...props }: any) => {
                                 const codeContent = String(children).replace(/\n$/, '');
@@ -375,21 +375,21 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
                                 }
                                 if (inline) {
                                   return (
-                                    <code className="bg-[#18181b] px-1 py-0.5 rounded text-[#38bdf8] font-mono text-[11px] sm:text-[12px] border border-[#27272a]" {...props}>
+                                    <code className="bg-[#181530] px-1 py-0.5 rounded text-[#8575ff] font-mono text-[11px] sm:text-[12px] border border-[#262046]" {...props}>
                                       {children}
                                     </code>
                                   );
                                 }
                                 return (
-                                  <div className="overflow-x-auto my-3 sm:my-4 rounded-xl bg-[#11131a] border border-[#27272a] p-3 sm:p-4 shadow-sm">
-                                    <code className="font-mono text-[11px] sm:text-xs text-[#38bdf8] leading-relaxed whitespace-pre-wrap" {...props}>
+                                  <div className="overflow-x-auto my-3 sm:my-4 rounded-xl bg-[#131126] border border-[#262046] p-3 sm:p-4 shadow-sm">
+                                    <code className="font-mono text-[11px] sm:text-xs text-[#8575ff] leading-relaxed whitespace-pre-wrap" {...props}>
                                       {children}
                                     </code>
                                   </div>
                                 );
                               },
                               blockquote: ({ node, ...props }) => (
-                                <blockquote className="border-l-2 border-[#38bdf8] pl-3 sm:pl-4 py-1.5 my-2.5 text-[#a1a1aa] italic bg-[#38bdf8]/5 rounded-r-lg" {...props} />
+                                <blockquote className="border-l-2 border-[#8575ff] pl-3 sm:pl-4 py-1.5 my-2.5 text-[#a1a1aa] italic bg-[#8575ff]/5 rounded-r-lg" {...props} />
                               ),
                             }}
                           >
@@ -405,11 +405,11 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
 
             {isSending && (
               <div className="flex items-start gap-2.5 sm:gap-4 w-full">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#38bdf8]/20 to-[#818cf8]/20 border border-[#38bdf8]/40 flex items-center justify-center text-[#38bdf8] shrink-0 shadow-[0_0_16px_rgba(56,189,248,0.15)]">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#4200db]/30 to-[#8575ff]/30 border border-[#8575ff]/50 flex items-center justify-center text-[#8575ff] shrink-0 shadow-[0_0_16px_rgba(133,117,255,0.2)]">
                   <Bot className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
                 </div>
-                <div className="py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-xl bg-[#121215] border border-[#27272a] text-xs sm:text-[13px] text-[#a1a1aa] flex items-center gap-2.5 shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-[#38bdf8] animate-ping" />
+                <div className="py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-xl bg-[#131126] border border-[#262046] text-xs sm:text-[13px] text-[#a1a1aa] flex items-center gap-2.5 shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-[#8575ff] animate-ping" />
                   <span>Consultando as bases e gerando raciocínio...</span>
                 </div>
               </div>
@@ -419,7 +419,7 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
         </div>
 
         {/* Input Bar Fixed at Bottom */}
-        <div className="p-3 sm:p-4 md:p-5 border-t border-[#27272a] bg-[#0c0d12] shrink-0 shadow-2xl">
+        <div className="p-3 sm:p-4 md:p-5 border-t border-[#262046] bg-[#0d0b1a] shrink-0 shadow-2xl">
           <form
             onSubmit={e => {
               e.preventDefault();
@@ -432,13 +432,13 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
               value={inputText}
               onChange={e => setInputText(e.target.value)}
               placeholder="Pergunte ao Copiloto (ex: liquidar Beleza?)..."
-              className="flex-1 bg-[#18181b] border border-[#27272a] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#38bdf8]/70 transition-colors shadow-inner"
+              className="flex-1 bg-[#181530] border border-[#262046] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#8575ff]/70 transition-colors shadow-inner"
               disabled={isSending}
             />
             <button
               type="submit"
               disabled={!inputText.trim() || isSending}
-              className="px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#09090b] font-semibold text-xs sm:text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 sm:gap-2 shadow-md hover:shadow-[0_0_15px_rgba(56,189,248,0.3)] active:scale-95 shrink-0"
+              className="px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-[#4200db] hover:bg-[#35009e] text-[#ffffff] font-semibold text-xs sm:text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 sm:gap-2 shadow-md shadow-[#4200db]/30 hover:shadow-[0_0_15px_rgba(133,117,255,0.4)] active:scale-95 shrink-0"
             >
               <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Enviar</span>

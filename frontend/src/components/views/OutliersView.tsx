@@ -61,7 +61,7 @@ export const OutliersView = () => {
         devSection="Seção 2: Outliers e Anomalias (DEVELOPMENT.md)"
       />
 
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-lg bg-[#11131a] border border-[#27272a]">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-lg bg-[#131126] border border-[#262046]">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-xs text-[#a1a1aa] font-medium">Tabela:</span>
           <select
@@ -70,7 +70,7 @@ export const OutliersView = () => {
               setSelectedTable(e.target.value);
               setSelectedMetric(undefined);
             }}
-            className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+            className="text-xs bg-[#181530] border border-[#262046] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#8575ff]"
           >
             {(outliersData?.available_tables || ['vendas', 'estoque', 'clientes', 'atendimento', 'marketing']).map(t => (
               <option key={t} value={t}>{t.toUpperCase()}</option>
@@ -83,7 +83,7 @@ export const OutliersView = () => {
           <select
             value={selectedMetric || outliersData?.selected_metric || ''}
             onChange={e => setSelectedMetric(e.target.value)}
-            className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+            className="text-xs bg-[#181530] border border-[#262046] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#8575ff]"
           >
             {(outliersData?.available_metrics || []).map(m => (
               <option key={m} value={m}>{m}</option>

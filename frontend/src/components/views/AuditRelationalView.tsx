@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../api/client';
 import { RelationalAuditData } from '../../types/analytics';
-import { MetricCard } from '../common/MetricCard';
 import { ScopeBadge } from '../common/ScopeBadge';
 import { AlertTriangle, ShieldAlert } from 'lucide-react';
 import {
@@ -51,7 +50,7 @@ export const AuditRelationalView = () => {
         {(relData?.audit_findings || []).map((finding, idx) => (
           <div
             key={idx}
-            className="p-3 sm:p-3.5 rounded-lg bg-[#11131a] border border-[#27272a] flex items-start gap-2.5 sm:gap-3 text-xs"
+            className="p-3 sm:p-3.5 rounded-lg bg-[#131126] border border-[#262046] flex items-start gap-2.5 sm:gap-3 text-xs"
           >
             <div className="mt-0.5 shrink-0">
               {finding.severity === 'Crítica' ? (
@@ -77,7 +76,7 @@ export const AuditRelationalView = () => {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-1.5 text-[11px] font-mono bg-[#18181b] p-2 rounded border border-[#27272a]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-1.5 text-[11px] font-mono bg-[#181530] p-2 rounded border border-[#262046]">
                 <div>
                   <span className="text-[#71717a] block">Base Vendas:</span>
                   <span className="text-[#d4d4d8]">{finding.erp_coverage}</span>
@@ -96,14 +95,14 @@ export const AuditRelationalView = () => {
         ))}
       </div>
 
-      <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+      <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
         <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
           <span className="truncate">Atribuição de Mídia vs. Receita Real de Vendas</span>
         </div>
         <div className="h-64 sm:h-72 w-full mt-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={relData?.mkt_vs_sales || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
               <XAxis dataKey="ano_mes" stroke="#71717a" fontSize={10} tickLine={false} />
               <YAxis
                 stroke="#71717a"
@@ -112,13 +111,13 @@ export const AuditRelationalView = () => {
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                 formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
               />
               <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
               <Bar dataKey="investimento_mkt" name="Invest. Mídia (R$)" fill="#94a3b8" radius={[3, 3, 0, 0]} />
               <Bar dataKey="receita_declarada_mkt" name="Receita Mídia (R$)" fill="#f59e0b" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="receita_liquida_real" name="Receita Real (R$)" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="receita_liquida_real" name="Receita Real (R$)" fill="#8575ff" radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

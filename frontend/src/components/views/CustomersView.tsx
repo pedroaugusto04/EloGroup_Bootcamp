@@ -130,7 +130,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
         </div>
       </div>
 
-      <div className="p-3 sm:p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
+      <div className="p-3 sm:p-3.5 rounded-lg bg-[#181530] border border-[#262046] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
         <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
         <div className="leading-relaxed">
           <span className="font-semibold text-[#f4f4f5]">Diagnóstico de Concentração de Clientes (Hipótese 5):</span>{' '}
@@ -139,33 +139,33 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
             Distribuição de Clientes por Segmento RFM
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={custData?.segments || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="segmento" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                 />
-                <Bar dataKey="total_clientes" name="Total Clientes" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="total_clientes" name="Total Clientes" fill="#8575ff" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
             LTV Médio por Segmento RFM (R$)
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={custData?.segments || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="segmento" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis
                   stroke="#71717a"
@@ -174,7 +174,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
                 <Bar dataKey="ltv_medio" name="LTV Médio (R$)" fill="#10b981" radius={[3, 3, 0, 0]} />

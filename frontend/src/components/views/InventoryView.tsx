@@ -13,8 +13,6 @@ import {
   Tooltip,
   Legend,
   CartesianGrid,
-  PieChart,
-  Pie,
   Cell,
 } from 'recharts';
 
@@ -29,7 +27,7 @@ const STATUS_COLORS: Record<string, string> = {
   'Descontinuado': '#f43f5e',
   'Estoque Crítico': '#f59e0b',
   'Normal': '#10b981',
-  'Excesso': '#38bdf8',
+  'Excesso': '#8575ff',
 };
 
 export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onOpenAuditModal }) => {
@@ -59,8 +57,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
     {
       key: 'sku_id',
       header: 'SKU',
-      className: 'font-mono text-[#38bdf8]',
-      render: r => <span className="font-mono text-[#38bdf8]">{r.sku_id}</span>,
+      className: 'font-mono text-[#8575ff]',
+      render: r => <span className="font-mono text-[#8575ff]">{r.sku_id}</span>,
     },
     { key: 'nome_produto', header: 'Produto' },
     { key: 'categoria', header: 'Categoria' },
@@ -112,15 +110,15 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
         devSection="Seção 3 & Seção 5: Hipótese 6 (Descompasso de Estoque & Ruptura)"
       />
 
-      <div className="p-3 rounded-lg border border-[#38bdf8]/30 bg-[#38bdf8]/5 text-xs text-[#a1a1aa]">
+      <div className="p-3 rounded-lg border border-[#8575ff]/30 bg-[#8575ff]/5 text-xs text-[#a1a1aa]">
         {data?.methodology_banner || 'Carregando escopo temporal e metodologia…'}
       </div>
 
       {/* Autonomous Inventory Audit & Email Dispatch Banner */}
       {onOpenAuditModal && (
-        <div className="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-[#18181b] via-[#151720] to-[#121624] border border-[#38bdf8]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+        <div className="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-[#181530] via-[#16132e] to-[#121024] border border-[#8575ff]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
           <div className="flex items-center gap-3">
-            <div className="p-2 sm:p-2.5 rounded-lg bg-[#38bdf8]/15 border border-[#38bdf8]/30 text-[#38bdf8]">
+            <div className="p-2 sm:p-2.5 rounded-lg bg-[#4200db]/20 border border-[#8575ff]/40 text-[#8575ff]">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -132,7 +130,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
           </div>
           <button
             onClick={onOpenAuditModal}
-            className="w-full sm:w-auto px-3.5 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#0284c7] text-[#09090b] font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-[#38bdf8]/20 transition-all active:scale-95 whitespace-nowrap"
+            className="w-full sm:w-auto px-3.5 py-2 rounded-lg bg-[#4200db] hover:bg-[#35009e] text-[#ffffff] font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-[#4200db]/30 transition-all active:scale-95 whitespace-nowrap"
           >
             <Mail className="w-4 h-4" />
             <span>Gerar Auditoria</span>
@@ -142,7 +140,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
 
       {/* Category Filter */}
       {filterOptions?.categories && (
-        <div className="flex items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-lg bg-[#11131a] border border-[#27272a] flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-lg bg-[#131126] border border-[#262046] flex-wrap">
           <span className="text-xs text-[#a1a1aa] font-medium mr-1">Filtrar Categoria:</span>
           {filterOptions.categories.map(cat => {
             const active = selectedCats.includes(cat);
@@ -157,8 +155,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
                   }
                 }}
                 className={`text-[10px] sm:text-[11px] px-2 sm:px-2.5 py-0.5 rounded border transition-colors ${active
-                    ? 'bg-[#38bdf8]/15 border-[#38bdf8]/60 text-[#38bdf8] font-medium'
-                    : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46]'
+                    ? 'bg-[#8575ff]/20 border-[#8575ff]/60 text-[#8575ff] font-medium'
+                    : 'bg-[#181530] border-[#262046] text-[#a1a1aa] hover:border-[#4a3f85]'
                   }`}
               >
                 {cat}
@@ -212,8 +210,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
       </div>
 
       {/* Key Finding Executive Callout */}
-      <div className="p-3 sm:p-3.5 rounded-lg bg-[#18181b] border border-[#27272a] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
-        <div className="w-2 h-2 rounded-full bg-[#38bdf8] mt-1.5 shrink-0" />
+      <div className="p-3 sm:p-3.5 rounded-lg bg-[#181530] border border-[#262046] text-xs text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3">
+        <div className="w-2 h-2 rounded-full bg-[#8575ff] mt-1.5 shrink-0" />
         <div className="leading-relaxed">
           <span className="font-semibold text-[#f4f4f5]">Diretriz de análise:</span>{' '}
           Ruptura imediata, ponto de pedido e margem em risco no lead time representam diferentes níveis de urgência operacional. Itens descontinuados devem ser priorizados para liquidação e liberação de capital.
@@ -223,18 +221,18 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         {/* Rupture by Category Stacked */}
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
             <span className="truncate">Sinais operacionais por categoria</span>
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data?.categories_rupture || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="categoria" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="skus_ruptura" name="Ruptura Real (Estoque = 0)" fill="#ef4444" stackId="a" radius={[0, 0, 0, 0]} />
@@ -245,14 +243,14 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
         </div>
 
         {/* Capital Breakdown by Status */}
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
             <span className="truncate">Capital coberto em Vendas por status</span>
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data?.status_breakdown || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="status_disponibilidade" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis
                   stroke="#71717a"
@@ -261,14 +259,14 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
                 <Bar dataKey="capital_total_estoque" name="Capital Total (R$)" radius={[3, 3, 0, 0]}>
                   {(data?.status_breakdown || []).map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={STATUS_COLORS[entry.status_disponibilidade] || '#38bdf8'}
+                      fill={STATUS_COLORS[entry.status_disponibilidade] || '#8575ff'}
                     />
                   ))}
                 </Bar>

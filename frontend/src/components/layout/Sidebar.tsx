@@ -135,13 +135,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 sm:w-80 lg:w-64 xl:w-72 bg-[#121215] border-r border-[#27272a] flex flex-col h-full shrink-0 select-none transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 sm:w-80 lg:w-64 xl:w-72 bg-[#121024] border-r border-[#262046] flex flex-col h-full shrink-0 select-none transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
           }`}
       >
         {/* Brand Header */}
-        <div className="p-4 border-b border-[#27272a] bg-[#0d0d10] flex items-center justify-between">
+        <div className="p-4 border-b border-[#262046] bg-[#0d0b1a] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8] shadow-sm">
+            <div className="w-8 h-8 rounded-md bg-[#4200db]/20 border border-[#8575ff]/40 flex items-center justify-center text-[#8575ff] shadow-sm shadow-[#4200db]/30">
               <Layers className="w-4 h-4" />
             </div>
             <div>
@@ -154,7 +154,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Close button on Mobile */}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b] lg:hidden transition-colors"
+            className="p-1.5 rounded-lg text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#181530] lg:hidden transition-colors"
             title="Fechar menu"
           >
             <X className="w-5 h-5" />
@@ -178,14 +178,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       key={item.id}
                       onClick={() => handleItemClick(item.id)}
                       className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${isActive
-                        ? 'bg-[#18181b] border-[#38bdf8]/50 shadow-[0_0_12px_rgba(56,189,248,0.08)]'
-                        : 'bg-transparent border-transparent hover:bg-[#18181b]/60 hover:border-[#27272a]'
+                        ? 'bg-[#181530] border-[#8575ff]/50 shadow-[0_0_12px_rgba(133,117,255,0.12)]'
+                        : 'bg-transparent border-transparent hover:bg-[#181530]/60 hover:border-[#262046]'
                         }`}
                     >
                       <div
                         className={`mt-0.5 p-1.5 rounded-md transition-colors shrink-0 ${isActive
-                          ? 'bg-[#38bdf8]/15 text-[#38bdf8]'
-                          : 'bg-[#18181b] text-[#71717a] group-hover:text-[#a1a1aa]'
+                          ? 'bg-[#4200db]/30 text-[#8575ff] border border-[#8575ff]/30'
+                          : 'bg-[#181530] text-[#71717a] group-hover:text-[#a1a1aa]'
                           }`}
                       >
                         <Icon className="w-4 h-4" />
@@ -209,7 +209,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </div>
 
                       {isActive && (
-                        <ChevronRight className="w-3.5 h-3.5 text-[#38bdf8] self-center shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-[#8575ff] self-center shrink-0" />
                       )}
                     </button>
                   );
@@ -220,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Footer Info */}
-        <div className="p-3 border-t border-[#27272a] bg-[#0d0d10] text-[11px] font-mono text-[#71717a]">
+        <div className="p-3 border-t border-[#262046] bg-[#0d0b1a] text-[11px] font-mono text-[#71717a]">
           <div className="flex items-center justify-between">
             <span>v2.0.0</span>
           </div>

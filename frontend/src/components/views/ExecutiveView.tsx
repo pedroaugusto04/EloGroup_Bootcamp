@@ -23,7 +23,7 @@ interface ExecutiveViewProps {
   filterOptions?: FilterOptions;
 }
 
-const COLORS = ['#38bdf8', '#818cf8', '#34d399', '#fbbf24', '#f87171', '#a78bfa'];
+const COLORS = ['#8575ff', '#6366f1', '#a855f7', '#34d399', '#fbbf24', '#f87171', '#38bdf8'];
 
 export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) => {
   const [loading, setLoading] = useState(true);
@@ -68,8 +68,8 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
     {
       key: 'sku_id',
       header: 'SKU',
-      className: 'font-mono text-[#38bdf8]',
-      render: r => <span className="font-mono text-[#38bdf8]">{r.sku_id}</span>,
+      className: 'font-mono text-[#8575ff]',
+      render: r => <span className="font-mono text-[#8575ff]">{r.sku_id}</span>,
     },
     {
       key: 'nome_produto',
@@ -116,13 +116,13 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       />
 
       {/* Filter Controls */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-lg bg-[#11131a] border border-[#27272a]">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-lg bg-[#131126] border border-[#262046]">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-xs text-[#a1a1aa] font-medium">Status:</span>
           <select
             value={status}
             onChange={e => setStatus(e.target.value)}
-            className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+            className="text-xs bg-[#181530] border border-[#262046] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#8575ff]"
           >
             <option value="Aprovado">Aprovado</option>
             <option value="Todos">Todos</option>
@@ -136,7 +136,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
           <select
             value={selectedYear}
             onChange={e => setSelectedYear(e.target.value)}
-            className="text-xs bg-[#18181b] border border-[#27272a] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+            className="text-xs bg-[#181530] border border-[#262046] rounded px-2 sm:px-2.5 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#8575ff]"
           >
             <option value="Todos">Todos os Anos</option>
             <option value="2023">2023</option>
@@ -145,7 +145,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
         </div>
 
         {filterOptions?.categories && filterOptions.categories.length > 0 && (
-          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-[#27272a]/50">
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-[#262046]/50">
             <span className="text-xs text-[#a1a1aa] font-medium mr-1">Categorias:</span>
             {filterOptions.categories.map(cat => {
               const active = selectedCats.includes(cat);
@@ -161,8 +161,8 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
                   }}
                   className={`text-[10px] sm:text-[11px] px-2 sm:px-2.5 py-0.5 rounded border transition-colors ${
                     active
-                      ? 'bg-[#38bdf8]/15 border-[#38bdf8]/60 text-[#38bdf8] font-medium'
-                      : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46]'
+                      ? 'bg-[#8575ff]/20 border-[#8575ff]/60 text-[#8575ff] font-medium'
+                      : 'bg-[#181530] border-[#262046] text-[#a1a1aa] hover:border-[#4a3f85]'
                   }`}
                 >
                   {cat}
@@ -222,31 +222,31 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       </div>
 
       {/* Margin Decomposition Mini-Bar */}
-      <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+      <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
         <div className="text-xs font-semibold text-[#f4f4f5] mb-2 sm:mb-3 flex items-center justify-between">
           <span>Decomposição da Receita Bruta à Margem Líquida</span>
           <span className="hidden sm:inline font-mono text-[11px] text-[#71717a]">Tabela Vendas 2023/2024</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
-          <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">
+          <div className="p-2 sm:p-2.5 rounded bg-[#181530] border border-[#262046]">
             <span className="text-[#a1a1aa] block text-[10px] sm:text-[11px]">Receita Bruta Total</span>
             <span className="font-mono font-bold text-xs sm:text-sm text-[#f4f4f5]">
               R$ {((decomp.bruta || 0) / 1e6).toFixed(2)}M
             </span>
           </div>
-          <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">
+          <div className="p-2 sm:p-2.5 rounded bg-[#181530] border border-[#262046]">
             <span className="text-[#a1a1aa] block text-[10px] sm:text-[11px]">Descontos Concedidos</span>
             <span className="font-mono font-bold text-xs sm:text-sm text-rose-400">
               -R$ {((decomp.descontos || 0) / 1e6).toFixed(2)}M
             </span>
           </div>
-          <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">
+          <div className="p-2 sm:p-2.5 rounded bg-[#181530] border border-[#262046]">
             <span className="text-[#a1a1aa] block text-[10px] sm:text-[11px]">Custo Produtos (CMV)</span>
             <span className="font-mono font-bold text-xs sm:text-sm text-[#e4e4e7]">
               R$ {((decomp.custo_prod || 0) / 1e6).toFixed(2)}M
             </span>
           </div>
-          <div className="p-2 sm:p-2.5 rounded bg-[#18181b] border border-[#27272a]">
+          <div className="p-2 sm:p-2.5 rounded bg-[#181530] border border-[#262046]">
             <span className="text-[#a1a1aa] block text-[10px] sm:text-[11px]">Custo Total Frete</span>
             <span className="font-mono font-bold text-xs sm:text-sm text-[#e4e4e7]">
               R$ {((decomp.custo_frete || 0) / 1e6).toFixed(2)}M
@@ -258,14 +258,14 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         {/* Monthly Trend */}
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
             <span className="truncate">Evolução Mensal (Receita vs. Margem)</span>
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={execData?.monthly_trend || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="ano_mes" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis
                   stroke="#71717a"
@@ -274,26 +274,26 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="margem_contribuicao" name="Margem Contribuição" fill="#94a3b8" opacity={0.7} radius={[3, 3, 0, 0]} />
-                <Line type="monotone" dataKey="receita_liquida" name="Receita Líquida" stroke="#38bdf8" strokeWidth={2.5} dot={{ r: 2.5 }} />
+                <Line type="monotone" dataKey="receita_liquida" name="Receita Líquida" stroke="#8575ff" strokeWidth={2.5} dot={{ r: 2.5 }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Channel Performance */}
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 flex items-center justify-between">
             <span className="truncate">Desempenho por Canal de Venda</span>
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={execData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="canal" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis
                   stroke="#71717a"
@@ -302,11 +302,11 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                <Bar dataKey="receita_liquida" name="Receita Líquida" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="receita_liquida" name="Receita Líquida" fill="#8575ff" radius={[3, 3, 0, 0]} />
                 <Bar dataKey="margem_contribuicao" name="Margem Contribuição" fill="#94a3b8" radius={[3, 3, 0, 0]} />
               </ComposedChart>
             </ResponsiveContainer>
@@ -317,7 +317,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
       {/* Bottom Grid: Returns Impact & Top SKUs */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
         {/* Returns Reasons Pie */}
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a] flex flex-col">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046] flex flex-col">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-1">
             Impacto por Motivo de Devolução
           </div>
@@ -342,7 +342,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '11px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '11px' }}
                   formatter={(v: any) => `R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                 />
                 <Legend wrapperStyle={{ fontSize: '10px' }} />

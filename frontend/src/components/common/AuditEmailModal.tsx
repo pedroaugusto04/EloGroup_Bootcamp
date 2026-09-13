@@ -34,7 +34,6 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
     setLoading(true);
     setError(null);
     setResult(null);
-
     try {
       const res = await api.runAudit({
         period_key: periodKey,
@@ -58,12 +57,12 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-[#11131a] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-lg bg-[#131126] border border-[#262046] rounded-xl shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-[#27272a] bg-[#0d0d10] flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-[#262046] bg-[#0d0b1a] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#38bdf8]/15 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8]">
+            <div className="w-8 h-8 rounded-lg bg-[#4200db]/20 border border-[#8575ff]/40 flex items-center justify-center text-[#8575ff]">
               <Mail className="w-4 h-4" />
             </div>
             <div>
@@ -79,7 +78,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="p-1.5 rounded-lg text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b] transition-colors disabled:opacity-50"
+            className="p-1.5 rounded-lg text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#181530] transition-colors disabled:opacity-50"
           >
             <X className="w-4 h-4" />
           </button>
@@ -102,7 +101,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                     value={periodKey}
                     onChange={e => setPeriodKey(e.target.value as PeriodKey)}
                     disabled={loading}
-                    className="w-full text-xs bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2 text-[#f4f4f5] focus:outline-none focus:border-[#38bdf8]"
+                    className="w-full text-xs bg-[#181530] border border-[#262046] rounded-lg px-3 py-2 text-[#f4f4f5] focus:outline-none focus:border-[#8575ff]"
                   >
                     {periods.map(period => (
                       <option key={period.period_key} value={period.period_key}>
@@ -113,7 +112,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                   </select>
                 </div>
 
-                <details className="rounded-lg border border-[#27272a] bg-[#18181b] p-3 text-[11px] text-[#a1a1aa]">
+                <details className="rounded-lg border border-[#262046] bg-[#181530] p-3 text-[11px] text-[#a1a1aa]">
                   <summary className="cursor-pointer font-medium text-[#d4d4d8]">Metodologia e limitações</summary>
                   <p className="mt-2 leading-relaxed">Posição de estoque fornecida — data de referência não informada. Vendas representam tendência histórica observada, não previsão. Financeiro vem de Vendas; cenários não são perdas realizadas.</p>
                 </details>
@@ -128,7 +127,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                     onChange={e => setToEmail(e.target.value)}
                     placeholder="diretoria@verticeretail.com.br (ou seu e-mail)"
                     disabled={loading}
-                    className="w-full text-xs bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2 text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#38bdf8]"
+                    className="w-full text-xs bg-[#181530] border border-[#262046] rounded-lg px-3 py-2 text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#8575ff]"
                   />
                   <span className="text-[10px] text-[#71717a] mt-1 block">
                     Se vazio, usa o e-mail padrão configurado nas variáveis de ambiente.
@@ -142,7 +141,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                     checked={sendEmail}
                     onChange={e => setSendEmail(e.target.checked)}
                     disabled={loading}
-                    className="rounded border-[#27272a] bg-[#18181b] text-[#38bdf8] focus:ring-0"
+                    className="rounded border-[#262046] bg-[#181530] text-[#8575ff] focus:ring-0"
                   />
                   <label htmlFor="sendEmailCheckbox" className="text-xs text-[#d4d4d8] cursor-pointer select-none">
                     Enviar e-mail
@@ -169,7 +168,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 bg-[#18181b] rounded-lg border border-[#27272a] text-xs space-y-1.5 font-mono">
+              <div className="p-3 bg-[#181530] rounded-lg border border-[#262046] text-xs space-y-1.5 font-mono">
                 <div className="flex justify-between text-[#a1a1aa]">
                   <span>Status do Parecer:</span>
                   <span className={result.deterministic_approved ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
@@ -178,7 +177,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                 </div>
                 <div className="flex justify-between text-[#a1a1aa]">
                   <span>Status E-mail:</span>
-                  <span className="text-[#38bdf8] font-semibold">{result.email_status}</span>
+                  <span className="text-[#8575ff] font-semibold">{result.email_status}</span>
                 </div>
                 {result.email_result?.to && (
                   <div className="flex justify-between text-[#a1a1aa]">
@@ -196,20 +195,20 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:p-5 border-t border-[#27272a] bg-[#0d0d10] flex items-center justify-end gap-2.5">
+        <div className="p-4 sm:p-5 border-t border-[#262046] bg-[#0d0b1a] flex items-center justify-end gap-2.5">
           {!result ? (
             <>
               <button
                 onClick={onClose}
                 disabled={loading}
-                className="px-3.5 py-2 rounded-lg text-xs font-medium text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b] transition-colors disabled:opacity-50"
+                className="px-3.5 py-2 rounded-lg text-xs font-medium text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#181530] transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleRunAudit}
                 disabled={loading}
-                className="px-4 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#09090b] text-xs font-semibold flex items-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-[#4200db] hover:bg-[#35009e] text-[#ffffff] text-xs font-semibold flex items-center gap-2 transition-all shadow-md shadow-[#4200db]/30 active:scale-95 disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -228,13 +227,13 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
             <>
               <button
                 onClick={onClose}
-                className="px-3.5 py-2 rounded-lg text-xs font-medium text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b] transition-colors"
+                className="px-3.5 py-2 rounded-lg text-xs font-medium text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#181530] transition-colors"
               >
                 Fechar
               </button>
               {result.audit_thread_id && <button
                 onClick={handleOpenCopilot}
-                className="px-4 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#09090b] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+                className="px-4 py-2 rounded-lg bg-[#4200db] hover:bg-[#35009e] text-[#ffffff] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-[#4200db]/30 active:scale-95"
               >
                 <span>Abrir Conversa no Copiloto</span>
                 <ExternalLink className="w-3.5 h-3.5" />

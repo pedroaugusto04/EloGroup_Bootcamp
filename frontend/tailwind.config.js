@@ -9,20 +9,27 @@ export default {
     extend: {
       colors: {
         bg: {
-          primary: '#09090b',
-          secondary: '#121215',
-          tertiary: '#18181b',
-          card: '#11131a',
+          primary: '#0a0914',
+          secondary: '#121024',
+          tertiary: '#181530',
+          card: '#131126',
         },
         border: {
-          subtle: '#27272a',
-          muted: '#1f1f23',
-          focus: '#3f3f46',
+          subtle: '#262046',
+          muted: '#1f1a3a',
+          focus: '#4a3f85',
+        },
+        vertice: {
+          primary: '#4200db',
+          dark: '#35009e',
+          light: '#8575ff',
+          pastel: '#e8e6ff',
+          glow: 'rgba(133, 117, 255, 0.25)',
         },
         elo: {
           navy: '#0b132b',
-          cyan: '#38bdf8',
-          blue: '#2563eb',
+          purple: '#4200db',
+          lilac: '#8575ff',
           slate: '#64748b',
         }
       },

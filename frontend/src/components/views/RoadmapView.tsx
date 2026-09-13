@@ -62,7 +62,7 @@ export const RoadmapView: React.FC = () => {
       </div>
 
       {/* Horizon Filters */}
-      <div className="flex items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-xl bg-[#11131a] border border-[#27272a] overflow-x-auto no-scrollbar touch-pan-x shadow-sm">
+      <div className="flex items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-xl bg-[#131126] border border-[#262046] overflow-x-auto no-scrollbar touch-pan-x shadow-sm">
         <span className="text-xs text-[#a1a1aa] font-medium mr-1 whitespace-nowrap">Filtrar Horizonte:</span>
         {['Todos', 'Quick Wins', '30 Dias', '60 Dias', '90 Dias'].map(horizon => {
           const active = selectedHorizon === horizon;
@@ -72,8 +72,8 @@ export const RoadmapView: React.FC = () => {
               onClick={() => setSelectedHorizon(horizon)}
               className={`text-xs px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg border whitespace-nowrap transition-all ${
                 active
-                  ? 'bg-[#38bdf8]/15 border-[#38bdf8]/60 text-[#38bdf8] font-semibold shadow-sm'
-                  : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46] hover:text-[#f4f4f5]'
+                  ? 'bg-[#8575ff]/20 border-[#8575ff]/60 text-[#8575ff] font-semibold shadow-sm'
+                  : 'bg-[#181530] border-[#262046] text-[#a1a1aa] hover:border-[#4a3f85] hover:text-[#f4f4f5]'
               }`}
             >
               {horizon}
@@ -87,18 +87,18 @@ export const RoadmapView: React.FC = () => {
         {filteredInitiatives.map(init => (
           <div
             key={init.id}
-            className="p-4 sm:p-5 rounded-xl bg-[#11131a] border border-[#27272a] hover:border-[#38bdf8]/40 transition-all flex flex-col justify-between space-y-3 sm:space-y-4 shadow-sm"
+            className="p-4 sm:p-5 rounded-xl bg-[#131126] border border-[#262046] hover:border-[#8575ff]/50 transition-all flex flex-col justify-between space-y-3 sm:space-y-4 shadow-sm"
           >
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-xs font-mono font-semibold px-2 sm:px-2.5 py-0.5 rounded-md bg-[#18181b] border border-[#27272a] text-[#38bdf8]">
+                <span className="text-xs font-mono font-semibold px-2 sm:px-2.5 py-0.5 rounded-md bg-[#181530] border border-[#262046] text-[#8575ff]">
                   {init.horizon}
                 </span>
                 <span
                   className={`text-xs font-mono px-2 sm:px-2.5 py-0.5 rounded-md font-semibold ${
                     init.type.includes('Quick Win')
                       ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-[#18181b] text-[#a1a1aa] border border-[#27272a]'
+                      : 'bg-[#181530] text-[#a1a1aa] border border-[#262046]'
                   }`}
                 >
                   {init.type}
@@ -117,10 +117,10 @@ export const RoadmapView: React.FC = () => {
               </p>
             </div>
 
-            <div className="pt-3 border-t border-[#27272a] flex items-center justify-between text-xs">
+            <div className="pt-3 border-t border-[#262046] flex items-center justify-between text-xs">
               <div>
                 <span className="text-[10px] sm:text-[11px] text-[#71717a] block">Impacto Estimado:</span>
-                <span className="font-mono font-bold text-[#38bdf8] text-xs sm:text-sm">
+                <span className="font-mono font-bold text-[#8575ff] text-xs sm:text-sm">
                   {init.financial_impact_label}
                 </span>
               </div>

@@ -59,12 +59,12 @@ export const Header: React.FC<HeaderProps> = ({
   const meta = titles[activeTab];
 
   return (
-    <header className="h-14 sm:h-16 border-b border-[#27272a] bg-[#0d0d10]/95 backdrop-blur px-3 sm:px-6 flex items-center justify-between shrink-0 select-none z-10">
+    <header className="h-14 sm:h-16 border-b border-[#262046] bg-[#0d0b1a]/95 backdrop-blur px-3 sm:px-6 flex items-center justify-between shrink-0 select-none z-10">
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         {onOpenSidebar && (
           <button
             onClick={onOpenSidebar}
-            className="p-2 -ml-1 rounded-lg text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#18181b] lg:hidden transition-colors shrink-0"
+            className="p-2 -ml-1 rounded-lg text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#181530] lg:hidden transition-colors shrink-0"
             title="Abrir Menu de Navegação"
             aria-label="Abrir Menu"
           >
@@ -86,10 +86,10 @@ export const Header: React.FC<HeaderProps> = ({
         {onOpenAuditModal && (
           <button
             onClick={onOpenAuditModal}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-[#38bdf8]/10 hover:bg-[#38bdf8]/20 border border-[#38bdf8]/40 hover:border-[#38bdf8]/70 text-[#38bdf8] text-xs font-semibold transition-all shadow-sm active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-[#8575ff]/15 hover:bg-[#8575ff]/25 border border-[#8575ff]/40 hover:border-[#8575ff]/70 text-[#8575ff] text-xs font-semibold transition-all shadow-sm active:scale-95"
             title="Executar análise sob demanda e, se solicitado, enviar e-mail executivo"
           >
-            <Mail className="w-3.5 h-3.5 text-[#38bdf8]" />
+            <Mail className="w-3.5 h-3.5 text-[#8575ff]" />
             <span className="hidden sm:inline">Gerar Auditoria</span>
           </button>
         )}
@@ -97,10 +97,10 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-[#18181b] border border-[#27272a] hover:border-[#3f3f46] text-[#d4d4d8] text-xs font-medium transition-colors disabled:opacity-50 active:scale-95"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-[#181530] border border-[#262046] hover:border-[#4a3f85] text-[#d4d4d8] text-xs font-medium transition-colors disabled:opacity-50 active:scale-95"
           title="Recarregar dados"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#38bdf8]' : 'text-[#a1a1aa]'}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#8575ff]' : 'text-[#a1a1aa]'}`} />
           <span className="hidden sm:inline">Atualizar</span>
         </button>
       </div>

@@ -58,7 +58,7 @@ export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) =
       header: 'ROAS',
       align: 'right',
       render: r => (
-        <span className="font-mono text-[#38bdf8] font-bold">
+        <span className="font-mono text-[#8575ff] font-bold">
           {Number(r.roas).toFixed(2)}x
         </span>
       ),
@@ -128,14 +128,14 @@ export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) =
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
             Investimento vs. Receita por Canal de Mídia
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={mktData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="canal" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis
                   stroke="#71717a"
@@ -144,32 +144,32 @@ export const MarketingView: React.FC<MarketingViewProps> = ({ filterOptions }) =
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                   formatter={(val: any) => [`R$ ${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`]}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Bar dataKey="investimento" name="Investimento (R$)" fill="#94a3b8" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="receita_gerada" name="Receita Declarada (R$)" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="receita_gerada" name="Receita Declarada (R$)" fill="#8575ff" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-[#11131a] border border-[#27272a]">
+        <div className="p-3 sm:p-4 rounded-lg bg-[#131126] border border-[#262046]">
           <div className="text-xs font-semibold text-[#f4f4f5] mb-2 truncate">
             Eficiência Relativa: ROAS vs. CAC por Canal
           </div>
           <div className="h-64 sm:h-72 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={mktData?.channels || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" opacity={0.6} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#262046" opacity={0.6} />
                 <XAxis dataKey="canal" stroke="#71717a" fontSize={10} tickLine={false} />
                 <YAxis stroke="#71717a" fontSize={10} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#181530', borderColor: '#262046', borderRadius: '6px', fontSize: '12px' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                <Bar dataKey="roas" name="ROAS (x)" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="roas" name="ROAS (x)" fill="#8575ff" radius={[3, 3, 0, 0]} />
                 <Bar dataKey="cac" name="CAC (R$)" fill="#f59e0b" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
