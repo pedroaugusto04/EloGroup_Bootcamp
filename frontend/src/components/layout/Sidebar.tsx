@@ -9,11 +9,11 @@ import {
   SlidersHorizontal,
   Target,
   Bot,
-  Layers,
   ChevronRight,
   X,
 } from 'lucide-react';
 import { ViewTab } from '../../types/analytics';
+import { VerticeLogo } from '../common/VerticeLogo';
 
 interface SidebarProps {
   activeTab: ViewTab;
@@ -141,8 +141,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Brand Header */}
         <div className="p-4 border-b border-[#262046] bg-[#0d0b1a] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md bg-[#4200db]/20 border border-[#8575ff]/40 flex items-center justify-center text-[#8575ff] shadow-sm shadow-[#4200db]/30">
-              <Layers className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-md bg-[#4200db]/25 border border-[#8575ff]/40 flex items-center justify-center text-[#8575ff] shadow-sm shadow-[#4200db]/30">
+              <VerticeLogo className="w-4 h-4 text-[#8575ff]" size={16} />
             </div>
             <div>
               <div className="text-sm font-bold tracking-tight text-[#f4f4f5] flex items-center gap-1.5">
