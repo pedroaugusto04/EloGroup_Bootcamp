@@ -59,22 +59,22 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
       render: r => Number(r.total_tickets).toLocaleString('pt-BR'),
     },
     {
-      key: 'pct_volume',
+      key: 'pct_total',
       header: '% Volume',
       align: 'right',
-      render: r => `${Number(r.pct_volume).toFixed(1)}%`,
+      render: r => `${(Number(r.pct_total ?? r.pct_volume) || 0).toFixed(1)}%`,
     },
     {
       key: 'csat_medio',
       header: 'CSAT Médio',
       align: 'right',
-      render: r => `${Number(r.csat_medio).toFixed(2)} / 5.0`,
+      render: r => `${(Number(r.csat_medio) || 0).toFixed(2)} / 5.0`,
     },
     {
-      key: 'custo_total_categoria',
+      key: 'custo_operacional_total',
       header: 'Custo Total',
       align: 'right',
-      render: r => `R$ ${Number(r.custo_total_categoria).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      render: r => `R$ ${(Number(r.custo_operacional_total ?? r.custo_total_categoria) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
     },
     {
       key: 'custo_evitavel_automacao',
@@ -137,7 +137,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
       <div className="p-3 sm:p-3.5 rounded-lg bg-[#ffffff] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] text-xs text-[#5e6270] dark:text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3 shadow-sm">
         <div className="w-2 h-2 rounded-full bg-[#4200db] dark:bg-[#8575ff] mt-1.5 shrink-0" />
         <div className="leading-relaxed">
-          <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Oportunidade Imediata de IA & Notificação (Hipótese 4):</span>{' '}
+          <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Oportunidade Imediata de IA & Notificação:</span>{' '}
           O motivo <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#4200db] dark:text-[#8575ff] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), logo o atrito é puramente ansiedade e falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento resolve o problema.
         </div>
       </div>

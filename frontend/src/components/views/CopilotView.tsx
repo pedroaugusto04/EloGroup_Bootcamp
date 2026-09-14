@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../api/client';
 import { ChatThread, ChatMessage, PeriodMeta } from '../../types/analytics';
+import { InventoryCopilotIcon } from '../common/InventoryCopilotIcon';
 import { MermaidDiagram } from '../common/MermaidDiagram';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -8,8 +9,6 @@ import {
   Send,
   Plus,
   Trash2,
-  Sparkles,
-  Bot,
   User,
   Mail,
 } from 'lucide-react';
@@ -291,12 +290,12 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-10 sm:py-20 px-2 sm:px-4 space-y-4 sm:space-y-5">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#4200db]/15 to-[#8575ff]/25 dark:from-[#4200db]/30 dark:to-[#8575ff]/30 border border-[#4200db]/30 dark:border-[#8575ff]/50 flex items-center justify-center text-[#4200db] dark:text-[#8575ff] shadow-[0_0_30px_rgba(66,0,219,0.15)] dark:shadow-[0_0_30px_rgba(66,0,219,0.3)]">
-                  <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <InventoryCopilotIcon className="w-12 h-12 sm:w-14 sm:h-14" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#131920] dark:text-[#f4f4f5] font-sans tracking-tight">Copiloto de estoque baseado em tendência histórica</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-[#131920] dark:text-[#f4f4f5] font-sans tracking-tight">Predictive Inventory Advisor</h3>
                   <p className="text-xs sm:text-sm text-[#5e6270] dark:text-[#71717a] max-w-xl mt-1.5 sm:mt-2 font-sans leading-relaxed">
-                    Assistente conectado ao DuckDB para posição operacional, evidências históricas e cenários de liquidação — sem previsão ou compra automática.
+                    Analisa o histórico de vendas para avaliar a saúde do estoque, antecipar riscos de ruptura ou excesso e sugerir ações de reposição ou liquidação.
                   </p>
                 </div>
 
@@ -330,7 +329,7 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
                   ) : (
                     <div className="flex items-start gap-2.5 sm:gap-4 w-full min-w-0">
                       <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#4200db]/15 to-[#8575ff]/25 dark:from-[#4200db]/30 dark:to-[#8575ff]/30 border border-[#4200db]/30 dark:border-[#8575ff]/50 flex items-center justify-center text-[#4200db] dark:text-[#8575ff] shrink-0 mt-0.5 shadow-[0_0_16px_rgba(66,0,219,0.1)] dark:shadow-[0_0_16px_rgba(133,117,255,0.2)]">
-                        <Bot className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
+                        <InventoryCopilotIcon className="w-7 h-7 sm:w-8 sm:h-8" />
                       </div>
                       <div className="flex-1 min-w-0 text-xs sm:text-[13.5px] text-[#2d3142] dark:text-[#d4d4d8] leading-relaxed overflow-hidden">
                         <div className="prose dark:prose-invert max-w-none text-xs sm:text-[13.5px]">
@@ -406,7 +405,7 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
             {isSending && (
               <div className="flex items-start gap-2.5 sm:gap-4 w-full">
                 <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#4200db]/15 to-[#8575ff]/25 dark:from-[#4200db]/30 dark:to-[#8575ff]/30 border border-[#4200db]/30 dark:border-[#8575ff]/50 flex items-center justify-center text-[#4200db] dark:text-[#8575ff] shrink-0 shadow-[0_0_16px_rgba(66,0,219,0.1)] dark:shadow-[0_0_16px_rgba(133,117,255,0.2)]">
-                  <Bot className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
+                  <InventoryCopilotIcon className="w-7 h-7 sm:w-8 sm:h-8" />
                 </div>
                 <div className="py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-xl bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] text-xs sm:text-[13px] text-[#5e6270] dark:text-[#a1a1aa] flex items-center gap-2.5 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-[#4200db] dark:bg-[#8575ff] animate-ping" />

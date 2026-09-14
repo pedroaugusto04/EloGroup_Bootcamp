@@ -190,7 +190,7 @@ def test_service_publishes_only_deterministic_recommendations():
     result = InventoryAgentService().run_diagnostic("full_history")
     assert result["deterministic_approved"] is True
     assert result["llm_complement_status"] in ("completed", "not_used")
-    assert result["final_report"].startswith("# Copiloto de estoque baseado em tendência histórica")
+    assert result["final_report"].startswith("# Predictive Inventory Advisor")
     assert "## 2. Liquidação de descontinuados e liberação de caixa" in result["final_report"]
     assert "Margem de contribuição simulada" in result["final_report"]
     assert "### Sensibilidade ao sell-through" in result["final_report"]

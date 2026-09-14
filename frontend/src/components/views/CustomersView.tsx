@@ -98,7 +98,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
       <ScopeBadge
         tables={['clientes']}
         scope="15.000 clientes cadastrados • Ano Base 2026"
-        devSection="Seção 3 & Seção 5: Hipótese 5 (Segmentos de Clientes & Concentração)"
+        devSection="Seção 3 & Seção 5: Segmentos de Clientes & Concentração"
       />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
@@ -135,7 +135,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ filterOptions }) =
       <div className="p-3 sm:p-3.5 rounded-lg bg-[#ffffff] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] text-xs text-[#5e6270] dark:text-[#d4d4d8] flex items-start gap-2.5 sm:gap-3 shadow-sm">
         <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
         <div className="leading-relaxed">
-          <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Diagnóstico de Concentração de Clientes (Hipótese 5):</span>{' '}
+          <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Diagnóstico de Concentração de Clientes:</span>{' '}
           Clientes dos segmentos <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Campeões</span> e <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Fiéis</span> são poucos em volume, mas representam a maior fatia do LTV acumulado. Em contrapartida, <span className="font-mono text-amber-600 dark:text-amber-400 font-semibold">46,7% da base</span> está nas faixas de risco.
         </div>
       </div>

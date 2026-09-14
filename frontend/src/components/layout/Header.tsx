@@ -21,15 +21,15 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
     subtitle: 'Desempenho do funil de aquisição, ROAS declarado, CAC, CTR e conversões por canal.',
   },
   customers: {
-    title: 'Base de Clientes & RFM (Hipótese 5)',
+    title: 'Base de Clientes & RFM',
     subtitle: 'Matriz de segmentação RFM, curva de concentração de Pareto e LTV acumulado da base.',
   },
   support: {
-    title: 'Atendimento, CX & Automação com IA (Hipótese 4)',
+    title: 'Atendimento, CX & Automação com IA',
     subtitle: 'Canais de entrada, CSAT, SLA real de resolução e dimensionamento de custos evitáveis com IA.',
   },
   inventory: {
-    title: 'Estoque, Suprimentos & Ruptura (Hipótese 6)',
+    title: 'Estoque, Suprimentos & Ruptura',
     subtitle: 'Posição operacional de estoque; valores financeiros são reconciliados exclusivamente com Vendas.',
   },
   audit: {
@@ -45,8 +45,8 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
     subtitle: 'Síntese executiva transversal, matriz de esforço x impacto e cronograma de quick wins.',
   },
   copilot: {
-    title: 'Copiloto de estoque baseado em tendência histórica',
-    subtitle: 'Tendência observada, exposição como cenário e análises de liquidação sem execução automática.',
+    title: 'Predictive Inventory Advisor',
+    subtitle: 'Tendência observada, exposição como cenário e análises de liquidação.',
   },
 };
 

@@ -151,7 +151,7 @@ def generate_inventory_audit_report(package: dict, recommendations: List[dict]) 
     agent_exec_summary = package.get("agent_executive_summary")
 
     lines = [
-        "# Copiloto de estoque baseado em tendência histórica de vendas",
+        "# Predictive Inventory Advisor",
         "",
         f"> {summary['methodology_banner']}",
         "",

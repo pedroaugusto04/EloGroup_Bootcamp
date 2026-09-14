@@ -103,7 +103,7 @@ def render_executive_email_template(report_data: Dict[str, Any], deep_link_url: 
 
     return f"""<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width">
-<title>Copiloto de Estoque · Vértice Retail</title>
+<title>Predictive Inventory Advisor · Vértice Retail</title>
 <style>
 body{{background:#f3f3f7;color:#131920;font-family:Arial,sans-serif;margin:0;padding:0}}
 main{{background:#fff;border:1px solid #dedee3;border-radius:12px;margin:24px auto;max-width:680px;padding:28px}}
@@ -123,7 +123,7 @@ small{{color:#52525b;font-size:11px;font-weight:600}}.priorities{{border-collaps
 </style></head>
 <body><main>
 <div class="eyebrow">VÉRTICE RETAIL · {badge}</div>
-<h1>Copiloto de estoque baseado em tendência histórica</h1>
+<h1>Predictive Inventory Advisor</h1>
 <p class="banner">{html.escape(banner)}</p>
 <table class="metric-grid" role="presentation"><tbody>
   <tr>

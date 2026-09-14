@@ -174,11 +174,16 @@ def get_inventory_analytics(
         "skus_precisa_reposicao": exposure,
         "taxa_ruptura": rupture * 100.0 / total_skus if total_skus else None,
         "capital_parado": capital["capital_disponivel_descontinuado"] if not selected else None,
+        "capital_cadastral_descontinuado": capital.get("capital_cadastral_descontinuado") if not selected else None,
         "descontinuados_valorados": capital["descontinuados_valorados"] if not selected else None,
         "lead_time_medio": None,
     }
     critical_skus = [
         item for item in package["items"] if not selected or item.get("categoria") in selected
+    ]
+    overstock_skus = [
+        item for item in package.get("queues", {}).get("alta_cobertura", [])
+        if not selected or item.get("categoria") in selected
     ]
     categories = [{
         **row,
@@ -199,6 +204,7 @@ def get_inventory_analytics(
         "kpis": kpis,
         "categories_rupture": categories,
         "critical_skus": critical_skus,
+        "overstock_skus": overstock_skus,
         "status_breakdown": discontinued_breakdown,
     }
 

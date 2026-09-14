@@ -26,6 +26,7 @@ SELECT
     COUNT(*) FILTER (WHERE is_descontinuado AND unit_cost IS NULL) AS descontinuados_excluidos,
     SUM(estoque_fisico * unit_cost) FILTER (WHERE is_descontinuado) AS capital_fisico_descontinuado,
     SUM(estoque_disponivel * unit_cost) FILTER (WHERE is_descontinuado) AS capital_disponivel_descontinuado,
+    SUM(estoque_disponivel * custo_unitario) FILTER (WHERE is_descontinuado) AS capital_cadastral_descontinuado,
     COUNT(*) FILTER (WHERE custo_unitario IS NOT NULL AND unit_cost IS NOT NULL) AS skus_comparacao_custo,
     CORR(custo_unitario, unit_cost) FILTER (WHERE custo_unitario IS NOT NULL AND unit_cost IS NOT NULL) AS correlacao_custo_estoque_vendas,
     COUNT(*) FILTER (

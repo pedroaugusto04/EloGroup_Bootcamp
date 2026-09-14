@@ -8,11 +8,11 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Target,
-  Bot,
   ChevronRight,
   X,
 } from 'lucide-react';
 import { ViewTab } from '../../types/analytics';
+import { InventoryCopilotIcon } from '../common/InventoryCopilotIcon';
 import { VerticeLogo } from '../common/VerticeLogo';
 
 interface SidebarProps {
@@ -55,21 +55,21 @@ const navSections: NavSection[] = [
       },
       {
         id: 'customers',
-        label: 'Clientes & RFM (Hipótese 5)',
+        label: 'Clientes & RFM',
         tag: '03',
         icon: Users,
         description: '',
       },
       {
         id: 'support',
-        label: 'Atendimento & IA (Hipótese 4)',
+        label: 'Atendimento & IA',
         tag: '04',
         icon: Headphones,
         description: '',
       },
       {
         id: 'inventory',
-        label: 'Estoque & Suprimentos (Hip. 6)',
+        label: 'Estoque & Suprimentos',
         tag: '05',
         icon: Package,
         description: '',
@@ -104,7 +104,7 @@ const navSections: NavSection[] = [
         id: 'copilot',
         label: 'Copiloto de Estoque',
         tag: '09',
-        icon: Bot,
+        icon: InventoryCopilotIcon,
         description: '',
       },
     ],
@@ -186,11 +186,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     >
                       <div
                         className={`mt-0.5 p-1.5 rounded-md transition-colors shrink-0 ${isActive
-                          ? 'bg-[#4200db] text-[#ffffff] dark:bg-[#4200db]/30 dark:text-[#8575ff] dark:border dark:border-[#8575ff]/30 shadow-sm'
+                          ? item.id === 'copilot'
+                            ? 'bg-[#ffffff] dark:bg-[#e8e6ff] border border-[#c4b8ff] shadow-sm'
+                            : 'bg-[#4200db] text-[#ffffff] dark:bg-[#4200db]/30 dark:text-[#8575ff] dark:border dark:border-[#8575ff]/30 shadow-sm'
                           : 'bg-[#f3f2f8] dark:bg-[#181530] text-[#5e6270] dark:text-[#71717a] group-hover:text-[#131920] dark:group-hover:text-[#a1a1aa]'
                           }`}
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className={item.id === 'copilot' ? 'w-5 h-5' : 'w-4 h-4'} />
                       </div>
 
                       <div className="flex-1 min-w-0">

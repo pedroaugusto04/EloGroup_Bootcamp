@@ -114,7 +114,7 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
 
                 <details className="rounded-lg border border-[#e6e5f0] dark:border-[#262046] bg-[#f8f7fc] dark:bg-[#181530] p-3 text-[11px] text-[#5e6270] dark:text-[#a1a1aa]">
                   <summary className="cursor-pointer font-medium text-[#131920] dark:text-[#d4d4d8]">Metodologia e limitações</summary>
-                  <p className="mt-2 leading-relaxed">Posição de estoque fornecida — data de referência não informada. Vendas representam tendência histórica observada, não previsão. Financeiro vem de Vendas; cenários não são perdas realizadas.</p>
+                  <p className="mt-2 leading-relaxed">Posição de estoque fornecida — data de referência não informada. Vendas representam tendência histórica observada. Financeiro vem de Vendas.</p>
                 </details>
 
                 <div>

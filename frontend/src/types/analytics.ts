@@ -124,6 +124,7 @@ export interface InventoryAnalyticsData {
     skus_precisa_reposicao: number;
     taxa_ruptura: number;
     capital_parado: number;
+    capital_cadastral_descontinuado?: number;
     lead_time_medio: number;
     descontinuados_valorados?: number;
   };
@@ -152,6 +153,18 @@ export interface InventoryAnalyticsData {
     deficit_potencial_unidades?: number;
     lead_time_cadastral_dias?: number;
     margem_potencialmente_exposta?: number;
+  }>;
+  overstock_skus?: Array<{
+    sku_id: string;
+    nome_produto: string;
+    categoria: string;
+    fornecedor_id?: string;
+    estoque_disponivel: number;
+    demanda_diaria_historica: number;
+    cobertura_dias_historica: number;
+    unidades_excedentes: number;
+    capital_excedente: number;
+    custo_unitario_historico: number;
   }>;
   status_breakdown: Array<{
     status_disponibilidade: string;
@@ -236,11 +249,15 @@ export interface SupportAnalyticsData {
     categoria_problema: string;
     is_automatizavel: boolean;
     total_tickets: number;
-    pct_volume: number;
+    pct_total: number;
+    pct_volume?: number;
     csat_medio: number;
-    custo_total_categoria: number;
+    tickets_detratores?: number;
+    tempo_resposta_medio_min?: number;
+    tempo_resolucao_medio_h?: number;
+    custo_operacional_total: number;
+    custo_total_categoria?: number;
     custo_evitavel_automacao: number;
-    sla_estourado_count: number;
   }>;
 }
 
