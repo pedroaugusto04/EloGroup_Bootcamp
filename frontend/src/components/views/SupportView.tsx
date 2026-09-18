@@ -43,16 +43,6 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
   const aiColumns: Column<any>[] = [
     { key: 'categoria_problema', header: 'Motivo do Chamado', className: 'font-semibold text-[#131920] dark:text-[#f4f4f5]' },
     {
-      key: 'is_automatizavel',
-      header: 'Automação IA',
-      align: 'center',
-      render: r => (
-        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${r.is_automatizavel ? 'bg-[#e8e6ff] dark:bg-[#8575ff]/20 text-[#4200db] dark:text-[#8575ff] border border-[#c4b8ff] dark:border-[#8575ff]/40' : 'bg-[#f3f2f8] dark:bg-[#1f1a3a] text-[#5e6270] dark:text-[#71717a]'}`}>
-          {r.is_automatizavel ? 'Automatizável (IA)' : 'Atendimento Humano'}
-        </span>
-      ),
-    },
-    {
       key: 'total_tickets',
       header: 'Volume Tickets',
       align: 'right',
@@ -75,16 +65,6 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
       header: 'Custo Total',
       align: 'right',
       render: r => `R$ ${(Number(r.custo_operacional_total ?? r.custo_total_categoria) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-    },
-    {
-      key: 'custo_evitavel_automacao',
-      header: 'Economia Potencial (IA)',
-      align: 'right',
-      render: r => (
-        <span className={`font-mono font-bold ${r.custo_evitavel_automacao > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#8e92a0] dark:text-[#71717a]'}`}>
-          R$ {Number(r.custo_evitavel_automacao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-        </span>
-      ),
     },
   ];
 
@@ -138,7 +118,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
         <div className="w-2 h-2 rounded-full bg-[#4200db] dark:bg-[#8575ff] mt-1.5 shrink-0" />
         <div className="leading-relaxed">
           <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">Oportunidade Imediata de IA & Notificação:</span>{' '}
-          O motivo <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#4200db] dark:text-[#8575ff] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), logo o atrito é puramente ansiedade e falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento resolve o problema.
+          O motivo <span className="font-semibold text-[#131920] dark:text-[#f4f4f5]">'Onde está meu pedido'</span> responde por <span className="font-mono text-[#4200db] dark:text-[#8575ff] font-bold">30% de todo o suporte</span> e gera <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">R$ 159.660,00</span> em custos evitáveis. O prazo de entrega é padrão (8,3 dias), o que indica falta de visibilidade: uma notificação automática via WhatsApp com link de rastreamento pode minimizar o problema.
         </div>
       </div>
 
@@ -198,7 +178,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ filterOptions }) => {
 
       <div className="flex flex-col">
         <div className="text-xs font-semibold text-[#131920] dark:text-[#f4f4f5] mb-2">
-          Diagnóstico de Causas-Raiz & Custos Evitáveis por Automação IA
+          Diagnóstico de Causas-Raiz e Custos por Motivo de Chamado
         </div>
         <DataTable
           columns={aiColumns}

@@ -287,3 +287,23 @@ def test_checkpoint_memory_receives_only_new_message():
     assert answer == "ok"
     assert len(copilot.agent.messages) == 1
     assert copilot.agent.messages[0].content == "nova pergunta"
+
+
+def test_critic_reflection_routing():
+    from src.agent.graph import should_reflect_or_finish
+
+    # Quando reprovado e ainda não atingiu o limite de revisões, deve refletir (voltar ao consolidator)
+    state_revision_0 = {"critic_approved": False, "revision_count": 0, "critic_feedback": "Violação"}
+    assert should_reflect_or_finish(state_revision_0) == "consolidator"
+
+    state_revision_1 = {"critic_approved": False, "revision_count": 1, "critic_feedback": "Violação"}
+    assert should_reflect_or_finish(state_revision_1) == "consolidator"
+
+    # Quando atinge o limite (2), encerra com finish
+    state_revision_2 = {"critic_approved": False, "revision_count": 2, "critic_feedback": "Violação"}
+    assert should_reflect_or_finish(state_revision_2) == "finish"
+
+    # Quando aprovado, encerra com finish
+    state_approved = {"critic_approved": True, "revision_count": 0}
+    assert should_reflect_or_finish(state_approved) == "finish"
+

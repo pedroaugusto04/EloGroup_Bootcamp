@@ -21,7 +21,7 @@ import { RoadmapData, RoadmapInitiative } from '../../types/analytics';
 import { ScopeBadge } from '../common/ScopeBadge';
 import { MetricCard } from '../common/MetricCard';
 
-interface SlideGanttBlock {
+interface GanttBlock {
   id: string;
   title: string;
   colSpan: number;
@@ -33,13 +33,13 @@ interface SlideGanttBlock {
   criteria: string;
 }
 
-interface SlideGanttRow {
+interface GanttRow {
   agentId: string;
   agentLabel: string;
-  blocks: SlideGanttBlock[];
+  blocks: GanttBlock[];
 }
 
-const slideGanttRows: SlideGanttRow[] = [
+const ganttRows: GanttRow[] = [
   {
     agentId: 'agente1',
     agentLabel: 'Agente 1 • Estoque',
@@ -52,7 +52,7 @@ const slideGanttRows: SlideGanttRow[] = [
         horizonLabel: 'Dia 30 (Dados + Supply)',
         agentLabel: 'Agente 1 • Estoque',
         squad: 'Equipe de Dados e Operações',
-        scope: 'Piloto de liquidação dos 206 SKUs descontinuados com meta de 50% de sell-through e trava para novas compras no ERP.',
+        scope: 'Piloto de liquidação dos 206 SKUs descontinuados (R$ 6,1M imobilizados) com meta de 50% de sell-through e trava para novas compras no ERP.',
         criteria: '≥90% de recomendações acatadas, liquidação sem margem negativa e zero recompra de itens bloqueados.',
       },
       {
@@ -80,7 +80,7 @@ const slideGanttRows: SlideGanttRow[] = [
         horizonLabel: 'Dia 30 (Dados + Supply)',
         agentLabel: 'Agente 2 • Desconto',
         squad: 'Equipe Comercial e Dados',
-        scope: 'Parametrização de tetos de desconto por SKU a partir de custo histórico (CMV), frete e taxa real de devoluções.',
+        scope: 'Parametrização de tetos dinâmicos de desconto por SKU a partir de custo histórico (CMV), frete e taxa real de devoluções.',
         criteria: 'Margem real validada por categoria e regras de teto registradas no motor de precificação.',
       },
       {
@@ -91,7 +91,7 @@ const slideGanttRows: SlideGanttRow[] = [
         horizonLabel: 'Dia 60 (Logística + CX)',
         agentLabel: 'Agente 2 • Desconto',
         squad: 'Equipe Comercial e Growth',
-        scope: 'Teste piloto limitando descontos ao teto de 15% com grupo de controle para proteger a margem sem perda de volume.',
+        scope: 'Teste piloto do Margin Recovery Advisor com teto dinâmico por SKU para podar descontos excessivos (>20%) sem perda de volume.',
         criteria: 'Redução de 50% nos descontos acima de 20%, com impacto negativo no volume de vendas inferior a 5%.',
       },
       {
@@ -102,7 +102,7 @@ const slideGanttRows: SlideGanttRow[] = [
         horizonLabel: 'Dia 90 (IA + Atendimento)',
         agentLabel: 'Agente 2 • Desconto',
         squad: 'Equipe Comercial',
-        scope: 'Expansão definitiva das regras de teto de desconto de 15% para 100% do catálogo de produtos ativos.',
+        scope: 'Expansão definitiva da governança de tetos dinâmicos via Margin Recovery Advisor para 100% do catálogo de produtos ativos.',
         criteria: 'Aplicação contínua no checkout e monitoramento de margem bruta preservada mês a mês.',
       },
     ],
@@ -186,49 +186,44 @@ export const RoadmapView: React.FC = () => {
   const riskMatrix = data?.risk_matrix || [];
   const sequencing = data?.sequencing_rationale;
 
-  const allSlideBlocks = slideGanttRows.flatMap(row => row.blocks);
-  const selectedBlock = allSlideBlocks.find(b => b.id === selectedBlockId) || allSlideBlocks[0];
+  const allGanttBlocks = ganttRows.flatMap(row => row.blocks);
+  const selectedBlock = allGanttBlocks.find(b => b.id === selectedBlockId) || allGanttBlocks[0];
 
   // Tabs metadata
   const tabs = [
     {
       id: 'timeline' as StrategicTab,
       label: 'Execução 30 / 60 / 90',
-      slideTag: 'Slide 12',
       icon: CalendarRange,
       description: 'Cronograma e frentes',
     },
     {
       id: 'business_case' as StrategicTab,
       label: 'Business Case e ROI',
-      slideTag: 'Slide 11.1',
       icon: TrendingUp,
       description: 'Investimento e retorno',
     },
     {
       id: 'risks' as StrategicTab,
       label: 'Governança e Riscos',
-      slideTag: 'Slide 13',
       icon: ShieldAlert,
       description: 'Metas e contingência',
     },
     {
       id: 'sequencing' as StrategicTab,
       label: 'Sequenciamento',
-      slideTag: 'Slide A4',
       icon: SlidersHorizontal,
-      description: 'Marketing e CRM',
+      description: 'Marketing e Clientes',
     },
     {
       id: 'initiatives' as StrategicTab,
       label: 'Catálogo de Ações',
-      slideTag: `${initiatives.length} ações`,
       icon: ListChecks,
       description: 'Ações detalhadas por prazo',
     },
   ];
 
-  // Agentes do Slide 12 para montagem da matriz de cruzamento
+  // Agentes operacionais para montagem da matriz de cruzamento
   const agentRows = [
     {
       id: 'stock',
@@ -295,7 +290,7 @@ export const RoadmapView: React.FC = () => {
       <ScopeBadge
         tables={['vendas', 'estoque', 'atendimento', 'marketing', 'clientes']}
         scope="Plano Estratégico: Business Case e Governança"
-        devSection="Alinhado aos Slides Executivos (Slides 06 a 13 e Slides Auxiliares A1-A4)"
+        devSection="Planejamento Estratégico e Governança Integrada"
       />
 
       {/* Main Tab Navigation Bar */}
@@ -313,26 +308,16 @@ export const RoadmapView: React.FC = () => {
                   : 'bg-[#faf9fe] dark:bg-[#181530]/60 border-transparent hover:border-[#e6e5f0] dark:hover:border-[#262046] text-[#5e6270] dark:text-[#a1a1aa] hover:text-[#131920] dark:hover:text-[#f4f4f5]'
                   }`}
               >
-                <div className="flex items-center justify-between gap-1 mb-1">
-                  <div className="flex items-center gap-2">
-                    <Icon
-                      className={`w-4 h-4 ${isActive ? 'text-[#4200db] dark:text-[#8575ff]' : 'text-[#5e6270] dark:text-[#a1a1aa]'
-                        }`}
-                    />
-                    <span
-                      className={`text-xs sm:text-sm font-bold ${isActive ? 'text-[#131920] dark:text-[#f4f4f5]' : 'text-[#40434f] dark:text-[#d4d4d8]'
-                        }`}
-                    >
-                      {tab.label}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon
+                    className={`w-4 h-4 ${isActive ? 'text-[#4200db] dark:text-[#8575ff]' : 'text-[#5e6270] dark:text-[#a1a1aa]'
+                      }`}
+                  />
                   <span
-                    className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border whitespace-nowrap ${isActive
-                      ? 'bg-[#4200db]/10 text-[#4200db] dark:bg-[#8575ff]/20 dark:text-[#8575ff] border-[#4200db]/30 dark:border-[#8575ff]/40'
-                      : 'bg-[#e6e5f0]/50 dark:bg-[#262046]/50 text-[#5e6270] dark:text-[#71717a] border-transparent'
+                    className={`text-xs sm:text-sm font-bold ${isActive ? 'text-[#131920] dark:text-[#f4f4f5]' : 'text-[#40434f] dark:text-[#d4d4d8]'
                       }`}
                   >
-                    {tab.slideTag}
+                    {tab.label}
                   </span>
                 </div>
                 <p className="text-[11px] text-[#5e6270] dark:text-[#71717a] line-clamp-1">
@@ -345,25 +330,19 @@ export const RoadmapView: React.FC = () => {
       </div>
 
       {/* =========================================================================
-          TAB 1: EXECUÇÃO 30 / 60 / 90 DIAS (SLIDE 12)
+          TAB 1: EXECUÇÃO 30 / 60 / 90 DIAS
           ========================================================================= */}
       {activeTab === 'timeline' && (
         <div className="space-y-6">
-          {/* Header com Toggle de Visualização (Slide 12 Matrix vs Cards) */}
+          {/* Header com Toggle de Visualização */}
           <div className="rounded-2xl bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] p-5 sm:p-6 shadow-sm space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e6e5f0] dark:border-[#262046] pb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#4200db]/10 text-[#4200db] dark:bg-[#8575ff]/20 dark:text-[#8575ff] font-bold">
-                    Slide 12: Execução
-                  </span>
                   <h3 className="text-base sm:text-lg font-bold text-[#131920] dark:text-[#f4f4f5]">
                     Cronograma de execução (30, 60 e 90 dias)
                   </h3>
                 </div>
-                <p className="text-xs text-[#5e6270] dark:text-[#a1a1aa]">
-                  Sequência de entregas por frente de trabalho e equipe responsável no período de 90 dias.
-                </p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -379,7 +358,7 @@ export const RoadmapView: React.FC = () => {
                       }`}
                   >
                     <SlidersHorizontal className="w-3.5 h-3.5" />
-                    <span>Gantt Slide 12</span>
+                    <span>RoadMap</span>
                   </button>
                   <button
                     onClick={() => setTimelineLayout('matrix')}
@@ -395,28 +374,20 @@ export const RoadmapView: React.FC = () => {
               </div>
             </div>
 
-            {/* Visualização 1: SLIDE 12 GANTT EXECUTIVO (CRONOGRAMA 30 / 60 / 90) */}
+            {/* Visualização 1: CRONOGRAMA OPERACIONAL (30 / 60 / 90) */}
             {timelineLayout === 'gantt' && (
               <div className="space-y-6">
-                {/* Slide Frame */}
+                {/* Gantt Container */}
                 <div className="rounded-2xl border border-[#e6e5f0] dark:border-[#262046] bg-[#ffffff] dark:bg-[#110d21] p-6 sm:p-8 shadow-sm space-y-6">
-                  {/* Slide Top Bar */}
+                  {/* Gantt Header */}
                   <div className="flex items-center justify-between border-b border-[#f1f0f7] dark:border-[#1e1938] pb-4">
                     <div className="flex items-center gap-2.5">
-                      <span className="w-6 h-1 bg-[#a21caf] dark:bg-[#c084fc] rounded-full inline-block" />
-                      <span className="text-xs sm:text-sm font-bold tracking-wider text-[#581c87] dark:text-[#d8b4fe]">
-                        12 / ROADMAP
+                      <span className="w-6 h-1 bg-[#4200db] dark:bg-[#8575ff] rounded-full inline-block" />
+                      <span className="text-xs sm:text-sm font-bold tracking-wider text-[#4200db] dark:text-[#8575ff]">
+                        ROADMAP DE IMPLEMENTAÇÃO
                       </span>
                     </div>
-                    <span className="text-xs sm:text-sm font-black tracking-widest text-[#131920] dark:text-[#f4f4f5]">
-                      VÉRTICE
-                    </span>
                   </div>
-
-                  {/* Slide Title */}
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1a0526] dark:text-[#faf5ff] tracking-tight">
-                    RoadMap
-                  </h2>
 
                   {/* Gantt Grid Container */}
                   <div className="overflow-x-auto">
@@ -453,7 +424,7 @@ export const RoadmapView: React.FC = () => {
                       </div>
 
                       {/* Rows */}
-                      {slideGanttRows.map(row => (
+                      {ganttRows.map(row => (
                         <div key={row.agentId} className="flex items-center gap-3">
                           {/* Row Label */}
                           <div className="w-52 sm:w-64 shrink-0 font-bold text-sm sm:text-base text-[#131920] dark:text-[#f4f4f5] pr-2">
@@ -487,18 +458,11 @@ export const RoadmapView: React.FC = () => {
                           </div>
                         </div>
                       ))}
-
-                      {/* Slide Footer */}
-                      <div className="flex justify-end pt-4">
-                        <span className="text-xs font-bold font-mono text-[#5e6270] dark:text-[#71717a]">
-                          12
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Detail Inspection Card below Slide */}
+                {/* Detail Inspection Card */}
                 {selectedBlock && (
                   <div className="rounded-xl border border-[#4200db]/30 dark:border-[#8575ff]/40 bg-[#faf9fe] dark:bg-[#181432] p-5 shadow-sm space-y-3 transition-all">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e6e5f0] dark:border-[#262046] pb-3">
@@ -529,14 +493,6 @@ export const RoadmapView: React.FC = () => {
                       </div>
                       <div className="p-3.5 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] space-y-1">
                         <span className="text-[10px] font-mono uppercase tracking-wider text-[#5e6270] dark:text-[#a1a1aa] font-bold block">
-                          Equipe Responsável
-                        </span>
-                        <p className="text-xs text-[#131920] dark:text-[#e4e4e7] leading-relaxed font-semibold">
-                          {selectedBlock.squad}
-                        </p>
-                      </div>
-                      <div className="p-3.5 rounded-lg bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] space-y-1">
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-[#5e6270] dark:text-[#a1a1aa] font-bold block">
                           Critério de Sucesso e Gate
                         </span>
                         <p className="text-xs text-[#131920] dark:text-[#e4e4e7] leading-relaxed">
@@ -562,7 +518,7 @@ export const RoadmapView: React.FC = () => {
                       GATE 2 • DIA 60
                     </span>
                     <p className="text-[11px] text-[#5e6270] dark:text-[#a1a1aa]">
-                      Avaliação do teste A/B com teto de 15% de desconto e queda imediata de 30% nos chamados sobre status de entrega.
+                      Avaliação do teste A/B com teto dinâmico de desconto por SKU e queda imediata de 30% nos chamados sobre status de entrega.
                     </p>
                   </div>
                   <div className="p-3.5 rounded-xl bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] space-y-1 shadow-xs">
@@ -577,7 +533,7 @@ export const RoadmapView: React.FC = () => {
               </div>
             )}
 
-            {/* Visualização 2: MATRIZ EXECUTIVA DO SLIDE 12 */}
+            {/* Visualização 2: MATRIZ EXECUTIVA DE GOVERNANÇA */}
             {timelineLayout === 'matrix' && (
               <div className="space-y-4">
                 {/* Timeline Progress Ribbon para a Matriz */}
@@ -611,122 +567,122 @@ export const RoadmapView: React.FC = () => {
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-[#e6e5f0] dark:border-[#262046] shadow-sm">
-                <table className="w-full text-left border-collapse min-w-[760px]">
-                  <thead>
-                    <tr className="bg-[#f4f3fa] dark:bg-[#110f22] border-b border-[#e6e5f0] dark:border-[#262046]">
-                      <th className="p-3.5 text-xs font-bold font-mono text-[#5e6270] dark:text-[#a1a1aa] uppercase tracking-wider w-[240px]">
-                        Frente e Agente
-                      </th>
-                      {timeline.map((phase) => (
-                        <th
-                          key={phase.phase}
-                          className="p-3.5 text-xs font-bold text-[#131920] dark:text-[#f4f4f5] border-l border-[#e6e5f0] dark:border-[#262046]"
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-mono text-[11px] text-[#4200db] dark:text-[#8575ff] font-bold">
-                              {phase.phase.toUpperCase()}
-                            </span>
-                            <span className="text-xs font-semibold text-[#5e6270] dark:text-[#a1a1aa]">
-                              {phase.title}
-                            </span>
-                          </div>
+                  <table className="w-full text-left border-collapse min-w-[760px]">
+                    <thead>
+                      <tr className="bg-[#f4f3fa] dark:bg-[#110f22] border-b border-[#e6e5f0] dark:border-[#262046]">
+                        <th className="p-3.5 text-xs font-bold font-mono text-[#5e6270] dark:text-[#a1a1aa] uppercase tracking-wider w-[240px]">
+                          Frente e Agente
                         </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e6e5f0] dark:divide-[#262046]">
-                    {agentRows.map(row => {
-                      const Icon = row.icon;
-                      return (
-                        <tr
-                          key={row.id}
-                          className="bg-[#ffffff] dark:bg-[#131126] hover:bg-[#faf9fe] dark:hover:bg-[#15122b] transition-colors"
-                        >
-                          {/* Coluna da Frente / Agente */}
-                          <td className="p-3.5 align-top bg-[#faf9fe]/60 dark:bg-[#15122b]/60">
-                            <div className="flex items-start gap-2.5">
-                              <div className={`p-1.5 rounded-lg border ${row.accent} shrink-0 mt-0.5`}>
-                                <Icon className="w-3.5 h-3.5" />
-                              </div>
-                              <div>
-                                <span className="text-xs font-bold text-[#131920] dark:text-[#f4f4f5] block leading-snug">
-                                  {row.title}
-                                </span>
-                                <span className="text-[10px] text-[#5e6270] dark:text-[#71717a] font-mono">
-                                  {row.department}
-                                </span>
-                              </div>
+                        {timeline.map((phase) => (
+                          <th
+                            key={phase.phase}
+                            className="p-3.5 text-xs font-bold text-[#131920] dark:text-[#f4f4f5] border-l border-[#e6e5f0] dark:border-[#262046]"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-mono text-[11px] text-[#4200db] dark:text-[#8575ff] font-bold">
+                                {phase.phase.toUpperCase()}
+                              </span>
+                              <span className="text-xs font-semibold text-[#5e6270] dark:text-[#a1a1aa]">
+                                {phase.title}
+                              </span>
                             </div>
-                          </td>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#e6e5f0] dark:divide-[#262046]">
+                      {agentRows.map(row => {
+                        const Icon = row.icon;
+                        return (
+                          <tr
+                            key={row.id}
+                            className="bg-[#ffffff] dark:bg-[#131126] hover:bg-[#faf9fe] dark:hover:bg-[#15122b] transition-colors"
+                          >
+                            {/* Coluna da Frente / Agente */}
+                            <td className="p-3.5 align-top bg-[#faf9fe]/60 dark:bg-[#15122b]/60">
+                              <div className="flex items-start gap-2.5">
+                                <div className={`p-1.5 rounded-lg border ${row.accent} shrink-0 mt-0.5`}>
+                                  <Icon className="w-3.5 h-3.5" />
+                                </div>
+                                <div>
+                                  <span className="text-xs font-bold text-[#131920] dark:text-[#f4f4f5] block leading-snug">
+                                    {row.title}
+                                  </span>
+                                  <span className="text-[10px] text-[#5e6270] dark:text-[#71717a] font-mono">
+                                    {row.department}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
 
-                          {/* Células da Matriz para cada Fase (Dia 30, 60, 90) */}
-                          {timeline.map(phase => {
-                            const deliverable = phase.deliverables.find(d => row.matchAgent(d.agent));
-                            if (!deliverable) {
+                            {/* Células da Matriz para cada Fase (Dia 30, 60, 90) */}
+                            {timeline.map(phase => {
+                              const deliverable = phase.deliverables.find(d => row.matchAgent(d.agent));
+                              if (!deliverable) {
+                                return (
+                                  <td
+                                    key={phase.phase}
+                                    className="p-3.5 align-top border-l border-[#e6e5f0] dark:border-[#262046] text-xs text-[#5e6270] dark:text-[#71717a]"
+                                  >
+                                    -
+                                  </td>
+                                );
+                              }
+
                               return (
                                 <td
                                   key={phase.phase}
-                                  className="p-3.5 align-top border-l border-[#e6e5f0] dark:border-[#262046] text-xs text-[#5e6270] dark:text-[#71717a]"
+                                  className="p-3.5 align-top border-l border-[#e6e5f0] dark:border-[#262046] space-y-2"
                                 >
-                                  -
+                                  <span
+                                    className={`inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${getBadgeStyle(
+                                      deliverable.badge,
+                                    )}`}
+                                  >
+                                    {deliverable.badge}
+                                  </span>
+                                  <p className="text-[11px] sm:text-xs text-[#40434f] dark:text-[#d4d4d8] leading-relaxed">
+                                    {deliverable.scope}
+                                  </p>
                                 </td>
                               );
-                            }
-
-                            return (
-                              <td
-                                key={phase.phase}
-                                className="p-3.5 align-top border-l border-[#e6e5f0] dark:border-[#262046] space-y-2"
-                              >
-                                <span
-                                  className={`inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${getBadgeStyle(
-                                    deliverable.badge,
-                                  )}`}
-                                >
-                                  {deliverable.badge}
-                                </span>
-                                <p className="text-[11px] sm:text-xs text-[#40434f] dark:text-[#d4d4d8] leading-relaxed">
-                                  {deliverable.scope}
-                                </p>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                  {/* Rodapé da Matriz com Equipe e Critério */}
-                  <tfoot>
-                    <tr className="bg-[#f4f3fa] dark:bg-[#110f22] border-t border-[#e6e5f0] dark:border-[#262046] text-[11px]">
-                      <td className="p-3.5 font-mono text-[#5e6270] dark:text-[#a1a1aa] font-bold">
-                        Governança da fase
-                      </td>
-                      {timeline.map(phase => (
-                        <td
-                          key={phase.phase}
-                          className="p-3.5 border-l border-[#e6e5f0] dark:border-[#262046] space-y-1"
-                        >
-                          <div className="text-[#5e6270] dark:text-[#a1a1aa]">
-                            <strong className="text-[#131920] dark:text-[#f4f4f5]">Equipe:</strong> {phase.squad}
-                          </div>
-                          <div className="text-[#5e6270] dark:text-[#a1a1aa]">
-                            <strong className="text-[#131920] dark:text-[#f4f4f5]">Critério:</strong>{' '}
-                            {phase.tracking_criteria}
-                          </div>
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    {/* Rodapé da Matriz com Equipe e Critério */}
+                    <tfoot>
+                      <tr className="bg-[#f4f3fa] dark:bg-[#110f22] border-t border-[#e6e5f0] dark:border-[#262046] text-[11px]">
+                        <td className="p-3.5 font-mono text-[#5e6270] dark:text-[#a1a1aa] font-bold">
+                          Governança da fase
                         </td>
-                      ))}
-                    </tr>
-                  </tfoot>
-                </table>
+                        {timeline.map(phase => (
+                          <td
+                            key={phase.phase}
+                            className="p-3.5 border-l border-[#e6e5f0] dark:border-[#262046] space-y-1"
+                          >
+                            <div className="text-[#5e6270] dark:text-[#a1a1aa]">
+                              <strong className="text-[#131920] dark:text-[#f4f4f5]">Equipe:</strong> {phase.squad}
+                            </div>
+                            <div className="text-[#5e6270] dark:text-[#a1a1aa]">
+                              <strong className="text-[#131920] dark:text-[#f4f4f5]">Critério:</strong>{' '}
+                              {phase.tracking_criteria}
+                            </div>
+                          </td>
+                        ))}
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </div>
         </div>
       )}
 
       {/* =========================================================================
-          TAB 2: BUSINESS CASE & RETORNO ECONÔMICO (SLIDE 11.1)
+          TAB 2: BUSINESS CASE & RETORNO ECONÔMICO
           ========================================================================= */}
       {activeTab === 'business_case' && (
         <div className="space-y-6">
@@ -757,18 +713,15 @@ export const RoadmapView: React.FC = () => {
             <MetricCard
               label="Liquidação Descontinuados"
               value={bCase ? bCase.receita_liquidacao_central_label : 'R$ 4,14M'}
-              subtitle="50% de venda (caixa imediato)"
+              subtitle="50% de venda (sobre R$ 6,1M parados)"
             />
           </div>
 
-          {/* Estrutura em Três Colunas do Slide 11.1 */}
+          {/* Estrutura em Três Colunas */}
           <div className="rounded-2xl bg-[#ffffff] dark:bg-[#131126] border border-[#e6e5f0] dark:border-[#262046] p-5 sm:p-6 shadow-sm space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e6e5f0] dark:border-[#262046] pb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#4200db]/10 text-[#4200db] dark:bg-[#8575ff]/20 dark:text-[#8575ff] font-bold">
-                    Slide 11.1: Business Case
-                  </span>
                   <h3 className="text-base sm:text-lg font-bold text-[#131920] dark:text-[#f4f4f5]">
                     Business case e retorno econômico
                   </h3>
@@ -792,15 +745,15 @@ export const RoadmapView: React.FC = () => {
                         Liquidação de descontinuados:
                       </strong>
                       <span>
-                        +R$ 4,14M em receita líquida no cenário central (50% de venda e R$ 969k de margem de contribuição).
+                        +R$ 4,14M em receita líquida no cenário central (50% de venda sobre os R$ 6,1M imobilizados; R$ 969k de margem).
                       </span>
                     </li>
                     <li className="p-2.5 rounded-lg bg-[#ffffff] dark:bg-[#1a1636] border border-[#e6e5f0] dark:border-[#262046]">
                       <strong className="text-[#131920] dark:text-[#f4f4f5] block">
-                        Teto de descontos (15%):
+                        Governança dinâmica de descontos:
                       </strong>
                       <span>
-                        +R$ 1,80M ao ano em margem recuperada sem perda observada no volume vendido.
+                        +R$ 1,80M ao ano em margem recuperada com tetos dinâmicos por SKU.
                       </span>
                     </li>
                     <li className="p-2.5 rounded-lg bg-[#ffffff] dark:bg-[#1a1636] border border-[#e6e5f0] dark:border-[#262046]">
@@ -808,13 +761,10 @@ export const RoadmapView: React.FC = () => {
                         Automação de suporte e rastreio:
                       </strong>
                       <span>
-                        +R$ 55,7 mil ao ano em chamados evitados (80% em rastreio e 50% em dúvidas técnicas).
+                        +R$ 55,7 mil ao ano em chamados evitados (80% em rastreio e 50% em dúvidas técnicas, sobre os R$ 238,5 mil da base).
                       </span>
                     </li>
                   </ul>
-                </div>
-                <div className="pt-3 border-t border-[#e6e5f0] dark:border-[#262046] text-[11px] text-[#5e6270] dark:text-[#a1a1aa] italic">
-                  * A receita de liquidação é reforço imediato de caixa e não se repete nos anos seguintes.
                 </div>
               </div>
 
@@ -858,9 +808,6 @@ export const RoadmapView: React.FC = () => {
                     })}
                   </div>
                 </div>
-                <div className="pt-3 border-t border-[#e6e5f0] dark:border-[#262046] text-[11px] text-[#5e6270] dark:text-[#a1a1aa]">
-                  Estrutura enxuta com foco em DuckDB in-memory, automações e regras de segurança.
-                </div>
               </div>
 
               {/* Coluna 3: Métricas de Retorno */}
@@ -899,9 +846,6 @@ export const RoadmapView: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="pt-3 border-t border-[#e6e5f0] dark:border-[#262046] text-[11px] text-[#5e6270] dark:text-[#a1a1aa]">
-                  Mesmo no cenário conservador (25% de liquidação e 25% de desconto capturado), o payback é de 4,5 meses.
-                </div>
               </div>
             </div>
           </div>
@@ -909,7 +853,7 @@ export const RoadmapView: React.FC = () => {
       )}
 
       {/* =========================================================================
-          TAB 3: GOVERNANÇA & RISCOS (SLIDE 13)
+          TAB 3: GOVERNANÇA & RISCOS
           ========================================================================= */}
       {activeTab === 'risks' && (
         <div className="space-y-6">
@@ -917,9 +861,6 @@ export const RoadmapView: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e6e5f0] dark:border-[#262046] pb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#4200db]/10 text-[#4200db] dark:bg-[#8575ff]/20 dark:text-[#8575ff] font-bold">
-                    Slide 13: Riscos e Governança
-                  </span>
                   <h3 className="text-base sm:text-lg font-bold text-[#131920] dark:text-[#f4f4f5]">
                     Riscos, metas e planos de contingência
                   </h3>
@@ -980,7 +921,7 @@ export const RoadmapView: React.FC = () => {
       )}
 
       {/* =========================================================================
-          TAB 4: RACIONAL DE SEQUENCIAMENTO (SLIDE A4)
+          TAB 4: RACIONAL DE SEQUENCIAMENTO
           ========================================================================= */}
       {activeTab === 'sequencing' && sequencing && (
         <div className="space-y-6">
@@ -988,9 +929,6 @@ export const RoadmapView: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e6e5f0] dark:border-[#262046] pb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#4200db]/10 text-[#4200db] dark:bg-[#8575ff]/20 dark:text-[#8575ff] font-bold">
-                    Slide A4: Sequenciamento
-                  </span>
                   <h3 className="text-base sm:text-lg font-bold text-[#131920] dark:text-[#f4f4f5]">
                     {sequencing.title}
                   </h3>
@@ -1002,70 +940,37 @@ export const RoadmapView: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Marketing */}
-              <div className="p-4 sm:p-5 rounded-xl bg-[#faf9fe] dark:bg-[#15122b] border border-[#e6e5f0] dark:border-[#262046] space-y-3 flex flex-col justify-between shadow-sm">
-                <div className="space-y-2">
-                  <span className="text-xs font-bold text-[#131920] dark:text-[#f4f4f5]">
-                    {sequencing.marketing.title}
-                  </span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold font-mono text-[#4200db] dark:text-[#8575ff]">
-                      {sequencing.marketing.highlight_number}
+              {(sequencing.items || [sequencing.marketing, sequencing.crm]).filter(Boolean).map((item, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 sm:p-5 rounded-xl bg-[#faf9fe] dark:bg-[#15122b] border border-[#e6e5f0] dark:border-[#262046] space-y-3 flex flex-col justify-between shadow-sm"
+                >
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-[#131920] dark:text-[#f4f4f5]">
+                      {item.title}
                     </span>
-                    <span className="text-xs text-[#5e6270] dark:text-[#a1a1aa]">
-                      {sequencing.marketing.highlight_label}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold font-mono text-[#4200db] dark:text-[#8575ff]">
+                        {item.highlight_number}
+                      </span>
+                      <span className="text-xs text-[#5e6270] dark:text-[#a1a1aa]">
+                        {item.highlight_label}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#40434f] dark:text-[#d4d4d8] leading-relaxed">
+                      {item.divergence}
+                    </p>
+                  </div>
+                  <div className="pt-3 border-t border-[#e6e5f0] dark:border-[#262046] text-xs">
+                    <strong className="text-[#4200db] dark:text-[#8575ff] block mb-0.5">
+                      Ação recomendada:
+                    </strong>
+                    <span className="text-[#5e6270] dark:text-[#a1a1aa]">
+                      {item.next_step}
                     </span>
                   </div>
-                  <p className="text-xs text-[#40434f] dark:text-[#d4d4d8] leading-relaxed">
-                    {sequencing.marketing.divergence}
-                  </p>
                 </div>
-                <div className="pt-3 border-t border-[#e6e5f0] dark:border-[#262046] text-xs">
-                  <strong className="text-[#4200db] dark:text-[#8575ff] block mb-0.5">
-                    Próximo passo (60 dias):
-                  </strong>
-                  <span className="text-[#5e6270] dark:text-[#a1a1aa]">
-                    {sequencing.marketing.next_step}
-                  </span>
-                </div>
-              </div>
-
-              {/* CRM */}
-              <div className="p-4 sm:p-5 rounded-xl bg-[#faf9fe] dark:bg-[#15122b] border border-[#e6e5f0] dark:border-[#262046] space-y-3 flex flex-col justify-between shadow-sm">
-                <div className="space-y-2">
-                  <span className="text-xs font-bold text-[#131920] dark:text-[#f4f4f5]">
-                    {sequencing.crm.title}
-                  </span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold font-mono text-[#4200db] dark:text-[#8575ff]">
-                      {sequencing.crm.highlight_number}
-                    </span>
-                    <span className="text-xs text-[#5e6270] dark:text-[#a1a1aa]">
-                      {sequencing.crm.highlight_label}
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#40434f] dark:text-[#d4d4d8] leading-relaxed">
-                    {sequencing.crm.divergence}
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#e6e5f0] dark:border-[#262046] text-xs">
-                  <strong className="text-[#4200db] dark:text-[#8575ff] block mb-0.5">
-                    Próximo passo (90 dias):
-                  </strong>
-                  <span className="text-[#5e6270] dark:text-[#a1a1aa]">
-                    {sequencing.crm.next_step}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-[#faf9fe] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-              <span className="font-bold text-[#4200db] dark:text-[#8575ff] whitespace-nowrap">
-                Resposta à banca:
-              </span>
-              <span className="text-[#131920] dark:text-[#f4f4f5] font-medium">
-                {sequencing.c_level_takeaway}
-              </span>
+              ))}
             </div>
           </div>
         </div>
@@ -1081,9 +986,6 @@ export const RoadmapView: React.FC = () => {
               <h3 className="text-base font-bold text-[#131920] dark:text-[#f4f4f5]">
                 Catálogo de iniciativas ({initiatives.length})
               </h3>
-              <p className="text-xs text-[#5e6270] dark:text-[#a1a1aa]">
-                Filtre por prazo de execução para ver o impacto financeiro e as métricas de acompanhamento.
-              </p>
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2 p-1 rounded-xl bg-[#faf9fe] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] overflow-x-auto no-scrollbar">
@@ -1131,12 +1033,9 @@ export const RoadmapView: React.FC = () => {
                       </span>
                     </div>
 
-                    <h4 className="text-sm sm:text-base font-bold text-[#131920] dark:text-[#f4f4f5] tracking-tight mb-1">
+                    <h4 className="text-sm sm:text-base font-bold text-[#131920] dark:text-[#f4f4f5] tracking-tight mb-2">
                       {init.title}
                     </h4>
-                    <div className="text-[11px] sm:text-xs text-[#5e6270] dark:text-[#71717a] font-mono mb-2">
-                      {init.hypothesis} • {init.category}
-                    </div>
 
                     <p className="text-xs text-[#40434f] dark:text-[#d4d4d8] leading-relaxed">
                       {init.description}

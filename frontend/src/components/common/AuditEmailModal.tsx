@@ -69,9 +69,6 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
               <h3 className="text-sm font-bold text-[#131920] dark:text-[#f4f4f5] tracking-tight">
                 Análise de Estoque & E-mail Executivo
               </h3>
-              <p className="text-[11px] text-[#5e6270] dark:text-[#71717a]">
-                Pacote factual reproduzível, executado sob demanda
-              </p>
             </div>
           </div>
 
@@ -88,10 +85,6 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
         <div className="p-4 sm:p-5 space-y-4">
           {!result ? (
             <>
-              <p className="text-xs text-[#5e6270] dark:text-[#a1a1aa] leading-relaxed">
-                O backend resolverá a janela selecionada, reconciliará fatos e cenários e só publicará o relatório se os checks determinísticos forem aprovados.
-              </p>
-
               <div className="space-y-3 pt-1">
                 <div>
                   <label className="block text-xs font-medium text-[#131920] dark:text-[#d4d4d8] mb-1">
@@ -112,14 +105,9 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                   </select>
                 </div>
 
-                <details className="rounded-lg border border-[#e6e5f0] dark:border-[#262046] bg-[#f8f7fc] dark:bg-[#181530] p-3 text-[11px] text-[#5e6270] dark:text-[#a1a1aa]">
-                  <summary className="cursor-pointer font-medium text-[#131920] dark:text-[#d4d4d8]">Metodologia e limitações</summary>
-                  <p className="mt-2 leading-relaxed">Posição de estoque fornecida — data de referência não informada. Vendas representam tendência histórica observada. Financeiro vem de Vendas.</p>
-                </details>
-
                 <div>
                   <label className="block text-xs font-medium text-[#131920] dark:text-[#d4d4d8] mb-1">
-                    Destinatário do E-mail (Opcional)
+                    Destinatário do E-mail
                   </label>
                   <input
                     type="email"
@@ -129,9 +117,6 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                     disabled={loading}
                     className="w-full text-xs bg-[#ffffff] dark:bg-[#181530] border border-[#e6e5f0] dark:border-[#262046] rounded-lg px-3 py-2 text-[#131920] dark:text-[#f4f4f5] placeholder-[#8e92a0] dark:placeholder-[#71717a] focus:outline-none focus:border-[#4200db] dark:focus:border-[#8575ff]"
                   />
-                  <span className="text-[10px] text-[#8e92a0] dark:text-[#71717a] mt-1 block">
-                    Se vazio, usa o e-mail padrão configurado nas variáveis de ambiente.
-                  </span>
                 </div>
 
                 <div className="flex items-center gap-2 pt-1">
@@ -162,9 +147,6 @@ export const AuditEmailModal: React.FC<AuditEmailModalProps> = ({
                 {result.analysis_success ? <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
                 <div className="space-y-1">
                   <div className="font-semibold">{result.analysis_success ? 'Análise executada' : 'Análise não concluída'}</div>
-                  <div className="text-[#5e6270] dark:text-[#a1a1aa] leading-relaxed">
-                    Consulte abaixo, separadamente, a reconciliação determinística e o processamento do e-mail.
-                  </div>
                 </div>
               </div>
 

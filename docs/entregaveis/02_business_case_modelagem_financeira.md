@@ -8,7 +8,7 @@
 
 Implementar, em 90 dias, três frentes conectadas ao diagnóstico:
 
-1. **Predictive Stock Advisor:** prioriza liquidação de descontinuados e ações de reposição.
+1. **Predictive Inventory Advisor:** prioriza liquidação de descontinuados e ações de reposição.
 2. **Margin Recovery Advisor:** recomenda o teto de desconto por SKU para proteger margem.
 3. **Rastreio e Atendimento N1:** reduz consultas operacionais com comunicação proativa e autoatendimento.
 
@@ -22,7 +22,7 @@ Implementar, em 90 dias, três frentes conectadas ao diagnóstico:
 
 ## Matriz de sensibilidade da liquidação (descontinuados)
 
-A modelagem de liquidação abrange 206 dos 207 SKUs descontinuados com saldo (1 SKU sem histórico em Vendas foi excluído por conservadorismo). Com desconto simulado de 30% sobre os preços praticados no ERP e ajuste de devoluções por categoria:
+A modelagem de liquidação abrange 206 dos 207 SKUs descontinuados com saldo (1 SKU sem histórico em Vendas foi excluído por conservadorismo). Com desconto simulado de 30% sobre os preços praticados em Vendas e ajuste de devoluções por categoria:
 
 | Cenário de sell-through | Unidades liquidadas | Receita bruta | Ajuste devoluções | Receita pós-devoluções | Margem de contribuição |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -51,7 +51,7 @@ O cálculo de retorno econômico considera a margem recuperada em descontos e a 
 
 O investimento de R$ 350 mil está estruturado em:
 - **Squad de projeto (90 dias):** R$ 250 mil (Tech Lead, Engenheiro de Dados/Analytics, Especialista de Negócios e CX).
-- **Infraestrutura e consumo de nuvem (12 meses):** R$ 60 mil (instâncias analíticas DuckDB in-memory e API LangGraph).
+- **Infraestrutura e consumo de nuvem (12 meses):** R$ 60 mil (instâncias analíticas e API).
 - **Mensageria e WhatsApp:** R$ 20 mil (notificações proativas de rastreio aos clientes).
 - **Gestão de mudança e capacitação:** R$ 20 mil (treinamento de equipes de compras e atendimento).
 
@@ -60,5 +60,5 @@ O investimento de R$ 350 mil está estruturado em:
 - **Estoque:** 50% de sell-through dos descontinuados em 90 dias, desconto médio de 30% e ajuste histórico de 14,88% para devoluções.
 - **Base de cálculo:** saldo disponível de Estoque; preço, custo, frete e devoluções históricos de Vendas.
 - **Descontos:** redução gradual de descontos acima do teto recomendado com acompanhamento diário de elasticidade volumétrica.
-- **CX e N1:** R$ 238,5 mil de custo de chamados no período de 391 dias (anualizado para R$ 79,5k/ano); a captura de 80% em rastreio e 50% em dúvidas técnicas equivale a R$ 55,7 mil/ano de economia.
+- **CX e N1:** R$ 238,5 mil de custo de chamados na base histórica; sob premissa conservadora (captura de 80% em rastreio e 50% em dúvidas técnicas), a economia anual estimada é de R$ 55,7 mil/ano.
 - **Decisão solicitada:** aprovar o ciclo de 90 dias com revisão dos indicadores nos dias 30, 60 e 90 antes de qualquer ampliação de escopo.

@@ -11,8 +11,7 @@ from src.infrastructure.database import DuckDBRepository
 
 router = APIRouter(prefix="/roadmap", tags=["roadmap"])
 
-# Matriz estritamente alinhada aos Slides Executivos (Slides 06 a 13 e Slides Auxiliares A1-A4)
-# e aos Relatórios de Diagnóstico Estratégico e Modelagem Financeira.
+# Matriz alinhada ao plano estratégico, auditoria e modelagem financeira.
 
 TIMELINE_PHASES = [
     {
@@ -55,7 +54,7 @@ TIMELINE_PHASES = [
             },
             {
                 "agent": "Agente 2 (Margem)",
-                "scope": "Teste piloto limitando descontos ao teto de 15% para proteger a margem sem perder volume.",
+                "scope": "Teste piloto do Margin Recovery Advisor limitando descontos ao teto dinâmico por SKU para proteger a margem sem perder volume.",
                 "badge": "Piloto Operacional"
             },
             {
@@ -80,7 +79,7 @@ TIMELINE_PHASES = [
             },
             {
                 "agent": "Agente 2 (Margem)",
-                "scope": "Aplicação do teto de desconto de 15% em 100% dos produtos do catálogo.",
+                "scope": "Aplicação contínua da governança de tetos dinâmicos de desconto em 100% dos produtos do catálogo.",
                 "badge": "Produção"
             },
             {
@@ -116,23 +115,53 @@ RISK_MATRIX = [
 ]
 
 SEQUENCING_RATIONALE = {
-    "title": "Por que Marketing e CRM ficam para a segunda fase",
-    "subtitle": "Antes de investir em campanhas ou réguas de clientes, é preciso corrigir os cadastros de checkout e vendas.",
+    "title": "Integração e Conciliação das Bases de Dados",
+    "subtitle": "Ajustes simples para conectar as bases e destravar decisões futuras com dados confiáveis.",
+    "items": [
+        {
+            "title": "Vendas e Marketing",
+            "highlight_number": "38,2M vs 26,5k",
+            "highlight_label": "conversões de pixel vs pedidos no ERP",
+            "divergence": "As plataformas de anúncio medem conversões próprias, sem vínculo direto com os pedidos faturados no ERP.",
+            "next_step": "Estabelecer vínculo entre os anúncios e as compras para medir o retorno real de cada canal antes de remanejar verbas."
+        },
+        {
+            "title": "Vendas e Clientes",
+            "highlight_number": "40,6% e 346",
+            "highlight_label": "vendas anônimas e clientes localizados",
+            "divergence": "Apenas 346 dos 15 mil clientes cadastrados constam nas vendas, e 40,6% dos pedidos estão em um usuário genérico.",
+            "next_step": "Identificar o cliente na compra para juntar o histórico em um só cadastro antes de planejar ações de fidelização."
+        },
+        {
+            "title": "Vendas e Atendimento",
+            "highlight_number": "65,4%",
+            "highlight_label": "chamados sem pedido localizado no ERP",
+            "divergence": "A maioria dos chamados de suporte cita pedidos que não aparecem no extrato de vendas.",
+            "next_step": "Conectar o atendimento às vendas para o operador localizar o histórico de compra do cliente de imediato."
+        },
+        {
+            "title": "Vendas e Estoque",
+            "highlight_number": "206 SKUs",
+            "highlight_label": "conciliados para liquidação imediata",
+            "divergence": "O custo cadastrado no estoque difere do praticado nas vendas, e o inventário reflete apenas uma foto estática.",
+            "next_step": "Conectar o sistema de estoque às vendas para atualizar custos e saldos automaticamente após a liquidação."
+        }
+    ],
     "marketing": {
-        "title": "Marketing e Mídia Paga",
-        "highlight_number": "38,2M",
-        "highlight_label": "conversões registradas na mídia em 2023",
-        "divergence": "O ERP registra 76,9 mil pedidos faturados no ano, sem identificação de campanha ou rastreamento de canal nos pedidos.",
-        "next_step": "Integrar o checkout com as ferramentas de mídia para acompanhar pedidos e margem real antes de mexer na verba."
+        "title": "Vendas e Marketing",
+        "highlight_number": "38,2M vs 26,5k",
+        "highlight_label": "conversões de pixel vs pedidos no ERP",
+        "divergence": "As plataformas de anúncio medem conversões próprias, sem vínculo direto com os pedidos faturados no ERP.",
+        "next_step": "Estabelecer vínculo entre os anúncios e as compras para medir o retorno real de cada canal antes de remanejar verbas."
     },
     "crm": {
-        "title": "CRM e Base de Clientes",
-        "highlight_number": "346 de 15 mil",
-        "highlight_label": "clientes cadastrados aparecem no histórico de vendas",
-        "divergence": "40,6% dos pedidos estão atribuídos a um único cliente, e o histórico de compras não bate com o faturamento.",
-        "next_step": "Consolidar o cadastro de clientes e recalcular o histórico antes de criar incentivos por segmento."
+        "title": "Vendas e Clientes",
+        "highlight_number": "40,6% e 346",
+        "highlight_label": "vendas anônimas e clientes localizados",
+        "divergence": "Apenas 346 dos 15 mil clientes cadastrados constam nas vendas, e 40,6% dos pedidos estão em um usuário genérico.",
+        "next_step": "Identificar o cliente na compra para juntar o histórico em um só cadastro antes de planejar ações de fidelização."
     },
-    "c_level_takeaway": "O diagnóstico aponta os gargalos. A otimização em mídia e CRM só trará retorno seguro quando o cadastro e o checkout estiverem unificados."
+    "c_level_takeaway": "A priorização foca primeiro em caixa e margem (Estoque e Preço). Ao mesmo tempo, esses alinhamentos organizam as informações para destravar ações de clientes, anúncios e suporte no ciclo seguinte."
 }
 
 
@@ -147,7 +176,7 @@ def get_roadmap_initiatives():
     initiatives = [
         {
             "id": "init-01",
-            "title": "Liquidação assistida de itens descontinuados",
+            "title": "Liquidação de Descontinuados (Predictive Inventory Advisor)",
             "hypothesis": "Hipótese 1 e 6 (Estoque parado)",
             "type": "Quick Win",
             "horizon": "30 Dias",
@@ -156,78 +185,14 @@ def get_roadmap_initiatives():
             "effort_days": 20,
             "category": "Estoque",
             "description": (
-                f"Liquidar os {capital['descontinuados_valorados']} SKUs descontinuados com 50% de sell-through "
-                f"e desconto de 30%, bloqueando novas recompras no sistema."
+                f"Liquidar os {capital['descontinuados_valorados']} SKUs descontinuados (R$ 6,1M imobilizados) com meta de 50% de sell-through "
+                f"e desconto médio de 30%, gerando caixa imediato com R$ 969k de margem e bloqueando recompras no ERP."
             ),
-            "metrics_to_watch": ["Sell-through do lote", "Receita líquida realizada", "Zero recompras de descontinuados"],
+            "metrics_to_watch": ["Sell-through do lote", "Receita líquida realizada", "Zero recompra no ERP"],
         },
         {
             "id": "init-02",
-            "title": "Definição de tetos de desconto por categoria",
-            "hypothesis": "Hipótese 2 (Margem e descontos)",
-            "type": "30 Dias",
-            "horizon": "30 Dias",
-            "financial_impact_label": "Preparação da trava de margem",
-            "financial_impact_value": 0,
-            "effort_days": 25,
-            "category": "Preço e Margem",
-            "description": (
-                "Calcular os limites de desconto por SKU a partir de custo, frete histórico e taxa de devolução "
-                "para apoiar o piloto de controle de margem."
-            ),
-            "metrics_to_watch": ["Tetos calculados por categoria", "Aderência comercial às regras", "Cobertura de produtos"],
-        },
-        {
-            "id": "init-03",
-            "title": "Mapeamento de rastreio e base técnica de produtos",
-            "hypothesis": "Hipótese 3 e 4 (Suporte e atendimento)",
-            "type": "30 Dias",
-            "horizon": "30 Dias",
-            "financial_impact_label": "Preparação para reduzir chamados",
-            "financial_impact_value": 0,
-            "effort_days": 20,
-            "category": "Atendimento",
-            "description": (
-                "Organizar as respostas para as principais dúvidas técnicas de produtos e mapear os eventos "
-                "de entrega das transportadoras para envio automático de status."
-            ),
-            "metrics_to_watch": ["Base de dúvidas homologada", "Alertas de transporte ativos", "Confiabilidade dos eventos"],
-        },
-        {
-            "id": "init-04",
-            "title": "Piloto de teto de desconto em 15%",
-            "hypothesis": "Hipótese 2 (Margem e descontos)",
-            "type": "Quick Win",
-            "horizon": "60 Dias",
-            "financial_impact_label": "R$ 1.800.000,00/ano (Margem recuperada)",
-            "financial_impact_value": 1800000,
-            "effort_days": 45,
-            "category": "Preço e Margem",
-            "description": (
-                "Limitar descontos excessivos ao teto de 15% em grupo piloto. "
-                "O teste estatístico mostrou que a redução de desconto não afeta o volume de unidades vendidas."
-            ),
-            "metrics_to_watch": ["Margem cedida acima do teto", "Volume diário de vendas", "Margem de contribuição por SKU"],
-        },
-        {
-            "id": "init-05",
-            "title": "Alertas automáticos de rastreio via WhatsApp e e-mail",
-            "hypothesis": "Hipótese 4 (Atendimento e CX)",
-            "type": "Quick Win",
-            "horizon": "60 Dias",
-            "financial_impact_label": "R$ 159.660,00 (Custo evitável de rastreio)",
-            "financial_impact_value": 159660,
-            "effort_days": 30,
-            "category": "Atendimento",
-            "description": (
-                "Enviar o link de rastreamento logo após a compra e a cada mudança de rota. "
-                "A ação reduz os 30% de chamados abertos apenas para saber onde está o pedido."
-            ),
-            "metrics_to_watch": ["Volume de chamados de localização", "Custo operacional de suporte", "Satisfação na entrega"],
-        },
-        {
-            "id": "init-06",
-            "title": "Ajuste de ponto de pedido para itens ativos",
+            "title": "Proteção contra Ruptura nos Ativos (Predictive Inventory Advisor)",
             "hypothesis": "Hipótese 6 (Estoque e compras)",
             "type": "60 Dias",
             "horizon": "60 Dias",
@@ -236,42 +201,58 @@ def get_roadmap_initiatives():
             "effort_days": 50,
             "category": "Estoque",
             "description": (
-                f"Recalcular o ponto de pedido e o prazo de entrega dos {exposure['skus']} SKUs ativos expostos, "
-                "evitando falta de mercadoria com base no histórico de vendas."
+                f"Recalcular ponto de pedido e lead time para os {exposure['skus']} SKUs ativos expostos durante o prazo dos fornecedores, "
+                "garantindo reposição contínua e prevenindo quebras de estoque."
             ),
-            "metrics_to_watch": ["Ruptura de estoque ativo", "Itens abaixo do ponto de pedido", "Margem protegida"],
+            "metrics_to_watch": ["Rupturas evitadas", "Aderência ao ponto de pedido", "Lead time de reposição"],
         },
         {
-            "id": "init-07",
-            "title": "Atendimento com IA para dúvidas técnicas de produtos",
+            "id": "init-03",
+            "title": "Governança Dinâmica de Descontos (Margin Recovery Advisor)",
+            "hypothesis": "Hipótese 2 (Margem e descontos)",
+            "type": "Quick Win",
+            "horizon": "60 Dias",
+            "financial_impact_label": "R$ 1.800.000,00/ano (Margem recuperada)",
+            "financial_impact_value": 1800000,
+            "effort_days": 45,
+            "category": "Preço e Margem",
+            "description": (
+                "Implementar piloto do copiloto de precificação aplicando tetos dinâmicos por SKU (cruzando CMV, frete e devoluções), "
+                "podando descontos excessivos inelásticos (>20%) sem perda de volume."
+            ),
+            "metrics_to_watch": ["Margem bruta preservada", "Volume diário de vendas", "Aderência aos tetos por SKU"],
+        },
+        {
+            "id": "init-04",
+            "title": "Notificações Proativas de Rastreio (WhatsApp & E-mail)",
+            "hypothesis": "Hipótese 4 (Atendimento e CX)",
+            "type": "Quick Win",
+            "horizon": "60 Dias",
+            "financial_impact_label": "R$ 37.254,00/ano (Base histórica: R$ 159,7k)",
+            "financial_impact_value": 37254,
+            "effort_days": 30,
+            "category": "Atendimento",
+            "description": (
+                "Envio automático de link de rastreamento e eventos de entrega logo após o despacho, "
+                "capturando 80% das consultas de localização de pedidos (30% do volume de chamados)."
+            ),
+            "metrics_to_watch": ["Queda nos chamados de rastreio", "Taxa de entrega no WhatsApp", "CSAT de entrega"],
+        },
+        {
+            "id": "init-05",
+            "title": "Autoatendimento N1 para Dúvidas Técnicas (Agente 3 • IA)",
             "hypothesis": "Hipótese 4 (Atendimento e CX)",
             "type": "90 Dias",
             "horizon": "90 Dias",
-            "financial_impact_label": "R$ 78.888,00 (Custo evitável de dúvidas técnicas)",
-            "financial_impact_value": 78888,
+            "financial_impact_label": "R$ 18.470,00/ano (Base histórica: R$ 78,9k)",
+            "financial_impact_value": 18470,
             "effort_days": 75,
             "category": "Atendimento",
             "description": (
-                "Colocar no ar assistente virtual para responder dúvidas técnicas de produtos (14,8% dos chamados), "
-                "com transferência rápida para atendentes quando necessário."
+                "Assistente virtual supervisionado para resolução de dúvidas técnicas de produtos (14,8% dos chamados; R$ 78,9 mil na base), "
+                "com captura estimada de 50% dos chamados e transbordo qualificado para equipe humana."
             ),
-            "metrics_to_watch": ["Resolução sem recontato em 7 dias", "Tempo de resposta", "Satisfação com o suporte"],
-        },
-        {
-            "id": "init-08",
-            "title": "Unificação do cadastro de clientes e rastreamento de mídia",
-            "hypothesis": "Qualidade dos dados e sequenciamento",
-            "type": "90 Dias",
-            "horizon": "90 Dias",
-            "financial_impact_label": "Confiabilidade para mídia e CRM",
-            "financial_impact_value": 500000,
-            "effort_days": 90,
-            "category": "Dados",
-            "description": (
-                "Unificar o cadastro de clientes e incluir tags de campanha no checkout, "
-                "garantindo dados confiáveis antes de investir em novas ferramentas de marketing."
-            ),
-            "metrics_to_watch": ["Taxa de conciliação entre bases", "Cobertura de clientes no ERP", "Atribuição de vendas"],
+            "metrics_to_watch": ["Resolução sem recontato em 7 dias", "Taxa de transbordo humano", "CSAT do autoatendimento"],
         },
     ]
 
@@ -292,7 +273,7 @@ def get_roadmap_initiatives():
         "economia_operacional_cx_label": "+R$ 55,7 mil/ano",
         "breakdown_investimento": [
             {"item": "Squad de Dados, Negócios e CX (90 dias)", "valor": 250000, "percentual": 71.4},
-            {"item": "Infraestrutura Cloud & DuckDB In-Memory (12 meses)", "valor": 60000, "percentual": 17.1},
+            {"item": "Infraestrutura Cloud (12 meses)", "valor": 60000, "percentual": 17.1},
             {"item": "Mensageria e WhatsApp de Rastreio", "valor": 20000, "percentual": 5.7},
             {"item": "Gestão de Mudança & Treinamento de Equipes", "valor": 20000, "percentual": 5.7}
         ]

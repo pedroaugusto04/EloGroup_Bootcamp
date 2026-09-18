@@ -34,7 +34,7 @@ def render_executive_email_template(report_data: Dict[str, Any], deep_link_url: 
     sell_through_pct = central.get("sell_through_pct")
     top = structured.get("top_attention_category") or {}
     banner = structured.get("methodology_banner") or (
-        "Posição de estoque fornecida — data de referência não informada. "
+        ""
         f"Tendência de vendas observada entre {meta.get('sales_start', '?')} e {meta.get('sales_end', '?')}."
     )
     approved = report_data.get("deterministic_approved") is True

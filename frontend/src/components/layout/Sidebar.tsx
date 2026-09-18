@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   BarChart3,
   TrendingUp,
@@ -8,11 +8,14 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Target,
+  FileText,
   ChevronRight,
   X,
+  Lock,
 } from 'lucide-react';
 import { ViewTab } from '../../types/analytics';
 import { InventoryCopilotIcon } from '../common/InventoryCopilotIcon';
+import { MarginRecoveryIcon } from '../common/MarginRecoveryIcon';
 import { VerticeLogo } from '../common/VerticeLogo';
 
 interface SidebarProps {
@@ -23,11 +26,11 @@ interface SidebarProps {
 }
 
 interface NavItem {
-  id: ViewTab;
+  id: ViewTab | 'margin_advisor';
   label: string;
-  tag: string;
   icon: React.ElementType;
-  description: string;
+  description?: string;
+  disabled?: boolean;
 }
 
 interface NavSection {
@@ -37,42 +40,63 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    title: '',
+    title: 'VISÃO OPERACIONAL',
     items: [
       {
         id: 'executive',
         label: 'Visão Executiva & Vendas',
-        tag: '01',
         icon: BarChart3,
-        description: '',
       },
       {
         id: 'marketing',
         label: 'Marketing & Mídia (ROAS)',
-        tag: '02',
         icon: TrendingUp,
-        description: '',
       },
       {
         id: 'customers',
         label: 'Clientes & RFM',
-        tag: '03',
         icon: Users,
-        description: '',
       },
       {
         id: 'support',
         label: 'Atendimento & IA',
-        tag: '04',
         icon: Headphones,
-        description: '',
       },
       {
         id: 'inventory',
         label: 'Estoque & Suprimentos',
-        tag: '05',
         icon: Package,
-        description: '',
+      },
+    ],
+  },
+  {
+    title: 'ENTREGÁVEIS',
+    items: [
+      {
+        id: 'roadmap',
+        label: 'Plano Estratégico',
+        icon: Target,
+      },
+      {
+        id: 'deliverables',
+        label: 'Documentos Executivos',
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    title: 'AGENTES & COPILOTOS',
+    items: [
+      {
+        id: 'copilot',
+        label: 'Predictive Inventory Advisor',
+        icon: InventoryCopilotIcon,
+      },
+      {
+        id: 'margin_advisor',
+        label: 'Margin Recovery Advisor',
+        icon: MarginRecoveryIcon,
+        disabled: true,
       },
     ],
   },
@@ -81,31 +105,13 @@ const navSections: NavSection[] = [
     items: [
       {
         id: 'audit',
-        label: 'Auditoria Relacional de Dados',
-        tag: '06',
+        label: 'Auditoria dos Dados',
         icon: ShieldCheck,
-        description: '',
       },
       {
         id: 'outliers',
-        label: 'Dispersão & Outliers (Tukey IQR)',
-        tag: '07',
+        label: 'Dispersão & Outliers',
         icon: SlidersHorizontal,
-        description: '',
-      },
-      {
-        id: 'roadmap',
-        label: 'Plano Estratégico',
-        tag: '08',
-        icon: Target,
-        description: '',
-      },
-      {
-        id: 'copilot',
-        label: 'Copiloto de Estoque',
-        tag: '09',
-        icon: InventoryCopilotIcon,
-        description: '',
       },
     ],
   },
@@ -117,8 +123,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
 }) => {
-  const handleItemClick = (id: ViewTab) => {
-    onTabChange(id);
+  const [lockedNotice, setLockedNotice] = useState<string | null>(null);
+
+  const handleItemClick = (item: NavItem) => {
+    if (item.disabled) {
+      setLockedNotice(
+        'Módulo bloqueado • Previsto para a Fase 2 (60 dias)'
+      );
+      setTimeout(() => setLockedNotice(null), 4500);
+      return;
+    }
+    onTabChange(item.id as ViewTab);
     onClose();
   };
 
@@ -162,7 +177,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation List by Section */}
-        <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-4 overflow-y-auto no-scrollbar">
           {navSections.map((section, sIdx) => (
             <div key={sIdx} className="space-y-1">
               {section.title && (
@@ -174,47 +189,56 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {section.items.map(item => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
+                  const isDisabled = item.disabled;
 
                   return (
                     <button
                       key={item.id}
-                      onClick={() => handleItemClick(item.id)}
-                      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-start gap-3 group ${isActive
-                        ? 'bg-[#e8e6ff]/70 dark:bg-[#181530] border-[#c4b8ff] dark:border-[#8575ff]/50 shadow-sm dark:shadow-[0_0_12px_rgba(133,117,255,0.12)]'
-                        : 'bg-transparent border-transparent hover:bg-[#f3f2f8] dark:hover:bg-[#181530]/60 hover:border-[#e6e5f0] dark:hover:border-[#262046]'
+                      onClick={() => handleItemClick(item)}
+                      title={isDisabled ? 'Módulo bloqueado • Previsto para a Fase 2 (60 dias)' : undefined}
+                      className={`w-full text-left p-2.5 rounded-lg border transition-all duration-150 flex items-center gap-3 group ${isDisabled
+                        ? 'bg-[#ffffff] dark:bg-[#16132b] border-[#e6e5f0] dark:border-[#262046] shadow-xs cursor-pointer opacity-85 hover:opacity-100 hover:border-[#c4b8ff] dark:hover:border-[#8575ff]/40'
+                        : isActive
+                          ? 'bg-[#e8e6ff]/70 dark:bg-[#181530] border-[#c4b8ff] dark:border-[#8575ff]/50 shadow-sm dark:shadow-[0_0_12px_rgba(133,117,255,0.12)]'
+                          : 'bg-transparent border-transparent hover:bg-[#f3f2f8] dark:hover:bg-[#181530]/60 hover:border-[#e6e5f0] dark:hover:border-[#262046]'
                         }`}
                     >
                       <div
-                        className={`mt-0.5 p-1.5 rounded-md transition-colors shrink-0 ${isActive
-                          ? item.id === 'copilot'
-                            ? 'bg-[#ffffff] dark:bg-[#e8e6ff] border border-[#c4b8ff] shadow-sm'
-                            : 'bg-[#4200db] text-[#ffffff] dark:bg-[#4200db]/30 dark:text-[#8575ff] dark:border dark:border-[#8575ff]/30 shadow-sm'
-                          : 'bg-[#f3f2f8] dark:bg-[#181530] text-[#5e6270] dark:text-[#71717a] group-hover:text-[#131920] dark:group-hover:text-[#a1a1aa]'
+                        className={`p-1.5 rounded-md transition-colors shrink-0 ${isDisabled
+                          ? 'bg-[#f4f3fa] dark:bg-[#1e1a38] border border-[#e6e5f0] dark:border-[#2b2550] text-[#8e92a0] dark:text-[#a1a1aa] shadow-xs'
+                          : isActive
+                            ? item.id === 'copilot'
+                              ? 'bg-[#ffffff] dark:bg-[#e8e6ff] border border-[#c4b8ff] shadow-sm'
+                              : 'bg-[#4200db] text-[#ffffff] dark:bg-[#4200db]/30 dark:text-[#8575ff] dark:border dark:border-[#8575ff]/30 shadow-sm'
+                            : 'bg-[#f3f2f8] dark:bg-[#181530] text-[#5e6270] dark:text-[#71717a] group-hover:text-[#131920] dark:group-hover:text-[#a1a1aa]'
                           }`}
                       >
-                        <Icon className={item.id === 'copilot' ? 'w-5 h-5' : 'w-4 h-4'} />
+                        <Icon className={item.id === 'copilot' || item.id === 'margin_advisor' ? 'w-5 h-5' : 'w-4 h-4'} />
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`text-xs font-semibold truncate ${isActive ? 'text-[#4200db] dark:text-[#f4f4f5]' : 'text-[#334155] dark:text-[#d4d4d8] group-hover:text-[#131920] dark:group-hover:text-[#f4f4f5]'
-                              }`}
-                          >
-                            {item.label}
-                          </span>
-                          <span className={`text-[10px] font-mono ml-1 ${isActive ? 'text-[#4200db] dark:text-[#8575ff]' : 'text-[#8e92a0] dark:text-[#71717a]'}`}>
-                            {item.tag}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-[#5e6270] dark:text-[#71717a] truncate mt-0.5 font-sans leading-tight">
-                          {item.description}
-                        </p>
+                        <span
+                          className={`text-xs font-semibold truncate block ${isDisabled
+                            ? 'text-[#5e6270] dark:text-[#d4d4d8]'
+                            : isActive
+                              ? 'text-[#4200db] dark:text-[#f4f4f5]'
+                              : 'text-[#334155] dark:text-[#d4d4d8] group-hover:text-[#131920] dark:group-hover:text-[#f4f4f5]'
+                            }`}
+                        >
+                          {item.label}
+                        </span>
+                        {item.description && (
+                          <p className="text-[11px] text-[#5e6270] dark:text-[#71717a] truncate mt-0.5 font-sans leading-tight">
+                            {item.description}
+                          </p>
+                        )}
                       </div>
 
-                      {isActive && (
+                      {isDisabled ? (
+                        <Lock className="w-3.5 h-3.5 text-[#8e92a0] dark:text-[#71717a] shrink-0 self-center" />
+                      ) : isActive ? (
                         <ChevronRight className="w-3.5 h-3.5 text-[#4200db] dark:text-[#8575ff] self-center shrink-0" />
-                      )}
+                      ) : null}
                     </button>
                   );
                 })}
@@ -222,6 +246,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ))}
         </nav>
+
+        {/* Locked Feature Toast Notice */}
+        {lockedNotice && (
+          <div className="p-3 mx-3 mb-2 rounded-xl bg-[#ffffff] dark:bg-[#1a1636] border border-[#e6e5f0] dark:border-[#262046] text-xs text-[#131920] dark:text-[#f4f4f5] shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <div className="flex items-start gap-2.5">
+              <Lock className="w-4 h-4 text-[#4200db] dark:text-[#8575ff] shrink-0 mt-0.5" />
+              <div className="leading-tight text-[11px] text-[#5e6270] dark:text-[#d4d4d8]">
+                {lockedNotice}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Footer Info */}
         <div className="p-3 border-t border-[#e6e5f0] dark:border-[#262046] bg-[#f8f7fc] dark:bg-[#0d0b1a] text-[11px] font-mono text-[#5e6270] dark:text-[#71717a] transition-colors">

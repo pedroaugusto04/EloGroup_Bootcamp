@@ -32,7 +32,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
   const [status, setStatus] = useState('Aprovado');
   const [selectedYear, setSelectedYear] = useState('Todos');
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
-  
+
   const [execData, setExecData] = useState<ExecutiveOverviewData | null>(null);
   const [salesData, setSalesData] = useState<SalesAnalyticsData | null>(null);
 
@@ -113,7 +113,7 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
     <div className="space-y-6 view-enter">
       <ScopeBadge
         tables={['vendas']}
-        scope="27.753 transações (Vendas) • Jan/2023 a 26/Jan/2024"
+        scope="27.758 transações (Vendas) • Jan/2023 a 26/Jan/2024"
         devSection="Seção 3: Observações por Tabela (Receita/Margem & Devoluções)"
       />
 
@@ -161,11 +161,10 @@ export const ExecutiveView: React.FC<ExecutiveViewProps> = ({ filterOptions }) =
                       setSelectedCats([...selectedCats, cat]);
                     }
                   }}
-                  className={`text-[10px] sm:text-[11px] px-2 sm:px-2.5 py-0.5 rounded border transition-colors ${
-                    active
+                  className={`text-[10px] sm:text-[11px] px-2 sm:px-2.5 py-0.5 rounded border transition-colors ${active
                       ? 'bg-[#e8e6ff] dark:bg-[#8575ff]/20 border-[#c4b8ff] dark:border-[#8575ff]/60 text-[#4200db] dark:text-[#8575ff] font-medium'
                       : 'bg-[#f8f7fc] dark:bg-[#181530] border-[#e6e5f0] dark:border-[#262046] text-[#5e6270] dark:text-[#a1a1aa] hover:border-[#cbd5e1] dark:hover:border-[#4a3f85]'
-                  }`}
+                    }`}
                 >
                   {cat}
                 </button>

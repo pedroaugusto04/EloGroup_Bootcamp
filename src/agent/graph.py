@@ -38,7 +38,16 @@ def should_continue_executing(state: InventoryAgentState) -> str:
 
 
 def should_reflect_or_finish(state: InventoryAgentState) -> str:
-    """Decide se o relatório foi aprovado pelo crítico ou se finaliza a esteira."""
+    """Decide se o relatório foi aprovado pelo crítico ou se retorna para revisão do consolidador."""
+    approved = state.get("critic_approved", False)
+    revision_count = int(state.get("revision_count", 0))
+    if not approved and revision_count < 2:
+        logger.warning(
+            "Crítico reprovou draft na revisão %d. Redirecionando para consolidator: %s",
+            revision_count,
+            state.get("critic_feedback"),
+        )
+        return "consolidator"
     return "finish"
 
 
@@ -69,7 +78,10 @@ def build_inventory_agent_graph():
     workflow.add_conditional_edges(
         "critic",
         should_reflect_or_finish,
-        {"finish": END}
+        {
+            "consolidator": "consolidator",
+            "finish": END,
+        }
     )
 
     return workflow.compile()

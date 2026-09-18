@@ -15,6 +15,8 @@ import {
   RoadmapData,
   PeriodKey,
   PeriodMeta,
+  DeliverableMeta,
+  DeliverableDetail,
 } from '../types/analytics';
 
 const BASE_URL = 'api';
@@ -133,4 +135,19 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params || {}),
     }),
+
+  // Documentos e Entregáveis
+  getDeliverables: () => fetchJson<DeliverableMeta[]>(`${BASE_URL}/deliverables`),
+
+  getDeliverable: (docId: string) => fetchJson<DeliverableDetail>(`${BASE_URL}/deliverables/${docId}`),
+
+  updateDeliverable: (docId: string, content: string) =>
+    fetchJson<DeliverableDetail>(`${BASE_URL}/deliverables/${docId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    }),
+
+  getDeliverableDownloadUrl: (docId: string) => `${BASE_URL}/deliverables/${docId}/download`,
+  getDeliverablesZipUrl: () => `${BASE_URL}/deliverables/export/zip`,
 };

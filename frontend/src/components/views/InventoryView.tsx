@@ -177,7 +177,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-semibold text-[#131920] dark:text-[#f4f4f5]">Análise de estoque sob demanda</h4>
+              <h4 className="text-xs sm:text-sm font-semibold text-[#131920] dark:text-[#f4f4f5]">Análise de Estoque</h4>
               <p className="text-[11px] sm:text-xs text-[#5e6270] dark:text-[#a1a1aa]">
                 Gere fatos reconciliados, cenários de liquidação e, se solicitado, envie o parecer por e-mail.
               </p>
@@ -210,8 +210,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
                   }
                 }}
                 className={`text-[10px] sm:text-[11px] px-2 sm:px-2.5 py-0.5 rounded border transition-colors ${active
-                    ? 'bg-[#e8e6ff] dark:bg-[#8575ff]/20 border-[#c4b8ff] dark:border-[#8575ff]/60 text-[#4200db] dark:text-[#8575ff] font-medium'
-                    : 'bg-[#f8f7fc] dark:bg-[#181530] border-[#e6e5f0] dark:border-[#262046] text-[#5e6270] dark:text-[#a1a1aa] hover:border-[#cbd5e1] dark:hover:border-[#4a3f85]'
+                  ? 'bg-[#e8e6ff] dark:bg-[#8575ff]/20 border-[#c4b8ff] dark:border-[#8575ff]/60 text-[#4200db] dark:text-[#8575ff] font-medium'
+                  : 'bg-[#f8f7fc] dark:bg-[#181530] border-[#e6e5f0] dark:border-[#262046] text-[#5e6270] dark:text-[#a1a1aa] hover:border-[#cbd5e1] dark:hover:border-[#4a3f85]'
                   }`}
               >
                 {cat}
@@ -309,38 +309,34 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ filterOptions, onO
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveTableTab('understock')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTableTab === 'understock'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTableTab === 'understock'
                   ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 shadow-sm'
                   : 'text-[#5e6270] dark:text-[#a1a1aa] hover:bg-[#f3f2f8] dark:hover:bg-[#181530]'
-              }`}
+                }`}
             >
               <span className="w-2 h-2 rounded-full bg-rose-500" />
               <span>Sub-estoque & Ruptura</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-medium ${
-                activeTableTab === 'understock'
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-medium ${activeTableTab === 'understock'
                   ? 'bg-rose-200/70 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200'
                   : 'bg-[#e6e5f0] dark:bg-[#262046] text-[#5e6270] dark:text-[#a1a1aa]'
-              }`}>
+                }`}>
                 {data?.critical_skus?.length || 0}
               </span>
             </button>
 
             <button
               onClick={() => setActiveTableTab('overstock')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTableTab === 'overstock'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTableTab === 'overstock'
                   ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 shadow-sm'
                   : 'text-[#5e6270] dark:text-[#a1a1aa] hover:bg-[#f3f2f8] dark:hover:bg-[#181530]'
-              }`}
+                }`}
             >
               <span className="w-2 h-2 rounded-full bg-[#8575ff]" />
               <span>Sobre-estoque & Excesso</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-medium ${
-                activeTableTab === 'overstock'
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-medium ${activeTableTab === 'overstock'
                   ? 'bg-purple-200/70 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200'
                   : 'bg-[#e6e5f0] dark:bg-[#262046] text-[#5e6270] dark:text-[#a1a1aa]'
-              }`}>
+                }`}>
                 {data?.overstock_skus?.length || 0}
               </span>
             </button>

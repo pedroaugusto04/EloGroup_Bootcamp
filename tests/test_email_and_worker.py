@@ -23,7 +23,7 @@ def test_render_executive_email_template():
         "factual_package": {
             "meta": {"sales_start": "2023-01-01", "sales_end": "2024-01-26"},
             "summary": {
-                "methodology_banner": "Posição de estoque fornecida — data de referência não informada. Tendência de vendas observada entre 01/01/2023 e 26/01/2024.",
+                "methodology_banner": "Tendência de vendas observada entre 01/01/2023 e 26/01/2024.",
                 "capital": {"capital_disponivel": 42500, "skus_com_custo_vendas": 10, "total_skus": 11},
                 "operational": {"ruptura_atual": 5, "ponto_pedido": 3, "alta_cobertura": 8, "capital_excedente": 32000.0},
                 "lead_time_exposure": {"skus": 1, "margem_potencialmente_exposta": 123.45},

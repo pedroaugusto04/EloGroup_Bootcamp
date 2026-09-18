@@ -79,6 +79,6 @@ def build_meta(period: SalesPeriod, warnings=None) -> Dict[str, object]:
 
 def methodology_banner(period: SalesPeriod) -> str:
     return (
-        "Posição de estoque fornecida — data de referência não informada. "
+        ""
         f"Tendência de vendas observada entre {period.start:%d/%m/%Y} e {period.end:%d/%m/%Y}."
     )

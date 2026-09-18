@@ -12,6 +12,7 @@ import { AuditRelationalView } from './components/views/AuditRelationalView';
 import { OutliersView } from './components/views/OutliersView';
 import { RoadmapView } from './components/views/RoadmapView';
 import { CopilotView } from './components/views/CopilotView';
+import { DeliverablesView } from './components/views/DeliverablesView';
 import { AuditEmailModal } from './components/common/AuditEmailModal';
 
 const getInitialNavState = (): { tab: ViewTab; threadId: string | null } => {
@@ -40,6 +41,7 @@ const getInitialNavState = (): { tab: ViewTab; threadId: string | null } => {
   if (viewParam === 'outliers' || viewParam === 'dispersao') return { tab: 'outliers', threadId: null };
   if (viewParam === 'audit' || viewParam === 'auditoria' || viewParam === 'relacional') return { tab: 'audit', threadId: null };
   if (viewParam === 'roadmap' || viewParam === 'plano') return { tab: 'roadmap', threadId: null };
+  if (viewParam === 'deliverables' || viewParam === 'entregaveis' || viewParam === 'docs') return { tab: 'deliverables', threadId: null };
 
   return { tab: 'executive', threadId: null };
 };
@@ -132,6 +134,7 @@ export const App: React.FC = () => {
               {activeTab === 'audit' && <AuditRelationalView />}
               {activeTab === 'outliers' && <OutliersView />}
               {activeTab === 'roadmap' && <RoadmapView />}
+              {activeTab === 'deliverables' && <DeliverablesView />}
             </div>
           </main>
         )}

@@ -6,18 +6,18 @@
 
 ## Sumário executivo
 
-A diretoria da Vértice Retail apontou percepção de queda na rentabilidade durante a expansão em e-commerce e marketplaces. A análise dos dados transacionais mostra que a margem de contribuição média se manteve estável entre 54,2% e 54,9%, totalizando R$ 16,67 milhões líquidos em 391 dias analisados.
+A diretoria da Vértice Retail apontou percepção de queda na rentabilidade durante a expansão em e-commerce e marketplaces. A análise dos dados transacionais mostra que a margem de contribuição média se manteve estável entre 54,2% e 54,9%, totalizando R$ 16,67 milhões faturados (R$ 14,17 milhões retidos pós-devoluções) em 391 dias analisados.
 
 A perda de eficiência observada decorre de três pontos específicos:
-1. Capital de giro imobilizado em 207 SKUs descontinuados (R$ 4,14M em receita recuperável pós-devoluções no cenário central), enquanto 701 SKUs ativos operam abaixo do ponto de pedido.
+1. Capital de giro imobilizado em produtos fora de linha (R$ 6,1M de custo histórico em 206 SKUs elegíveis, com R$ 4,14M em receita recuperável pós-devoluções no cenário central), enquanto 701 SKUs ativos operam abaixo do ponto de pedido.
 2. Concessão de descontos acima de 20% sem ganho proporcional de volume (o teste within-SKU indica estabilidade na quantidade vendida, com variação de −0,026 unidade).
 3. Sobrecarga do canal de suporte com demandas operacionais evitáveis: rastreamento de pedidos e dúvidas técnicas concentram 44,9% dos chamados (R$ 238,5 mil de custo no período).
 
-As oportunidades priorizadas tratam esses gargalos imediatos. As frentes de otimização de canais de marketing e segmentação de CRM foram postergadas para etapas futuras em função de limitações de rastreabilidade cadastral.
+As oportunidades priorizadas tratam esses gargalos imediatos. As frentes de otimização de canais de marketing e segmentação da base de clientes foram postergadas para etapas futuras em função de limitações de rastreabilidade cadastral.
 
 ## Árvore de hipóteses
 
-![Árvore de hipóteses da Vértice Retail](../assets/arvore_hipoteses.svg)
+![Árvore de hipóteses da Vértice Retail](/assets/arvore_hipoteses.svg)
 
 ## Diagnóstico das hipóteses
 
@@ -29,13 +29,13 @@ As oportunidades priorizadas tratam esses gargalos imediatos. As frentes de otim
 | Defeito e tamanho inadequado explicam parte das devoluções. | Sustentada | Os motivos se concentram em qualidade do produto e adequação de tamanho. | Fora do ciclo |
 | Consultas de rastreio geram demanda evitável. | Sustentada | 30,0% dos tickets consultam a localização do pedido. | Selecionada, prioridade 3 |
 | Dúvidas técnicas podem ser atendidas no N1. | Sustentada | 14,8% dos tickets são dúvidas técnicas. | Selecionada, prioridade 4 |
-| O retorno de Marketing pode ser comparado entre canais. | Inconclusiva | As campanhas não possuem atribuição confiável aos pedidos do ERP. | Fora do ciclo |
-| A segmentação do CRM representa o valor observado em Vendas. | Não sustentada | O LTV cadastral diverge do histórico transacional e a correlação observada é de −0,003. | Fora do ciclo |
+| O mix de canais de Marketing está eficiente? | Inconclusiva | As campanhas não possuem atribuição confiável aos pedidos do ERP. | Fora do ciclo |
+| A base de Clientes representa o valor observado em Vendas. | Não sustentada | O LTV cadastral diverge do histórico transacional e a correlação observada é de −0,003. | Fora do ciclo |
 | A principal limitação é a falta de dados. | Não sustentada | As bases existem, mas apresentam períodos, chaves e custos divergentes. | Tratar na governança |
 
 ## Oportunidades selecionadas
 
-1. **Predictive Stock Advisor:** prioriza ações para descontinuados, bloqueia recompras e alerta reposição de itens ativos.
+1. **Predictive Inventory Advisor:** prioriza ações para descontinuados, bloqueia recompras e alerta reposição de itens ativos.
 2. **Margin Recovery Advisor:** recomenda o teto de desconto por SKU para proteger a margem.
 3. **Rastreio proativo:** envia atualizações de status e link de acompanhamento do pedido.
 4. **Atendimento N1:** responde dúvidas técnicas validadas e transfere exceções para atendimento humano.
@@ -62,8 +62,8 @@ As oportunidades priorizadas tratam esses gargalos imediatos. As frentes de otim
 
 | Prazo | Entrega | Responsável | Dependências | Critério de acompanhamento |
 | --- | --- | --- | --- | --- |
-| 30 dias | Operação assistida do Predictive Stock Advisor; preparação da integração de descontos e da base de Atendimento N1. | Squad de Dados e Operações | Conexão DuckDB e conciliação de saldos | Recomendações válidas, sell-through e receita realizada. |
-| 60 dias | Calibração do Predictive Stock Advisor; ativação do Margin Recovery Advisor e das notificações de rastreio. | Squad de Produto e Comercial | Parametrização de tetos por SKU e mensageria | Margem cedida, volume diário e tickets de rastreio. |
+| 30 dias | Operação assistida do Predictive Inventory Advisor; preparação da integração de descontos e da base de Atendimento N1. | Squad de Dados e Operações | Conciliação de saldos | Recomendações válidas, sell-through e receita realizada. |
+| 60 dias | Calibração do Predictive Inventory Advisor; ativação do Margin Recovery Advisor e das notificações de rastreio. | Squad de Produto e Comercial | Parametrização de tetos por SKU e mensageria | Margem cedida, volume diário e tickets de rastreio. |
 | 90 dias | Manutenção do Margin Recovery Advisor; ativação do Atendimento N1 e calibração do rastreio. | Squad de CX e Engenharia | Base de dúvidas técnicas validada com supervisão | Resolução sem recontato em 7 dias e CSAT. |
 
 ## Riscos, mitigantes e gatilhos

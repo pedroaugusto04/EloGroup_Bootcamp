@@ -33,11 +33,11 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
     subtitle: 'Posição operacional de estoque; valores financeiros são reconciliados exclusivamente com Vendas.',
   },
   audit: {
-    title: 'Auditoria Relacional entre Bases',
+    title: 'Auditoria dos Dados',
     subtitle: 'Diagnóstico de integridade, assimetria temporal e reconciliação entre Vendas, Clientes e Mídia.',
   },
   outliers: {
-    title: 'Dispersão & Detecção de Outliers (Tukey IQR)',
+    title: 'Dispersão & Outliers (Tukey IQR)',
     subtitle: 'Análise estatística de anomalias, limites de quartis e desvios nas 5 tabelas.',
   },
   roadmap: {
@@ -46,7 +46,11 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
   },
   copilot: {
     title: 'Predictive Inventory Advisor',
-    subtitle: 'Tendência observada, exposição como cenário e análises de liquidação.',
+    subtitle: 'Auditoria de compras, simulação de liquidação de descontinuados e inteligência preditiva em DuckDB.',
+  },
+  deliverables: {
+    title: 'Documentos Executivos',
+    subtitle: 'Dossiês executivos, relatórios de auditoria, modelagem financeira e artefatos do Bootcamp.',
   },
 };
 

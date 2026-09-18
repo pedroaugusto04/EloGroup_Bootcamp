@@ -266,10 +266,9 @@ export const CopilotView: React.FC<CopilotViewProps> = ({ initialThreadId, onOpe
       {/* Chat Area */}
       <div className="flex-1 min-w-0 flex flex-col h-full bg-[#faf9fc] dark:bg-[#0a0914]">
         <div className="px-3 sm:px-6 py-2 border-b border-[#e6e5f0] dark:border-[#262046] bg-[#e8e6ff]/40 dark:bg-[#8575ff]/5 text-[10px] sm:text-[11px] text-[#5e6270] dark:text-[#a1a1aa] leading-relaxed">
-          <strong className="text-[#131920] dark:text-[#d4d4d8]">Posição de estoque fornecida — data de referência não informada.</strong>{' '}
           {periods[0]
             ? `Tendência de vendas observada entre ${periods[0].sales_start.split('-').reverse().join('/')} e ${periods[0].sales_end.split('-').reverse().join('/')}.`
-            : 'As datas da tendência de vendas serão resolvidas pelo backend.'}
+            : ''}
         </div>
         {/* Mobile Top Sub-Header */}
         <div className="md:hidden flex items-center justify-between px-3 py-2 border-b border-[#e6e5f0] dark:border-[#262046] bg-[#ffffff]/90 dark:bg-[#0d0b1a]/80 text-xs">

@@ -11,6 +11,7 @@ from src.api.routes.analytics import router as analytics_router
 from src.api.routes.audit import router as audit_router
 from src.api.routes.copilot import router as copilot_router
 from src.api.routes.roadmap import router as roadmap_router
+from src.api.routes.deliverables import router as deliverables_router
 
 app = FastAPI(
     title="Vértice Analytics API",
@@ -32,6 +33,7 @@ app.include_router(analytics_router, prefix="/api")
 app.include_router(audit_router, prefix="/api")
 app.include_router(copilot_router, prefix="/api")
 app.include_router(roadmap_router, prefix="/api")
+app.include_router(deliverables_router, prefix="/api")
 
 
 @app.get("/api/health")
@@ -49,9 +51,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+DOCS_ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / "docs" / "assets"
+PUBLIC_ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "public" / "assets"
+
+if DOCS_ASSETS_DIR.exists():
+    app.mount("/docs/assets", StaticFiles(directory=str(DOCS_ASSETS_DIR)), name="docs_assets")
 
 if FRONTEND_DIST.exists():
-    # Serve assets estáticos
+    # Serve assets estáticos compilados
     assets_dir = FRONTEND_DIST / "assets"
     if assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
@@ -66,6 +73,19 @@ if FRONTEND_DIST.exists():
         if target_file.is_file():
             return FileResponse(target_file)
         return FileResponse(FRONTEND_DIST / "index.html")
+
+elif PUBLIC_ASSETS_DIR.exists():
+    # Fallback para desenvolvimento quando backend roda sem dist
+    app.mount("/assets", StaticFiles(directory=str(PUBLIC_ASSETS_DIR)), name="assets")
+
+    @app.get("/")
+    def dev_root():
+        return {
+            "app": "Vértice Analytics API",
+            "docs": "/docs",
+            "health": "/api/health",
+            "message": "Frontend estático não compilado. Inicie com 'cd frontend && npm run dev' ou compile com 'cd frontend && npm run build'."
+        }
 
 
 if __name__ == "__main__":

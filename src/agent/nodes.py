@@ -119,7 +119,9 @@ def replanner_node(state: InventoryAgentState) -> Dict[str, Any]:
 
 def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
     """Consolida o pacote de auditoria e invoca o LLM para analisar os fatos e formular recomendações."""
-    package = build_audit_package(DuckDBRepository(), state.get("period_key", "full_history"))
+    package = state.get("factual_package")
+    if not package:
+        package = build_audit_package(DuckDBRepository(), state.get("period_key", "full_history"))
     checks = run_deterministic_checks(package)
     approved = all(checks.values())
 
@@ -131,6 +133,16 @@ def consolidator_node(state: InventoryAgentState) -> Dict[str, Any]:
         try:
             evidence_summary = _build_llm_evidence_summary(package)
             prompt = CONSOLIDATOR_EXECUTIVE_PROMPT.format(factual_summary=evidence_summary)
+            critic_feedback = state.get("critic_feedback")
+            revision_count = int(state.get("revision_count", 0))
+            if critic_feedback and revision_count > 0 and not state.get("critic_approved", True):
+                prompt += (
+                    f"\n\nATENÇÃO (REVISÃO REQUERIDA - TENTATIVA {revision_count + 1}):\n"
+                    f"O rascunho anterior foi rejeitado pela auditoria com o seguinte apontamento:\n"
+                    f"\"{critic_feedback}\"\n"
+                    f"Corrija estritamente essa questão sem violar os guardrails de negócio "
+                    f"(nunca sugira compras ou reposição para produtos descontinuados)."
+                )
             response = llm.invoke([HumanMessage(content=prompt)])
             response_text = getattr(response, "content", response)
             parsed = extract_json_from_llm_response(response_text)

@@ -77,6 +77,9 @@ WORKDIR /app
 # Código-fonte da aplicação
 COPY src/ /app/src/
 
+# Documentos e entregáveis do case
+COPY docs/ /app/docs/
+
 # Dados pré-processados gerados
 COPY --from=builder /app/data/processed/ /app/data/processed/
 

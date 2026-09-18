@@ -77,7 +77,7 @@ def get_relational_audit():
     audit_findings = [
         {
             "dimension": "Janela Temporal",
-            "erp_coverage": "Jan/2023 a 26/Jan/2024 (27.753 pedidos em Vendas)",
+            "erp_coverage": "Jan/2023 a 26/Jan/2024 (27.758 pedidos em Vendas)",
             "external_coverage": "Atendimento, Marketing e Estoque cobrem 2023 a 2025/2026",
             "impact": "Incompatibilidade temporal direta para análises de 2024 e 2025 na tabela de Vendas.",
             "severity": "Alta"

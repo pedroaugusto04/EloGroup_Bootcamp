@@ -7,7 +7,8 @@ export type ViewTab =
   | 'audit'
   | 'outliers'
   | 'roadmap'
-  | 'copilot';
+  | 'copilot'
+  | 'deliverables';
 
 export type PeriodKey = 'full_history' | 'calendar_2023' | 'last_90d_observed';
 
@@ -389,23 +390,20 @@ export interface RoadmapRiskItem {
   mitigation_action: string;
 }
 
+export interface SequencingCard {
+  title: string;
+  highlight_number: string;
+  highlight_label: string;
+  divergence: string;
+  next_step: string;
+}
+
 export interface RoadmapSequencingRationale {
   title: string;
   subtitle: string;
-  marketing: {
-    title: string;
-    highlight_number: string;
-    highlight_label: string;
-    divergence: string;
-    next_step: string;
-  };
-  crm: {
-    title: string;
-    highlight_number: string;
-    highlight_label: string;
-    divergence: string;
-    next_step: string;
-  };
+  items?: SequencingCard[];
+  marketing: SequencingCard;
+  crm: SequencingCard;
   c_level_takeaway: string;
 }
 
@@ -443,5 +441,20 @@ export interface RoadmapData {
     total_potential_value: number;
     inventory_scenario_value: number;
   };
+}
+
+export interface DeliverableMeta {
+  id: string;
+  filename: string;
+  title: string;
+  subtitle: string;
+  tag: string;
+  order: number;
+  word_count: number;
+  updated_at: string;
+}
+
+export interface DeliverableDetail extends DeliverableMeta {
+  content: string;
 }
 
