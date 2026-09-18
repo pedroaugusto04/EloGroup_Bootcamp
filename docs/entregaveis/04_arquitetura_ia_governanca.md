@@ -1,14 +1,14 @@
-# Arquitetura do Copiloto de IA, Segurança & Governança
+# Arquitetura do copiloto de IA, segurança e governança
 **Bootcamp EloGroup 2026 · Grupo 14**  
-**Autores:** Pedro Augusto & Pedro Lobo  
+**Autores:** Pedro Augusto e Pedro Lobo  
 
 ---
 
-## 1. Visão Geral da Arquitetura
+## 1. Visão geral da arquitetura
 
-O Copiloto **Predictive Stock Advisor** foi projetado sob o princípio da **separação estrita entre inteligência determinística e geração de linguagem natural**. 
+O copiloto Predictive Stock Advisor separa a lógica analítica determinística da geração de texto.
 
-Modelos de linguagem (LLMs) são probabilísticos e sujeitos a alucinações numéricas. Em consultoria financeira e gestão de estoque, erros de cálculo geram perdas de milhões. Portanto, **o LLM nunca realiza cálculos de margem, giro ou valuation; ele apenas interpreta, contextualiza e formata saídas produzidas por ferramentas determinísticas**.
+Modelos de linguagem são probabilísticos. Em gestão de estoque e finanças, cálculos precisam ser exatos. Por isso, o modelo não calcula margem, giro ou valuation: ele recebe as saídas calculadas pelas consultas e ferramentas analíticas em DuckDB e Python, contextualiza as informações e redige o parecer.
 
 ```mermaid
 flowchart TD
@@ -50,43 +50,42 @@ flowchart TD
 
 ---
 
-## 2. Componentes Técnicos Implementados
+## 2. Componentes técnicos implementados
 
-### 2.1 Motor Analítico Determinístico (`src/agent/inventory_analytics/`)
-- **Módulo Financeiro (`financial.py`):** Calcula o capital imobilizado e a exposição financeira utilizando o custo médio ponderado realizado em vendas (`vendas`), neutralizando a divergência de custos da base de estoque.
-- **Módulo Operacional (`operational.py`):** Avalia os 207 SKUs descontinuados e os 701 SKUs com saldo abaixo do ponto de pedido, segmentando por categoria e lead time do fornecedor.
-- **Módulo de Qualidade & Consolidação (`validation.py` e `consolidation.py`):** Executa sanity checks antes de liberar qualquer número para o agente.
+### 2.1 Motor analítico determinístico (`src/agent/inventory_analytics/`)
+- Módulo financeiro (`financial.py`): calcula o capital imobilizado e a exposição com base no custo médio ponderado realizado em vendas, contornando a divergência de custos da base de estoque.
+- Módulo operacional (`operational.py`): analisa os 207 SKUs descontinuados e os 701 SKUs abaixo do ponto de pedido, segmentados por categoria e prazo de fornecedor.
+- Módulo de consolidação e validação (`validation.py` e `consolidation.py`): aplica testes de consistência antes de disponibilizar os dados ao agente.
 
-### 2.2 Planner e Fluxo de Execução (`src/agent/graph.py` e `nodes.py`)
-- **Planner:** carrega um plano canônico de quatro etapas: estoque, demanda e capital, devoluções e recomendações 30-60-90.
-- **Executor e Replanner:** percorrem o plano e registram a conclusão de cada etapa.
-- **Consolidador:** reúne o pacote factual, executa os checks determinísticos e usa o LLM apenas para organizar o parecer e as recomendações.
-- **Crítico:** aplica os guardrails finais antes da publicação.
+### 2.2 Planejador e fluxo de execução (`src/agent/graph.py` e `nodes.py`)
+- Planner: carrega um plano estruturado em quatro etapas (estoque, demanda e capital, devoluções e recomendações 30-60-90). As etapas são definidas em `DEFAULT_PLAN_STEPS` e não são criadas livremente pelo modelo.
+- Executor e Replanner: percorrem o plano e registram a conclusão de cada etapa.
+- Consolidador: reúne as métricas apuradas, valida os dados e utiliza o LLM apenas para estruturar a redação do parecer.
+- Crítico: aplica salvaguardas antes da resposta final.
 
-O Planner é estruturado e determinístico: as etapas vêm de `DEFAULT_PLAN_STEPS`, e não são criadas livremente pelo LLM.
+### 2.3 Salvaguardas contra inconsistências de dados (`src/agent/deterministic_checks.py`)
+As saídas do modelo passam por verificações automáticas de consistência:
+- Bloqueio de valores não verificados: se o texto gerado contiver números que não constam nos dados das ferramentas, a resposta é rejeitada.
+- Continuidade de serviço: em caso de indisponibilidade ou limite na API do modelo, a aplicação publica o parecer factual gerado deterministicamente.
+- Testes automatizados: cobertura garantida em [`tests/test_deterministic_checks.py`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/tests/test_deterministic_checks.py).
 
-### 2.3 Salvaguardas contra Alucinação (`src/agent/deterministic_checks.py`)
-- O sistema submete todas as respostas do agente a uma bateria de testes de consistência:
-  - **Bloqueio de Invenção de Valores:** Se o texto gerado citar um valor financeiro que não consta no pacote retornado pelas tools, o parecer é invalidado.
-  - **Resiliência a Falha de LLM:** Caso a cota da API do modelo se esgote ou ocorra timeout, o sistema publica automaticamente o **Parecer Factual Base**, garantindo que a diretoria nunca fique sem o relatório técnico.
-  - **Auditoria Contínua:** Cobertura de testes unitários garantida em [`tests/test_deterministic_checks.py`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/tests/test_deterministic_checks.py).
+### 2.4 Copiloto ReAct e rotina autônoma (`src/agent/copilot.py` e `worker.py`)
+Ferramentas analíticas disponíveis:
+- `tool_inventory_health_scan`: consolida ruptura, cobertura e sobre-estoque.
+- `tool_sales_demand_matrix`: cruza estoque e demanda histórica.
+- `tool_returns_and_quality_risk`: identifica riscos de devolução e qualidade.
+- `tool_discontinued_stranded_capital` e `tool_simulate_inventory_liquidation`: analisam descontinuados e cenários de liquidação.
+- `tool_sku_deep_dive`: detalha SKUs específicos com dados transacionais.
 
-### 2.4 Copiloto ReAct & Worker Autônomo (`src/agent/copilot.py` e `worker.py`)
-- Equipado com ferramentas especializadas:
-  - `tool_inventory_health_scan`: consolida ruptura, cobertura e sobre-estoque.
-  - `tool_sales_demand_matrix`: cruza estoque e demanda histórica.
-  - `tool_returns_and_quality_risk`: identifica riscos de devolução e qualidade.
-  - `tool_discontinued_stranded_capital` e `tool_simulate_inventory_liquidation`: avaliam descontinuados e cenários de liquidação.
-  - `tool_sku_deep_dive`: detalha um SKU com evidências auditáveis.
-- O worker autônomo executa rotinas programadas sob demanda, compila o parecer e despacha o memo executivo por e-mail via serviço integrado ([`src/infrastructure/email_service.py`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/src/infrastructure/email_service.py)).
+A rotina autônoma executa análises programadas sob demanda, compila o parecer e despacha o resumo executivo por e-mail via [`src/infrastructure/email_service.py`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/src/infrastructure/email_service.py).
 
 ---
 
-## 3. Matriz de Governança, Riscos & Mitigantes
+## 3. Matriz de governança, riscos e mitigantes
 
-| Dimensão de Risco | Descrição da Ameaça | Medida de Mitigação Implementada | Gatilho de Reversão / Controle |
+| Risco | Descrição | Medida implementada | Gatilho de controle |
 | :--- | :--- | :--- | :--- |
-| **1. Alucinação de Dados** | Agente sugerir compra de produto descontinuado ou inventar valores. | Separação estrita de funções; motor determinístico valida 100% das saídas. | Zero compras de descontinuados permitidas em regras de negócio. |
-| **2. Privacidade & LGPD** | Exposição indevida de dados pessoais de clientes em logs ou prompts. | O copiloto de estoque e descontos opera exclusivamente em nível de SKU e canal agregado. IDs de clientes não são trafegados no LLM. | Anonimização nativa em `src/infrastructure/preprocessor.py`. |
-| **3. Drift de Dados** | Mudança no comportamento de vendas invalidar os cálculos de giro. | Recálculo dinâmico baseado no histórico consolidado com janelas configuráveis (`calendar_2023`, `last_90d`). | Alerta ao operador caso a mediana de vendas por SKU mude > 20%. |
-| **4. Adoção & Fator Humano** | Resistência do time de compras ou comercial em seguir as recomendações. | Explicações transparentes em linguagem natural acompanhadas das fórmulas de cálculo. Nenhuma ordem é disparada sem aprovação humana. | Alçada executiva necessária para exceções acima do teto recomendado por SKU. |
+| Invenção de dados | Sugestão de recompra de descontinuados ou citação de números incorretos. | Separação de funções; validação determinística de 100% das métricas antes da exibição. | Bloqueio sistêmico de ordens para itens descontinuados. |
+| Privacidade e dados pessoais | Exposição de dados de clientes em logs ou prompts. | O copiloto opera apenas em nível de SKU e canal agregado. Identificadores de clientes não entram no prompt. | Anonimização nativa em `src/infrastructure/preprocessor.py`. |
+| Mudança de padrão de dados | Alteração brusca no comportamento de vendas afetando o cálculo de giro. | Recálculo dinâmico baseado no histórico com janelas configuráveis. | Alerta quando a mediana de vendas de um SKU variar mais de 20%. |
+| Adoção operacional | Dúvidas ou resistência do time comercial em acatar recomendações. | Justificativas com memória de cálculo explícita. Nenhuma ordem de compra é emitida sem validação humana. | Aprovação manual mandatória para exceções ao teto recomendado. |

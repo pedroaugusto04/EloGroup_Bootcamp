@@ -1,12 +1,12 @@
-# Diagnóstico Executivo e Plano de Ação
+# Diagnóstico executivo e plano de ação
 **Bootcamp EloGroup 2026 · Grupo 14**  
-**Autores:** Pedro Augusto & Pedro Lobo
+**Autores:** Pedro Augusto e Pedro Lobo
 
 ---
 
 ## Sumário executivo
 
-A Vértice Retail faturou **R$ 16,67 milhões líquidos** no período analisado e manteve margem de contribuição entre **54,2% e 54,9%**. As oportunidades priorizadas são estoque, descontos, rastreio e atendimento N1.
+A Vértice Retail faturou R$ 16,67 milhões líquidos no período analisado e manteve margem de contribuição entre 54,2% e 54,9%. As oportunidades priorizadas no plano de ação são estoque, descontos, rastreio e atendimento N1.
 
 ## Árvore de hipóteses
 
@@ -16,14 +16,14 @@ A Vértice Retail faturou **R$ 16,67 milhões líquidos** no período analisado 
 
 | Hipótese | Conclusão | Evidência | Decisão |
 | --- | --- | --- | --- |
-| Estoque descontinuado e risco de ruptura exigem ação. | Sustentada | 207 SKUs descontinuados com saldo; 99 SKUs sem estoque disponível e 701 abaixo do ponto de pedido. | **Selecionada — prioridade 1** |
-| Descontos elevados aumentam o volume. | Não sustentada | Acima de 20%, a margem cai de 58% para 39%; o teste within-SKU indica variação de −0,02 unidade. | **Selecionada — prioridade 2** |
-| Atraso de entrega explica as devoluções. | Não sustentada | A taxa de devolução permanece próxima entre entregas de 0–3 dias e 16–20 dias. | Fora do ciclo |
+| Estoque descontinuado e risco de ruptura exigem ação. | Sustentada | 207 SKUs descontinuados com saldo; 99 SKUs sem estoque disponível e 701 abaixo do ponto de pedido. | Selecionada, prioridade 1 |
+| Descontos elevados aumentam o volume. | Não sustentada | Acima de 20%, a margem cai de 58% para 39%; o teste within-SKU indica variação de −0,02 unidade. | Selecionada, prioridade 2 |
+| Atraso de entrega explica as devoluções. | Não sustentada | A taxa de devolução permanece próxima entre entregas de 0 a 3 dias e 16 a 20 dias. | Fora do ciclo |
 | Defeito e tamanho inadequado explicam parte das devoluções. | Sustentada | Os motivos se concentram em qualidade do produto e adequação de tamanho. | Fora do ciclo |
-| Consultas de rastreio geram demanda evitável. | Sustentada | 30,0% dos tickets consultam a localização do pedido. | **Selecionada — prioridade 3** |
-| Dúvidas técnicas podem ser atendidas no N1. | Sustentada | 14,8% dos tickets são dúvidas técnicas. | **Selecionada — prioridade 4** |
+| Consultas de rastreio geram demanda evitável. | Sustentada | 30,0% dos tickets consultam a localização do pedido. | Selecionada, prioridade 3 |
+| Dúvidas técnicas podem ser atendidas no N1. | Sustentada | 14,8% dos tickets são dúvidas técnicas. | Selecionada, prioridade 4 |
 | O retorno de Marketing pode ser comparado entre canais. | Inconclusiva | As campanhas não possuem atribuição confiável aos pedidos do ERP. | Fora do ciclo |
-| A segmentação do CRM representa o valor observado em Vendas. | Não sustentada | O LTV cadastral diverge do histórico transacional e a correlação observada é −0,003. | Fora do ciclo |
+| A segmentação do CRM representa o valor observado em Vendas. | Não sustentada | O LTV cadastral diverge do histórico transacional e a correlação observada é de −0,003. | Fora do ciclo |
 | A principal limitação é a falta de dados. | Não sustentada | As bases existem, mas apresentam períodos, chaves e custos divergentes. | Tratar na governança |
 
 ## Oportunidades selecionadas
@@ -37,12 +37,12 @@ A Vértice Retail faturou **R$ 16,67 milhões líquidos** no período analisado 
 
 | Métrica | Cenário-base |
 | --- | ---: |
-| Receita estimada da liquidação, pós-devoluções | **R$ 4,14M** |
-| Margem recuperada por descontos | **R$ 1,80M/ano** |
-| Economia operacional em CX | **R$ 55,7 mil/ano** |
-| Investimento no primeiro ano | **R$ 350 mil** |
-| ROI líquido no primeiro ano | **4,3x** |
-| Payback estimado | **2,3 meses** |
+| Receita estimada da liquidação, pós-devoluções | R$ 4,14M |
+| Margem recuperada por descontos | R$ 1,80M/ano |
+| Economia operacional em CX | R$ 55,7 mil/ano |
+| Investimento no primeiro ano | R$ 350 mil |
+| ROI líquido no primeiro ano | 4,3x |
+| Payback estimado | 2,3 meses |
 
 ## Premissas do cenário
 
@@ -70,4 +70,4 @@ A Vértice Retail faturou **R$ 16,67 milhões líquidos** no período analisado 
 
 ## Decisão solicitada
 
-Aprovar o ciclo de 90 dias, com revisão dos KPIs nos dias 30, 60 e 90. A ampliação do escopo depende do cumprimento dos gatilhos acima.
+Aprovar o ciclo de 90 dias, com revisão dos indicadores nos dias 30, 60 e 90. A ampliação do escopo depende do cumprimento dos gatilhos acima.

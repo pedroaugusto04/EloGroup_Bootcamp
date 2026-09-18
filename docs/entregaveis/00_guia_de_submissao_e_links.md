@@ -1,57 +1,56 @@
-# Hub Central de Submissão e Guia de Acesso: Vértice Analytics
+# Hub central de submissão e guia de acesso: Vértice Analytics
 **Bootcamp EloGroup 2026 · AI Consulting Lab · Grupo 3**  
-**Autores:** Pedro Augusto & Pedro Lobo  
-**Cliente:** Vértice Retail (Diretoria Executiva — CEO, CFO, CMO, COO)
+**Autores:** Pedro Augusto e Pedro Lobo  
+**Cliente:** Vértice Retail (Diretoria Executiva: CEO, CFO, CMO e COO)
 
 ---
 
-## 1. Visão Geral da Entrega
+## 1. Visão geral da entrega
 
-A entrega do Grupo 3 combina **rigor consultivo de negócio**, **auditoria determinística de dados** e uma **plataforma tecnológica em produção** contendo Dashboard Executivo e Copiloto de IA conversacional.
+A entrega reúne análise estratégica de negócio, auditoria relacional das bases e uma aplicação web com painel executivo e copiloto de IA.
 
-| Entregável Oficial | Formato Principal | Onde Encontrar |
+| Entregável | Formato | Onde encontrar |
 | :--- | :---: | :--- |
-| **Apresentação Executiva Final** | PDF / Slides | [`docs/slides/Vértice (1).pdf`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/slides/Vértice%20(1).pdf) |
-| **Dashboard de Gestão & Demo de IA** | **Aplicação Web Ativa** | URL pública / `http://localhost:8501` |
-| **Relatório Executivo C-Level** | Markdown (.md) | [`01_relatorio_diagnostico_estrategico.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/01_relatorio_diagnostico_estrategico.md) |
-| **Business Case & Modelagem Financeira** | Markdown (.md) | [`02_business_case_modelagem_financeira.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/02_business_case_modelagem_financeira.md) |
-| **Dossiê de Auditoria & Memória de Cálculo** | Markdown (.md) | [`03_auditoria_dados_memoria_calculo.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/03_auditoria_dados_memoria_calculo.md) |
-| **Arquitetura de IA, Segurança e Governança** | Markdown (.md) | [`04_arquitetura_ia_governanca.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/04_arquitetura_ia_governanca.md) |
+| Apresentação executiva final | PDF / Slides | [`docs/slides/Vértice (1).pdf`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/slides/Vértice%20(1).pdf) |
+| Painel de gestão e demo de IA | Aplicação web | URL pública / `http://localhost:8501` |
+| Relatório executivo | Markdown (.md) | [`01_relatorio_diagnostico_estrategico.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/01_relatorio_diagnostico_estrategico.md) |
+| Business case e modelagem financeira | Markdown (.md) | [`02_business_case_modelagem_financeira.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/02_business_case_modelagem_financeira.md) |
+| Dossiê de auditoria e memória de cálculo | Markdown (.md) | [`03_auditoria_dados_memoria_calculo.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/03_auditoria_dados_memoria_calculo.md) |
+| Arquitetura de IA e governança | Markdown (.md) | [`04_arquitetura_ia_governanca.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/04_arquitetura_ia_governanca.md) |
 
 ---
 
-## 2. Acesso à Aplicação Web (Dashboard & Copiloto)
+## 2. Acesso à aplicação web
 
-A aplicação unifica o frontend React (TypeScript) e o backend FastAPI (DuckDB + LangGraph) em um único servidor otimizado.
+A aplicação integra o frontend React (TypeScript) e o backend FastAPI (DuckDB e LangGraph) em um único serviço.
 
-### Link de Produção (Acesso Online)
-- **URL da Aplicação Web:** `https://vertice-analytics.onrender.com` *(ou via Cloudflare Tunnel ativo)*
-- **Documentação Interativa da API (Swagger):** `/docs`
-- **Healthcheck:** `/api/health`
+### Link em produção
+- URL da aplicação: `https://vertice-analytics.onrender.com` *(ou túnel ativo)*
+- Documentação da API (Swagger): `/docs`
+- Healthcheck: `/api/health`
 
-### Como Rodar Localmente em 1 Passo (Via Docker)
-Caso deseje reproduzir a execução no seu próprio ambiente local:
+### Execução local via Docker
 
 ```bash
-# 1. Clonar e subir o container Docker unificado
+# 1. Subir o container Docker unificado
 docker compose up -d --build app
 
 # 2. Abrir no navegador:
 http://localhost:8501
 ```
 
-*(Para execução nativa sem Docker via Python e Vite, consulte as instruções em [`README.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/README.md)).*
+Instruções para execução sem Docker constam no [`README.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/README.md).
 
 ---
 
-## 3. Roteiro de Navegação para Avaliação da Banca
+## 3. Roteiro de navegação para a banca
 
-Ao acessar a aplicação, a banca pode testar diretamente as seguintes visões no menu lateral:
+Ao abrir a aplicação, os módulos estão disponíveis no menu lateral:
 
-1. **Visão Executiva (`/`):** KPIs macro de receita líquida (R$ 16,67M), margem de contribuição (54,34%), impacto de devoluções (R$ 2,5M estornados) e visão mensal.
-2. **Estoque & Ruptura (`/inventory`):** Mapa dos R$ 14,77M em descontinuados e lista dos 701 SKUs com estoque abaixo do ponto de pedido (96 SKUs zerados em Beleza).
-3. **Auditoria Relacional (`/audit`):** Matriz que expõe os 7 defeitos estruturais do data room (inconsistência entre marketing, CRM e vendas).
-4. **Plano 30/60/90 Dias (`/roadmap`):** Matriz interativa de priorização com cálculo dinâmico do impacto financeiro do estoque.
+1. **Visão executiva (`/`):** receita líquida de R$ 16,67M, margem de contribuição de 54,34%, impacto de devoluções (R$ 2,5M estornados) e evolução mensal.
+2. **Estoque e ruptura (`/inventory`):** R$ 14,77M em itens descontinuados e 701 SKUs abaixo do ponto de pedido (com 96 SKUs zerados em Beleza).
+3. **Auditoria relacional (`/audit`):** matriz com as 7 inconsistências estruturais entre marketing, CRM e vendas.
+4. **Plano 30-60-90 dias (`/roadmap`):** matriz de priorização com simulação de impacto financeiro em estoque.
 5. **Copiloto de IA (`/copilot`):**
-   - **Chat Interativo:** Converse com o *Predictive Stock Advisor* perguntando *"Quais SKUs descontinuados possuem maior capital imobilizado?"* ou *"Qual a recomendação de reposição para Beleza?"*.
-   - **Auditoria Autônoma com 1 Clique:** Clique em *"Executar Auditoria de Estoque"* para gerar o parecer técnico factual e disparar o relatório formatado por e-mail com salvaguardas determinísticas contra alucinações.
+   - Chat analítico: consultas sobre estoque e descontinuados (como *"Quais SKUs descontinuados possuem maior capital imobilizado?"* ou *"Qual a recomendação de reposição para Beleza?"*).
+   - Auditoria com um clique: botão *"Executar Auditoria de Estoque"* para gerar o parecer com base nos cálculos em DuckDB e despachar o relatório por e-mail.
