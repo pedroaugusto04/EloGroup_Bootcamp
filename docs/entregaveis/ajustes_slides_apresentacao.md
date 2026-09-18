@@ -1,6 +1,6 @@
 # Guia de ajuste dos slides da apresentação executiva
-**Deck base:** [`docs/slides/Vértice (1).pdf`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/slides/Vértice%20(1).pdf)  
-**Grupo 3:** Pedro Augusto e Pedro Lobo
+**Deck base:** [`docs/slides/Vértice-Slides.pdf`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/slides/Vértice-Slides.pdf)  
+**Grupo 14:** Pedro Augusto e Pedro Lobo
 
 Este guia contém os conteúdos e layouts para preencher os dois pontos de melhoria nos slides (no Canva, PowerPoint ou Figma).
 

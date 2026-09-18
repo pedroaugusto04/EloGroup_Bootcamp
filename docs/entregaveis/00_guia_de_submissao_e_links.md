@@ -1,5 +1,5 @@
 # Hub central de submissão e guia de acesso: Vértice Analytics
-**Bootcamp EloGroup 2026 · AI Consulting Lab · Grupo 3**  
+**Bootcamp EloGroup 2026 · AI Consulting Lab · Grupo 14**  
 **Autores:** Pedro Augusto e Pedro Lobo  
 **Cliente:** Vértice Retail (Diretoria Executiva: CEO, CFO, CMO e COO)
 
@@ -7,16 +7,19 @@
 
 ## 1. Visão geral da entrega
 
-A entrega reúne análise estratégica de negócio, auditoria relacional das bases e uma aplicação web com painel executivo e copiloto de IA.
+A entrega reúne análise estratégica de negócio, auditoria relacional das bases, artefatos rastreáveis de dados e uma aplicação web com painel executivo e copiloto de IA.
 
 | Entregável | Formato | Onde encontrar |
 | :--- | :---: | :--- |
-| Apresentação executiva final | PDF / Slides | [`docs/slides/Vértice (1).pdf`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/slides/Vértice%20(1).pdf) |
+| Apresentação executiva final (Deck principal) | PDF | [`docs/slides/Vértice-Slides.pdf`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/slides/Vértice-Slides.pdf) |
+| Slides auxiliares (Contrato de dados e anexos) | PDF / PPTX | [`docs/slides/Vértice-Slides-Auxiliares.pdf`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/slides/Vértice-Slides-Auxiliares.pdf) |
 | Painel de gestão e demo de IA | Aplicação web | URL pública / `http://localhost:8501` |
-| Relatório executivo | Markdown (.md) | [`01_relatorio_diagnostico_estrategico.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/01_relatorio_diagnostico_estrategico.md) |
+| Relatório executivo e diagnóstico | Markdown (.md) | [`01_relatorio_diagnostico_estrategico.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/01_relatorio_diagnostico_estrategico.md) |
 | Business case e modelagem financeira | Markdown (.md) | [`02_business_case_modelagem_financeira.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/02_business_case_modelagem_financeira.md) |
 | Dossiê de auditoria e memória de cálculo | Markdown (.md) | [`03_auditoria_dados_memoria_calculo.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/03_auditoria_dados_memoria_calculo.md) |
 | Arquitetura de IA e governança | Markdown (.md) | [`04_arquitetura_ia_governanca.md`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/entregaveis/04_arquitetura_ia_governanca.md) |
+| Relatórios de profiling das bases | HTML | [`docs/profiling/`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/docs/profiling/) (vendas, estoque, marketing, clientes, atendimento) |
+| Repositório de queries parametrizadas | SQL | [`src/queries/`](file:///home/pedroduarte/Documents/GitHub/EloGroup_Bootcamp/src/queries/) |
 
 ---
 

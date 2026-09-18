@@ -6,7 +6,14 @@
 
 ## Sumário executivo
 
-A Vértice Retail faturou R$ 16,67 milhões líquidos no período analisado e manteve margem de contribuição entre 54,2% e 54,9%. As oportunidades priorizadas no plano de ação são estoque, descontos, rastreio e atendimento N1.
+A diretoria da Vértice Retail apontou percepção de queda na rentabilidade durante a expansão em e-commerce e marketplaces. A análise dos dados transacionais mostra que a margem de contribuição média se manteve estável entre 54,2% e 54,9%, totalizando R$ 16,67 milhões líquidos em 391 dias analisados.
+
+A perda de eficiência observada decorre de três pontos específicos:
+1. Capital de giro imobilizado em 207 SKUs descontinuados (R$ 4,14M em receita recuperável pós-devoluções no cenário central), enquanto 701 SKUs ativos operam abaixo do ponto de pedido.
+2. Concessão de descontos acima de 20% sem ganho proporcional de volume (o teste within-SKU indica estabilidade na quantidade vendida, com variação de −0,026 unidade).
+3. Sobrecarga do canal de suporte com demandas operacionais evitáveis: rastreamento de pedidos e dúvidas técnicas concentram 44,9% dos chamados (R$ 238,5 mil de custo no período).
+
+As oportunidades priorizadas tratam esses gargalos imediatos. As frentes de otimização de canais de marketing e segmentação de CRM foram postergadas para etapas futuras em função de limitações de rastreabilidade cadastral.
 
 ## Árvore de hipóteses
 
@@ -53,11 +60,11 @@ A Vértice Retail faturou R$ 16,67 milhões líquidos no período analisado e ma
 
 ## Plano 30-60-90 dias
 
-| Prazo | Entrega | Critério de acompanhamento |
-| --- | --- | --- |
-| 30 dias | Operação assistida do Predictive Stock Advisor; preparação da integração de descontos e da base de Atendimento N1. | Recomendações válidas, sell-through e receita realizada. |
-| 60 dias | Calibração do Predictive Stock Advisor; ativação do Margin Recovery Advisor e das notificações de rastreio. | Margem cedida, volume diário e tickets de rastreio. |
-| 90 dias | Manutenção do Margin Recovery Advisor; ativação do Atendimento N1 e calibração do rastreio. | Resolução sem recontato em 7 dias e CSAT. |
+| Prazo | Entrega | Responsável | Dependências | Critério de acompanhamento |
+| --- | --- | --- | --- | --- |
+| 30 dias | Operação assistida do Predictive Stock Advisor; preparação da integração de descontos e da base de Atendimento N1. | Squad de Dados e Operações | Conexão DuckDB e conciliação de saldos | Recomendações válidas, sell-through e receita realizada. |
+| 60 dias | Calibração do Predictive Stock Advisor; ativação do Margin Recovery Advisor e das notificações de rastreio. | Squad de Produto e Comercial | Parametrização de tetos por SKU e mensageria | Margem cedida, volume diário e tickets de rastreio. |
+| 90 dias | Manutenção do Margin Recovery Advisor; ativação do Atendimento N1 e calibração do rastreio. | Squad de CX e Engenharia | Base de dúvidas técnicas validada com supervisão | Resolução sem recontato em 7 dias e CSAT. |
 
 ## Riscos, mitigantes e gatilhos
 
