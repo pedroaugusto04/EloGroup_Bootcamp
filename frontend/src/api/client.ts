@@ -12,6 +12,7 @@ import {
   FilterOptions,
   ChatThread,
   RoadmapInitiative,
+  RoadmapData,
   PeriodKey,
   PeriodMeta,
 } from '../types/analytics';
@@ -86,7 +87,7 @@ export const api = {
   },
 
   // Roadmap
-  getRoadmap: () => fetchJson<{ initiatives: RoadmapInitiative[]; summary: any }>(`${BASE_URL}/roadmap/initiatives`),
+  getRoadmap: () => fetchJson<RoadmapData>(`${BASE_URL}/roadmap/initiatives`),
 
   // Copilot Threads
   listThreads: () => fetchJson<{ threads: ChatThread[] }>(`${BASE_URL}/copilot/threads`),

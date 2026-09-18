@@ -95,7 +95,7 @@ const navSections: NavSection[] = [
       },
       {
         id: 'roadmap',
-        label: 'Plano Estratégico 30/60/90',
+        label: 'Plano Estratégico',
         tag: '08',
         icon: Target,
         description: '',

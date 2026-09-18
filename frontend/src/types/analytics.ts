@@ -366,3 +366,82 @@ export interface RoadmapInitiative {
   description: string;
   metrics_to_watch: string[];
 }
+
+export interface RoadmapDeliverable {
+  agent: string;
+  scope: string;
+  badge: string;
+}
+
+export interface RoadmapTimelinePhase {
+  phase: string;
+  title: string;
+  focus: string;
+  squad: string;
+  dependencies: string;
+  tracking_criteria: string;
+  deliverables: RoadmapDeliverable[];
+}
+
+export interface RoadmapRiskItem {
+  front: string;
+  kpi_target: string;
+  mitigation_action: string;
+}
+
+export interface RoadmapSequencingRationale {
+  title: string;
+  subtitle: string;
+  marketing: {
+    title: string;
+    highlight_number: string;
+    highlight_label: string;
+    divergence: string;
+    next_step: string;
+  };
+  crm: {
+    title: string;
+    highlight_number: string;
+    highlight_label: string;
+    divergence: string;
+    next_step: string;
+  };
+  c_level_takeaway: string;
+}
+
+export interface RoadmapBusinessCase {
+  investimento_total_ano_1: number;
+  investimento_total_label: string;
+  payback_meses: number;
+  roi_liquido_ano_1: number;
+  beneficio_anual_recorrente: number;
+  beneficio_anual_recorrente_label: string;
+  resultado_economico_liquido_ano_1: number;
+  resultado_economico_liquido_ano_1_label: string;
+  receita_liquidacao_central: number;
+  receita_liquidacao_central_label: string;
+  margem_recuperada_descontos: number;
+  margem_recuperada_descontos_label: string;
+  economia_operacional_cx: number;
+  economia_operacional_cx_label: string;
+  breakdown_investimento: Array<{
+    item: string;
+    valor: number;
+    percentual: number;
+  }>;
+}
+
+export interface RoadmapData {
+  initiatives: RoadmapInitiative[];
+  timeline: RoadmapTimelinePhase[];
+  business_case: RoadmapBusinessCase;
+  risk_matrix: RoadmapRiskItem[];
+  sequencing_rationale: RoadmapSequencingRationale;
+  summary: {
+    total_initiatives: number;
+    quick_wins_count: number;
+    total_potential_value: number;
+    inventory_scenario_value: number;
+  };
+}
+

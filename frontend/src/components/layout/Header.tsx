@@ -41,8 +41,8 @@ const titles: Record<ViewTab, { title: string; subtitle: string }> = {
     subtitle: 'Análise estatística de anomalias, limites de quartis e desvios nas 5 tabelas.',
   },
   roadmap: {
-    title: 'Plano de Ação Estratégico (30/60/90 Dias)',
-    subtitle: 'Síntese executiva transversal, matriz de esforço x impacto e cronograma de quick wins.',
+    title: 'Plano Estratégico',
+    subtitle: 'Business case consolidado, matriz de execução 30/60/90 dias, governança e sequenciamento.',
   },
   copilot: {
     title: 'Predictive Inventory Advisor',
