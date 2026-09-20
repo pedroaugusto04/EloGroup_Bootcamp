@@ -4,9 +4,9 @@
 
 Plataforma de inteligência analítica, auditoria de dados e copiloto de decisão executiva desenvolvida para o case **Vértice Retail (Bootcamp EloGroup 2026)**.
 
-- **Aplicação Web em Produção:** [https://pedro-duarte.ddns.net/vertice/](https://pedro-duarte.ddns.net/vertice/)
+- **Aplicação Web (Dashboard + Documentos + Agente):** [https://pedro-duarte.ddns.net/vertice/](https://pedro-duarte.ddns.net/vertice/)
 - **Repositório GitHub:** [https://github.com/pedroaugusto04/EloGroup_Bootcamp](https://github.com/pedroaugusto04/EloGroup_Bootcamp)
-- **Guia Detalhado de Entregáveis:** Consulte [`ENTREGAVEIS.md`](ENTREGAVEIS.md) para a matriz completa de correspondência com o edital do case, instruções de teste do Copiloto de IA e auditoria de consistência.
+- **Guia Detalhado de Entregáveis:** Consulte [`ENTREGAVEIS.md`](ENTREGAVEIS.md) para a matriz completa de correspondência com o edital do case e o guia de navegação na plataforma.
 
 ---
 
