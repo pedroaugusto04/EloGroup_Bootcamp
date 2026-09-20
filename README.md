@@ -26,9 +26,9 @@ Plataforma de inteligência analítica, auditoria de dados e copiloto de decisã
 
 ## 1. Arquitetura
 
-- **Frontend Moderno (TypeScript)**: Interface web minimalista em React + Vite + Tailwind CSS + Recharts (`frontend/`), desenhada na identidade visual da EloGroup (`#09090b`, `#121215`, `#38bdf8`) e sem emojis.
+- **Frontend Moderno (TypeScript)**: Interface web minimalista em React + Vite + Tailwind CSS + Recharts (`frontend/`).
 - **Backend API (FastAPI)**: Servidor assíncrono em Python 3.12 (`src/api/main.py`) expondo os dados analíticos e o Copiloto de IA.
-- **Motor de Dados (DuckDB)**: Banco colunar vetorial in-memory que consome diretamente os arquivos `data/processed/*.parquet` e executa consultas SQL em `< 5ms`.
+- **Motor de Dados (DuckDB)**: Banco colunar vetorial in-memory que consome diretamente os arquivos `data/processed/*.parquet`.
 - **Copiloto ReAct (LangGraph)**: Agente inteligente com memória persistente para diagnósticos e simulações de estoque.
 
 ### Contrato do Copiloto de estoque
