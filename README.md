@@ -1,6 +1,10 @@
-# Vértice Analytics (EloGroup Suite)
+# Vértice Analytics (EloGroup Bootcamp)
 
 Plataforma de inteligência analítica, auditoria de dados e copiloto de decisão executiva desenvolvida para o case **Vértice Retail (Bootcamp EloGroup 2026)**.
+
+- **Aplicação Web em Produção:** [https://pedro-duarte.ddns.net/vertice/](https://pedro-duarte.ddns.net/vertice/)
+- **Repositório GitHub:** [https://github.com/pedroaugusto04/EloGroup_Bootcamp](https://github.com/pedroaugusto04/EloGroup_Bootcamp)
+- **Guia Detalhado de Entregáveis:** Consulte [`ENTREGAVEIS.md`](ENTREGAVEIS.md) para a matriz completa de correspondência com o edital do case, instruções de teste do Copiloto de IA e auditoria de consistência.
 
 ---
 
@@ -8,13 +12,13 @@ Plataforma de inteligência analítica, auditoria de dados e copiloto de decisã
 
 | Entregável Oficial | Formato | Onde Encontrar |
 | :--- | :---: | :--- |
-| **Apresentação Final (Slide Deck)** | PDF | [`docs/slides/Vértice-Slides.pdf`](docs/slides/Vértice-Slides.pdf) |
 | **1. Diagnóstico Executivo & Hipóteses** | Markdown | [`docs/entregaveis/01_relatorio_diagnostico_estrategico.md`](docs/entregaveis/01_relatorio_diagnostico_estrategico.md) |
 | **2. Business Case & Modelagem Financeira** | Markdown | [`docs/entregaveis/02_business_case_modelagem_financeira.md`](docs/entregaveis/02_business_case_modelagem_financeira.md) |
 | **3. Auditoria de Dados & Memória de Cálculo** | Markdown | [`docs/entregaveis/03_auditoria_dados_memoria_calculo.md`](docs/entregaveis/03_auditoria_dados_memoria_calculo.md) |
 | **4. Arquitetura de IA & Governança** | Markdown | [`docs/entregaveis/04_arquitetura_ia_governanca.md`](docs/entregaveis/04_arquitetura_ia_governanca.md) |
 | **5. Racional Metodológico de Desenvolvimento** | Markdown | [`docs/entregaveis/DEVELOPMENT.md`](docs/entregaveis/DEVELOPMENT.md) |
-| **Dashboard de Gestão & Copiloto ReAct** | Web App | `http://localhost:8501` ou deploy Render |
+| **Roadmap de Implementação (30-60-90 dias)** | Imagem / Interativo | [`docs/assets/RoadMap.png`](docs/assets/RoadMap.png) ou na Web App (`/?view=roadmap`) |
+| **Dashboard de Gestão & Copiloto ReAct** | Web App em Produção | [https://pedro-duarte.ddns.net/vertice/](https://pedro-duarte.ddns.net/vertice/) |
 | **Relatórios de Profiling das 5 Bases** | HTML | [`docs/profiling/`](docs/profiling/) |
 | **Exportação Unificada de Artefatos** | ZIP | Aba *Entregáveis* na Web App ou `GET /api/deliverables/export/zip` |
 
