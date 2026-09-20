@@ -17,7 +17,7 @@ As oportunidades priorizadas tratam esses gargalos imediatos. As frentes de otim
 
 ## Árvore de hipóteses
 
-![Árvore de hipóteses da Vértice Retail](/assets/arvore_hipoteses.svg)
+![Árvore de hipóteses da Vértice Retail](../assets/arvore_hipoteses.svg)
 
 ## Diagnóstico das hipóteses
 

@@ -1,5 +1,7 @@
 # Vértice Analytics (EloGroup Bootcamp)
 
+# Grupo 14 - Pedro Augusto & Pedro Lobo
+
 Plataforma de inteligência analítica, auditoria de dados e copiloto de decisão executiva desenvolvida para o case **Vértice Retail (Bootcamp EloGroup 2026)**.
 
 - **Aplicação Web em Produção:** [https://pedro-duarte.ddns.net/vertice/](https://pedro-duarte.ddns.net/vertice/)
@@ -12,7 +14,8 @@ Plataforma de inteligência analítica, auditoria de dados e copiloto de decisã
 
 | Entregável Oficial | Formato | Onde Encontrar |
 | :--- | :---: | :--- |
-| **1. Diagnóstico Executivo & Hipóteses** | Markdown | [`docs/entregaveis/01_relatorio_diagnostico_estrategico.md`](docs/entregaveis/01_relatorio_diagnostico_estrategico.md) |
+| **1. Diagnóstico Executivo & Árvore de Hipóteses** | Markdown / SVG | [`docs/entregaveis/01_relatorio_diagnostico_estrategico.md`](docs/entregaveis/01_relatorio_diagnostico_estrategico.md)<br>[`docs/assets/arvore_hipoteses.svg`](docs/assets/arvore_hipoteses.svg) |
+| **Árvore de Hipóteses MECE** | Vetorial (SVG) / Interativo | [`docs/assets/arvore_hipoteses.svg`](docs/assets/arvore_hipoteses.svg) ou na Web App (`/?view=deliverables`) |
 | **2. Business Case & Modelagem Financeira** | Markdown | [`docs/entregaveis/02_business_case_modelagem_financeira.md`](docs/entregaveis/02_business_case_modelagem_financeira.md) |
 | **3. Auditoria de Dados & Memória de Cálculo** | Markdown | [`docs/entregaveis/03_auditoria_dados_memoria_calculo.md`](docs/entregaveis/03_auditoria_dados_memoria_calculo.md) |
 | **4. Arquitetura de IA & Governança** | Markdown | [`docs/entregaveis/04_arquitetura_ia_governanca.md`](docs/entregaveis/04_arquitetura_ia_governanca.md) |
