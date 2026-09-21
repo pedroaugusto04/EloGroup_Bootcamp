@@ -88,30 +88,30 @@ graph TD
 
 ```mermaid
 flowchart LR
-    subgraph D30["Dia 30: Quick Wins e Preparação"]
+    subgraph D30["DIA 30<br/>Dados + Supply"]
         direction TB
-        E1["<b>Estoque:</b> Piloto operacional de liquidação (206 SKUs descontinuados) e trava no ERP<br/><i>Squad de Dados e Operações</i>"]
-        D1["<b>Descontos:</b> Parametrização dos tetos dinâmicos de desconto por SKU<br/><i>Squad Comercial e Dados</i>"]
-        C1["<b>CX e Suporte:</b> Catalogação de dúvidas técnicas N1 e webhooks de rastreio<br/><i>Squad de CX e Logística</i>"]
+        A1_30["<b>Agente 1 • Estoque:</b><br/>Piloto operacional"]
+        A2_30["<b>Agente 2 • Desconto:</b><br/>Preparar integração"]
+        A3_30["<b>Rastreio + Agente 3 • N1:</b><br/>Preparar base N1"]
     end
 
-    subgraph D60["Dia 60: Pilotos Operacionais"]
+    subgraph D60["DIA 60<br/>Logística + CX"]
         direction TB
-        E2["<b>Estoque:</b> Calibração de ponto de pedido e lead time para 701 SKUs ativos<br/><i>Squad de Estoque e Compras</i>"]
-        D2["<b>Descontos:</b> Piloto operacional do Margin Recovery Advisor (corte de descontos >20%)<br/><i>Squad Comercial e Growth</i>"]
-        C2["<b>CX e Suporte:</b> Disparo proativo de notificações de rastreio (WhatsApp/e-mail)<br/><i>Squad de CX</i>"]
+        A1_60["<b>Agente 1 • Estoque:</b><br/>Manutenção + calibração"]
+        A2_60["<b>Agente 2 • Desconto:</b><br/>Piloto operacional"]
+        A3_60["<b>Rastreio + Agente 3 • N1:</b><br/>Piloto operacional"]
     end
 
-    subgraph D90["Dia 90: Escala e Manutenção"]
+    subgraph D90["DIA 90<br/>IA + Atendimento"]
         direction TB
-        E3["<b>Estoque:</b> Rotina automatizada e contínua de auditoria de compras em produção<br/><i>Squad de Estoque e Compras</i>"]
-        D3["<b>Descontos:</b> Expansão do teto dinâmico de margem para 100% do catálogo<br/><i>Squad Comercial</i>"]
-        C3["<b>CX e Suporte:</b> Autoatendimento IA para dúvidas técnicas e transbordo qualificado<br/><i>Squad de CX e IA</i>"]
+        A1_90["<b>Agente 1 • Estoque:</b><br/>Manutenção + calibração"]
+        A2_90["<b>Agente 2 • Desconto:</b><br/>Manutenção"]
+        A3_90["<b>Rastreio + Agente 3 • N1:</b><br/>Manutenção + calibração"]
     end
 
-    E1 --> E2 --> E3
-    D1 --> D2 --> D3
-    C1 --> C2 --> C3
+    A1_30 --> A1_60 --> A1_90
+    A2_30 --> A2_60 --> A2_90
+    A3_30 --> A3_60 --> A3_90
 ```
 
 | Prazo | Entrega | Responsável | Dependências | Critério de acompanhamento |
