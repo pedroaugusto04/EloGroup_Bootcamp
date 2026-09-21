@@ -19,6 +19,30 @@ As oportunidades priorizadas tratam esses gargalos imediatos. As frentes de otim
 
 ![Árvore de hipóteses da Vértice Retail](../assets/arvore_hipoteses.svg)
 
+```mermaid
+graph TD
+    Root["<b>Onde estão as oportunidades de margem e produtividade?</b>"]
+
+    Root --> B1["<b>COMERCIAL E OPERAÇÃO</b>"]
+    Root --> B2["<b>ATENDIMENTO</b>"]
+    Root --> B3["<b>CRESCIMENTO E DADOS</b>"]
+
+    %% Ramo 1: Comercial e Operação
+    B1 --> H1["Estoque descontinuado e ruptura exigem ação?<br/><b>SUSTENTADA · SELECIONADA 1</b>"]
+    B1 --> H2["Descontos elevados aumentam o volume?<br/><b>NÃO SUSTENTADA · SELECIONADA 2</b>"]
+    B1 --> H3["Atraso de entrega explica as devoluções?<br/><i>NÃO SUSTENTADA · FORA DO CICLO</i>"]
+    B1 --> H4["Defeito e tamanho explicam devoluções?<br/><i>SUSTENTADA · FORA DO CICLO</i>"]
+
+    %% Ramo 2: Atendimento
+    B2 --> H5["Rastreio gera contatos evitáveis?<br/><b>SUSTENTADA · SELECIONADA 3</b>"]
+    B2 --> H6["Dúvidas técnicas podem ser atendidas no N1?<br/><b>SUSTENTADA · SELECIONADA 4</b>"]
+
+    %% Ramo 3: Crescimento e Dados
+    B3 --> H7["O mix de canais está eficiente?<br/><i>INCONCLUSIVA · FORA DO CICLO</i>"]
+    B3 --> H8["A base de Clientes reflete as Vendas?<br/><i>NÃO SUSTENTADA · FORA DO CICLO</i>"]
+    B3 --> H9["A principal limitação é a falta de dados?<br/><i>NÃO SUSTENTADA · TRATAR NA GOVERNANÇA</i>"]
+```
+
 ## Diagnóstico das hipóteses
 
 | Hipótese | Conclusão | Evidência | Decisão |
@@ -59,6 +83,36 @@ As oportunidades priorizadas tratam esses gargalos imediatos. As frentes de otim
 - **ROI:** considera margem recuperada em descontos e economia em CX; a receita da liquidação é apresentada separadamente.
 
 ## Plano 30-60-90 dias
+
+![Cronograma e Roadmap 30-60-90 Dias](/assets/RoadMap.png)
+
+```mermaid
+flowchart LR
+    subgraph D30["Dia 30: Quick Wins e Preparação"]
+        direction TB
+        E1["<b>Estoque:</b> Piloto operacional de liquidação (206 SKUs descontinuados) e trava no ERP<br/><i>Squad de Dados e Operações</i>"]
+        D1["<b>Descontos:</b> Parametrização dos tetos dinâmicos de desconto por SKU<br/><i>Squad Comercial e Dados</i>"]
+        C1["<b>CX e Suporte:</b> Catalogação de dúvidas técnicas N1 e webhooks de rastreio<br/><i>Squad de CX e Logística</i>"]
+    end
+
+    subgraph D60["Dia 60: Pilotos Operacionais"]
+        direction TB
+        E2["<b>Estoque:</b> Calibração de ponto de pedido e lead time para 701 SKUs ativos<br/><i>Squad de Estoque e Compras</i>"]
+        D2["<b>Descontos:</b> Piloto operacional do Margin Recovery Advisor (corte de descontos >20%)<br/><i>Squad Comercial e Growth</i>"]
+        C2["<b>CX e Suporte:</b> Disparo proativo de notificações de rastreio (WhatsApp/e-mail)<br/><i>Squad de CX</i>"]
+    end
+
+    subgraph D90["Dia 90: Escala e Manutenção"]
+        direction TB
+        E3["<b>Estoque:</b> Rotina automatizada e contínua de auditoria de compras em produção<br/><i>Squad de Estoque e Compras</i>"]
+        D3["<b>Descontos:</b> Expansão do teto dinâmico de margem para 100% do catálogo<br/><i>Squad Comercial</i>"]
+        C3["<b>CX e Suporte:</b> Autoatendimento IA para dúvidas técnicas e transbordo qualificado<br/><i>Squad de CX e IA</i>"]
+    end
+
+    E1 --> E2 --> E3
+    D1 --> D2 --> D3
+    C1 --> C2 --> C3
+```
 
 | Prazo | Entrega | Responsável | Dependências | Critério de acompanhamento |
 | --- | --- | --- | --- | --- |
